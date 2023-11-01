@@ -17,82 +17,75 @@ __meta__ = {
 "_edit_use_anchors_": true
 }
 
-[node name="Parent_Margin" type="MarginContainer" parent="."]
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchor_right = 0.321
+anchor_bottom = 0.734
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="TextEdit" type="TextEdit" parent="MarginContainer"]
+margin_right = 328.0
+margin_bottom = 440.0
+text = "// Code"
+
+[node name="MarginContainer3" type="MarginContainer" parent="."]
+anchor_top = 0.794
+anchor_right = 0.324
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="RichTextLabel" type="RichTextLabel" parent="MarginContainer3"]
+visible = false
+margin_right = 331.0
+margin_bottom = 123.0
+theme = SubResource( 1 )
+
+[node name="MarginContainer4" type="MarginContainer" parent="."]
+material = SubResource( 2 )
+anchor_left = 0.33
 anchor_right = 1.0
 anchor_bottom = 1.0
 __meta__ = {
 "_edit_use_anchors_": true
 }
 
-[node name="MarginContainer" type="MarginContainer" parent="Parent_Margin"]
-anchor_right = 0.341
-anchor_bottom = 0.706
-__meta__ = {
-"_edit_use_anchors_": true
-}
+[node name="ViewportContainer" type="ViewportContainer" parent="MarginContainer4"]
+margin_right = 686.0
+margin_bottom = 600.0
+stretch = true
 
-[node name="TextEdit" type="TextEdit" parent="Parent_Margin/MarginContainer"]
-margin_right = 349.0
-margin_bottom = 423.0
-text = "// Code"
+[node name="Viewport" type="Viewport" parent="MarginContainer4/ViewportContainer"]
+size = Vector2( 686, 600 )
+size_override_stretch = true
+handle_input_locally = false
+render_target_update_mode = 3
+script = ExtResource( 4 )
 
-[node name="MarginContainer3" type="MarginContainer" parent="Parent_Margin"]
-anchor_top = 0.771
-anchor_right = 0.339
+[node name="Node2D" type="Node2D" parent="MarginContainer4/ViewportContainer/Viewport"]
+position = Vector2( 417, 0 )
+script = ExtResource( 3 )
+
+[node name="ColorRect" type="ColorRect" parent="MarginContainer4/ViewportContainer/Viewport"]
+show_behind_parent = true
+anchor_right = 1.0
 anchor_bottom = 1.0
+
+[node name="MarginContainer2" type="MarginContainer" parent="."]
+anchor_left = 0.238
+anchor_top = 0.743
+anchor_right = 0.321
+anchor_bottom = 0.788
 __meta__ = {
 "_edit_use_anchors_": true
 }
 
-[node name="RichTextLabel" type="RichTextLabel" parent="Parent_Margin/MarginContainer3"]
-visible = false
-margin_right = 347.0
-margin_bottom = 137.0
-theme = SubResource( 1 )
-
-[node name="MarginContainer2" type="MarginContainer" parent="Parent_Margin"]
-anchor_left = 0.266
-anchor_top = 0.712
-anchor_right = 0.339
-anchor_bottom = 0.758
-__meta__ = {
-"_edit_use_anchors_": true
-}
-
-[node name="Button" type="Button" parent="Parent_Margin/MarginContainer2"]
-margin_right = 74.0
+[node name="Button" type="Button" parent="MarginContainer2"]
+margin_right = 84.0
 margin_bottom = 27.0
 text = "Draw"
 script = ExtResource( 2 )
 
-[node name="MarginContainer4" type="MarginContainer" parent="Parent_Margin"]
-material = SubResource( 2 )
-anchor_left = 0.35
-anchor_right = 1.0
-anchor_bottom = 1.0
-__meta__ = {
-"_edit_use_anchors_": true
-}
-
-[node name="ViewportContainer" type="ViewportContainer" parent="Parent_Margin/MarginContainer4"]
-margin_right = 665.0
-margin_bottom = 600.0
-stretch = true
-
-[node name="Viewport" type="Viewport" parent="Parent_Margin/MarginContainer4/ViewportContainer"]
-size = Vector2( 665, 600 )
-size_override_stretch = true
-handle_input_locally = false
-render_target_v_flip = true
-render_target_update_mode = 3
-script = ExtResource( 4 )
-
-[node name="Node2D" type="Node2D" parent="Parent_Margin/MarginContainer4/ViewportContainer/Viewport"]
-position = Vector2( 417, 0 )
-script = ExtResource( 3 )
-
-[node name="ColorRect" type="ColorRect" parent="Parent_Margin/MarginContainer4/ViewportContainer"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-
-[connection signal="pressed" from="Parent_Margin/MarginContainer2/Button" to="." method="_on_Button_pressed"]
+[connection signal="pressed" from="MarginContainer2/Button" to="." method="_on_Button_pressed"]

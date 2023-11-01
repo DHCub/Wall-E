@@ -17,7 +17,7 @@ public class Control : Godot.Control
 	public void _on_Button_pressed() 
 	{
 		var code = GetNode<TextEdit>("MarginContainer/TextEdit");
-		var draw_area = GetNode<Node2D>("ViewportContainer/Viewport/Node2D");
+		var draw_area = GetNode<Node2D>("MarginContainer4/ViewportContainer/Viewport/Node2D");
 
 		var txt = code.Text;
 		var data = txt.Split('\n');
