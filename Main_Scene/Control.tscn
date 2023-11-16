@@ -1,9 +1,7 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://Main_Scene/Control.cs" type="Script" id=1]
-[ext_resource path="res://Main_Scene/Button.cs" type="Script" id=2]
 [ext_resource path="res://Main_Scene/Node2D.cs" type="Script" id=3]
-[ext_resource path="res://Main_Scene/Viewport.cs" type="Script" id=4]
 
 [sub_resource type="Theme" id=1]
 
@@ -17,19 +15,21 @@ __meta__ = {
 "_edit_use_anchors_": true
 }
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="Code_Edit_Marg" type="MarginContainer" parent="."]
 anchor_right = 0.321
 anchor_bottom = 0.734
 __meta__ = {
 "_edit_use_anchors_": true
 }
 
-[node name="TextEdit" type="TextEdit" parent="MarginContainer"]
+[node name="Code_Edit" type="TextEdit" parent="Code_Edit_Marg"]
 margin_right = 328.0
 margin_bottom = 440.0
-text = "// Code"
+text = "100
+100
+100"
 
-[node name="MarginContainer3" type="MarginContainer" parent="."]
+[node name="Console_Margin" type="MarginContainer" parent="."]
 anchor_top = 0.794
 anchor_right = 0.324
 anchor_bottom = 1.0
@@ -37,13 +37,12 @@ __meta__ = {
 "_edit_use_anchors_": true
 }
 
-[node name="RichTextLabel" type="RichTextLabel" parent="MarginContainer3"]
-visible = false
+[node name="Console" type="RichTextLabel" parent="Console_Margin"]
 margin_right = 331.0
 margin_bottom = 123.0
 theme = SubResource( 1 )
 
-[node name="MarginContainer4" type="MarginContainer" parent="."]
+[node name="Draw_Area_Marg" type="MarginContainer" parent="."]
 material = SubResource( 2 )
 anchor_left = 0.33
 anchor_right = 1.0
@@ -52,28 +51,27 @@ __meta__ = {
 "_edit_use_anchors_": true
 }
 
-[node name="ViewportContainer" type="ViewportContainer" parent="MarginContainer4"]
+[node name="Viewport_Container" type="ViewportContainer" parent="Draw_Area_Marg"]
 margin_right = 686.0
 margin_bottom = 600.0
 stretch = true
 
-[node name="Viewport" type="Viewport" parent="MarginContainer4/ViewportContainer"]
+[node name="Viewport" type="Viewport" parent="Draw_Area_Marg/Viewport_Container"]
 size = Vector2( 686, 600 )
 size_override_stretch = true
 handle_input_locally = false
 render_target_update_mode = 3
-script = ExtResource( 4 )
 
-[node name="Node2D" type="Node2D" parent="MarginContainer4/ViewportContainer/Viewport"]
-position = Vector2( 417, 0 )
-script = ExtResource( 3 )
-
-[node name="ColorRect" type="ColorRect" parent="MarginContainer4/ViewportContainer/Viewport"]
+[node name="Background" type="ColorRect" parent="Draw_Area_Marg/Viewport_Container/Viewport"]
 show_behind_parent = true
+light_mask = 2
 anchor_right = 1.0
 anchor_bottom = 1.0
 
-[node name="MarginContainer2" type="MarginContainer" parent="."]
+[node name="Node2D" type="Node2D" parent="Draw_Area_Marg/Viewport_Container/Viewport/Background"]
+script = ExtResource( 3 )
+
+[node name="Button_Margin" type="MarginContainer" parent="."]
 anchor_left = 0.238
 anchor_top = 0.743
 anchor_right = 0.321
@@ -82,10 +80,9 @@ __meta__ = {
 "_edit_use_anchors_": true
 }
 
-[node name="Button" type="Button" parent="MarginContainer2"]
-margin_right = 84.0
-margin_bottom = 27.0
+[node name="Draw_Button" type="Button" parent="Button_Margin"]
+anchor_right = 1.0
+anchor_bottom = 1.0
 text = "Draw"
-script = ExtResource( 2 )
 
-[connection signal="pressed" from="MarginContainer2/Button" to="." method="_on_Button_pressed"]
+[connection signal="pressed" from="Button_Margin/Draw_Button" to="." method="_on_Button_pressed"]
