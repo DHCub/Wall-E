@@ -1,10 +1,11 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using Geometry;
 
-public class Node2D : Godot.Node2D
+public partial class Node2D : Godot.Node2D
 {
-    private List<IDrawable> shapes = new List<IDrawable>();
+    private List<(GeoExpr geoExpr, Color color)> shapes = new List<(GeoExpr geoExpr, Color color)>();
     
     public override void _Ready()
     {
@@ -13,36 +14,34 @@ public class Node2D : Godot.Node2D
 
     public override void _Draw()
     {
-        DrawCircle(new Vector2(0, 0), 5, new Color(1000));
 
-        Color c = new Color(100);
         foreach(var shape in shapes)
         {
-            if (shape is Circle)
+            if (shape.geoExpr is Circle)
             {
-                var Circle = (Circle)shape;
+                var Circle = (Circle)shape.geoExpr;
 
                 // DrawCircle(Circle.Center, (float)Circle.Radius, Circle.Color);
-                DrawArc(Circle.Center, (float)Circle.Radius, 0, (float)(2*Math.PI), 10000, c, antialiased:true);
+                DrawArc((Vector2)Circle.Center, (float)Circle.Radius, 0, (float)(2*Math.PI), 10000, shape.color, antialiased:true, width: 2);
             }
         }
 
     }
 
-    public void Draw()
+    public void ReDraw()
     {
-        Update();
+        this.QueueRedraw();
     }
 
-    public void AddDrawable(IDrawable drawable)
+    public void AddDrawable(GeoExpr drawable, Color color)
     {
-        this.shapes.Add(drawable);
+        this.shapes.Add((drawable, new Color(1000)));
     }
 
     public void Clear()
     {
         this.shapes.Clear();
-        Update();
+        QueueRedraw();
     }
 
 
@@ -53,3 +52,4 @@ public class Node2D : Godot.Node2D
 //      
 //  }
 }
+
