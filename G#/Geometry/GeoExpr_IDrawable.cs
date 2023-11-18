@@ -2,14 +2,14 @@ namespace Geometry;
 using System;
 using Godot;
 
-public abstract class GeoExpr
+public abstract class GeoExpr : IDrawable
 {
     public static RandomNumberGenerator rnd = new RandomNumberGenerator();
 
-    protected static float Window_StartX = 0;
-    protected static float Window_EndX = 100;
-    protected static float Window_StartY = 0;
-    protected static float Window_EndY = 100;
+    public static float Window_StartX {get; private set;}
+    public static float Window_EndX {get; private set;}
+    public static float Window_StartY {get; private set;}
+    public static float Window_EndY {get; private set;}
 
     public const float Point_Representation_Radius = 5;
 
@@ -21,4 +21,6 @@ public abstract class GeoExpr
         Window_EndY = endY;
     }
 }
+
+public interface IDrawable{}
 

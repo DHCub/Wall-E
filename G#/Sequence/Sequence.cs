@@ -3,8 +3,9 @@ namespace GSharp;
 using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
+using Geometry;
 
-public abstract class Sequence<T> : IEnumerable<T> where T:class
+public abstract class Sequence<T> : IEnumerable<T> where T:GeoExpr
 {
     IEnumerator<T> IEnumerable<T>.GetEnumerator() => this.items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => this.items.GetEnumerator();

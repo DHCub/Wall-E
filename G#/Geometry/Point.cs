@@ -57,7 +57,7 @@ public partial class Point : GeoExpr
     public double AngleTo(Point other)
     {
         var cos_times_Norm = this.Dot_Product(other);
-        var sin_times_Norm = this.X_Coord*other.Y_Coord - this.Y_Coord - other.X_Coord;
+        var sin_times_Norm = this.X_Coord*other.Y_Coord - this.Y_Coord*other.X_Coord;
 
         var angle = Math.Atan2(sin_times_Norm, cos_times_Norm);
         if (angle < 0) angle = angle + 2*Math.PI;

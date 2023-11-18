@@ -1,8 +1,6 @@
 using Godot;
-using System;
 using Geometry;
 
-//    <TargetFramework>net472</TargetFramework>
 
 
 public partial class Control : Godot.Control
@@ -14,13 +12,13 @@ public partial class Control : Godot.Control
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		
+		Center_Transform();
+		Update_GeoExpr_Window();
 	}
 
 
 	public void _on_Button_pressed() 
 	{
-		Update_GeoExpr_Window(GetNode<MarginContainer>("Draw_Area_Marg"));
 
 		var code = GetNode<TextEdit>("Code_Edit_Marg/Code_Edit");
 		var draw_area = GetNode<Node2D>("Draw_Area_Marg/Viewport_Container/SubViewport/Background/Node2D");
@@ -32,33 +30,85 @@ public partial class Control : Godot.Control
 		// var rad = double.Parse(data[2]);
 
 		// draw_area.Clear();
-		draw_area.AddDrawable(new Circle(), new Color(1000));
-		draw_area.ReDraw();
+		draw_area.AddDrawable(
+			new Arc(
+				new(new(0, 0), new(1, 1)),
+				new(new(0, 0), new(0, 1)),
+				100
+			),
+			new(1000)
+		);
+		draw_area.AddDrawable(
+			new Line(new(0, 0), new(1, 0)),
+			new(1000)
+		);
+		draw_area.AddDrawable(
+			new Ray(
+				new(0, 0),
+				new(1, 1)
+			),
+			new(1000)
+		);
+		draw_area.AddDrawable(
+			new Segment(
+				new(-100, 100),
+				new(-100, -200)
+			),
+			new(1000)
+		);
+		draw_area.AddDrawable(
+			new Point(500, -100),
+			new(1000)
+		);
+		draw_area.AddDrawable(
+			new Circle(
+				new(-100, 100),
+				200
+			),
+			new(1, 0, 0)
+		);
+
+		GD.Print(new Point(1, 0).AngleTo(new Point(1, 0)));
+
+		draw_area.QueueRedraw();
 		// GD.Print(txt);
 	}
 
-//  // Called every frame. 'delta' is the elapsed time since the previous frame.
-	// public override void _Process(float delta)
+ 	// Called every frame. 'delta' is the elapsed time since the previous frame.
+	// public override void _Process(double delta)
 	// {
-	// 	// var draw_area_margin = GetNode<MarginContainer>("Draw_Area_Marg");
-	// 	// // var top_left = draw_area_margin.RectPosition;	
-	// 	// // var top_right = new Vector2(top_left.x + draw_area_margin.RectSize.x, top_left.y);
-	// 	// // var botton_left = new Vector2(top_left.x, top_left.y + draw_area_margin.RectSize.y);
-	// 	// // var botton_right = draw_area_margin.RectSize + top_left;
-	// 	// var x = draw_area_margin.RectSize.x/2;
-	// 	// var y = draw_area_margin.RectSize.y/2;
-
-	// 	// var draw_area = GetNode<Node2D>("Draw_Area_Marg/Viewport_Container/Viewport/Background/Node2D");
-	// 	// draw_area.Transform = new Transform2D(new Vector2(1, 0), new Vector2(0, 1), new Vector2(x, y));
-	// 	// draw_area.Update();
+		
 	// }
 
-	private void Update_GeoExpr_Window(MarginContainer draw_area_container)
+
+
+	private void Update_GeoExpr_Window()
 	{
+		var draw_area_container = GetNode<MarginContainer>("Draw_Area_Marg");		
+
 		GeoExpr.UpdateWindow(
-			0, draw_area_container.Size.X,
-			0, draw_area_container.Size.Y
+			-draw_area_container.Size.X/2, draw_area_container.Size.X/2,
+			-draw_area_container.Size.Y/2, draw_area_container.Size.Y/2
 		);
 	}
+
+	private void Center_Transform()
+	{
+		var draw_area_container = GetNode<MarginContainer>("Draw_Area_Marg");
+		var draw_area = GetNode<Node2D>("Draw_Area_Marg/Viewport_Container/SubViewport/Background/Node2D");
+
+		var x = draw_area_container.Size.X/2;
+		var y = draw_area_container.Size.Y/2;
+
+
+		draw_area.Transform = new Transform2D(new Vector2(1, 0), new Vector2(0, -1), new Vector2(x, y));
+	}
+
+	void _on_draw_area_marg_item_rect_changed()
+	{
+		Center_Transform();
+		Update_GeoExpr_Window();
+	}
+
 }
 
