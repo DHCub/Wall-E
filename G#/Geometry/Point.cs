@@ -21,8 +21,8 @@ public partial class Point : GeoExpr
     }
 
     public Point() : this(
-        GeoExpr.rnd.RandfRange(Window_StartX, Window_EndX), 
-        GeoExpr.rnd.RandfRange(Window_StartY, Window_EndY))
+        GeoExpr.rnd.RandfRange(IDrawable.Window_StartX, IDrawable.Window_EndX), 
+        GeoExpr.rnd.RandfRange(IDrawable.Window_StartY, IDrawable.Window_EndY))
     {}
 
     public Point(double X_Coord, double Y_Coord)
@@ -32,17 +32,17 @@ public partial class Point : GeoExpr
     }
 
     public static Point operator-(Point A, Point B)
-        => new Point(A.X_Coord - B.X_Coord, A.Y_Coord - B.Y_Coord);
+        => new(A.X_Coord - B.X_Coord, A.Y_Coord - B.Y_Coord);
 
     public static Point operator+(Point A, Point B)
-        => new Point(A.X_Coord + B.X_Coord, A.Y_Coord + B.Y_Coord);
+        => new(A.X_Coord + B.X_Coord, A.Y_Coord + B.Y_Coord);
 
     public static Point operator*(double alpha, Point A)
-        => new Point(A.X_Coord*alpha, A.Y_Coord*alpha);
+        => new(A.X_Coord*alpha, A.Y_Coord*alpha);
 
     public double Dot_Product(Point other) => this.X_Coord*other.X_Coord + this.Y_Coord*other.Y_Coord;
 
-    public bool isColinear(Point other)
+    public bool IsColinear(Point other)
     {
         if (this.isOrigin() || other.isOrigin()) return true;
         var cos = this.Dot_Product(other);
@@ -66,10 +66,19 @@ public partial class Point : GeoExpr
     }
 
     public Point Orthogonal()
-        => new Point(this.Y_Coord, -this.X_Coord);
+        => new(this.Y_Coord, -this.X_Coord);
 
     public static explicit operator Vector2(Point point) 
     {
         return new Vector2((float)point.X_Coord, (float)point.Y_Coord);
     }
+
+    public bool Equal_Approx(Point other)
+        => Functions.Equal_Vectors_Approx(this, other);
+
+    public double Distance_To(Point other)
+        => Functions.Distance(this, other);
+
+    public double Distance_To(Line L)
+        => Functions.Distance(this, L);
 }

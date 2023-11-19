@@ -55,24 +55,24 @@ public partial class Node2D : Godot.Node2D
             {
                 if (P1_inf)
                 {
-                    y1 = 3*GeoExpr.Window_StartY/2;
+                    y1 = 3*IDrawable.Window_StartY/2;
                 }
                 if (P2_inf)
                 {
-                    y2 = 3*GeoExpr.Window_EndY/2;
+                    y2 = 3*IDrawable.Window_EndY/2;
                 }
             }
             else
             {
                 if (P1_inf)
                 {
-                    x1 = 3*GeoExpr.Window_StartX/2;
+                    x1 = 3*IDrawable.Window_StartX/2;
                     y1 = -C/B - A/B*x1;
                 }
 
                 if (P2_inf)
                 {
-                    x2 = 3*GeoExpr.Window_EndX/2;
+                    x2 = 3*IDrawable.Window_EndX/2;
                     y2 = -C/B - A/B*x2;
                 }
             }
@@ -153,16 +153,16 @@ public partial class Node2D : Godot.Node2D
 
     }
 
-    public void AddDrawable(IDrawable drawable, Color color)
+    public void AddDrawable(Color color, params IDrawable[] drawable_array)
     {
-        if (drawable is Finite_Static_Seqence<GeoExpr> Sequence)
+        foreach(var drawable in drawable_array)
         {
-            foreach(var item in Sequence)
+            if (drawable is Finite_Static_Seqence<GeoExpr> Sequence)
             {
-                AddDrawable(item, color);
+                AddDrawable(color, Sequence.GetRemainder(0));
             }
+            else this.shapes.Add((drawable, color));
         }
-        else this.shapes.Add((drawable, color));
     }
 
     public void Clear()

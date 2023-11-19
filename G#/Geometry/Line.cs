@@ -44,7 +44,5 @@ public partial class Line : GeoExpr
     }
 
     public static Line Point_DirectorVec(Point Point, Point Direction_Vector)
-    {
-        return new Line(Point, Point + Direction_Vector);
-    }
+        => new(Point, Point + Direction_Vector);
 }

@@ -1,4 +1,6 @@
 namespace Geometry;
+
+using Godot;
 using GSharp;
 using System;
 using System.Collections.Generic;
@@ -14,6 +16,108 @@ static class Functions
     
     public static double Distance(Line L, Point P)
         => Distance(P, L);
+
+    public static Sequence<Point> Intersect(GeoExpr A, GeoExpr B)
+    {
+        if (A is Point P)
+        {
+            if (B is Point P2)
+                if (Equal_Vectors_Approx(P, P2))
+                    return new Finite_Static_Seqence<Point>(new Point[]{P});
+                else return new Finite_Static_Seqence<Point>();
+            
+            if (B is Line L1)
+                return Intersect(P, L1);
+            
+            if (B is Ray R1)
+                return Intersect(P, R1);
+            
+            if (B is Segment S1)
+                return Intersect(P, S1);
+
+            if (B is Circle C1)
+                return Intersect(P, C1);
+                
+            if (B is Arc Arc1)
+                return Intersect(P, Arc1);
+        }
+
+        else if (B is Point)
+            return Intersect(B, A);
+
+        else if (A is Line L)
+        {
+            if (B is Line L1)
+                return Intersect(L, L1);
+
+            if (B is Ray R1)
+                return Intersect(L, R1);
+            
+            if (B is Segment S1)
+                return Intersect(L, S1);
+            
+            if (B is Circle C1)
+                return Intersect(L, C1);
+            
+            if (B is Arc Arc1)
+                return Intersect(L, Arc1);
+        }
+    
+        else if (B is Line)
+            return Intersect(B, A);
+        
+        else if (A is Ray R)
+        {
+            if (B is Ray R1)
+                return Intersect(R, R1);
+
+            if (B is Segment S1)
+                return Intersect(R, S1);
+            
+            if (B is Circle C1)
+                return Intersect(R, C1);
+
+            if (B is Arc Arc1)
+                return Intersect(R, Arc1);
+        }
+
+        else if (B is Ray)
+            return Intersect(B, A);
+    
+        else if (A is Segment S)
+        {
+            if (B is Segment S1)
+                return Intersect(S, S1);
+
+            if (B is Circle C1)
+                return Intersect(S, C1);
+            
+            if (B is Arc Arc1)
+                return Intersect(S, Arc1);
+        }
+
+        else if (B is Segment)
+            return Intersect(B, A);
+
+        else if (A is Circle C)
+        {
+            if (B is Circle C1)
+                return Intersect(C, C1);
+            
+            else if (B is Arc Arc1)
+                return Intersect(C, Arc1);
+        }
+
+        else if (B is Circle)
+            return Intersect(B, A);
+
+        else if (A is Arc Arc && B is Arc Arc2)
+            return Intersect(Arc, Arc2);
+
+        throw new Exception("UNRECOGNIZED GEOEXPR");
+
+    }
+
 
     #region Point
 
@@ -58,7 +162,7 @@ static class Functions
 
     public static Finite_Static_Seqence<Point> Intersect (Line L, Point Point)
     {
-        if ((L.A_Point - Point).isColinear(L.Direction_Vector))
+        if ((L.A_Point - Point).IsColinear(L.Direction_Vector))
             return new Finite_Static_Seqence<Point>(new List<Point>(new Point[]{Point}));
         
         return new Finite_Static_Seqence<Point>();
@@ -216,9 +320,9 @@ static class Functions
     {        
         var AP_vector = Point - R.First_Point;
 
-        if (!AP_vector.isColinear(R.Director_Vector)) return new Finite_Static_Seqence<Point>();
+        if (!AP_vector.IsColinear(R.Director_Vector)) return new Finite_Static_Seqence<Point>();
 
-        if (AP_vector.Dot_Product(R.Director_Vector) < 0) return new Finite_Static_Seqence<Point>();
+        if (Less_Than_Approx(AP_vector.Dot_Product(R.Director_Vector), 0)) return new Finite_Static_Seqence<Point>();
         else return new Finite_Static_Seqence<Point>(new Point[]{Point});
     }
 
@@ -271,11 +375,13 @@ static class Functions
 
         var intersection = Intersect(Line_R, C);
 
+
         var list = new List<Point>(2);
 
         foreach(var P in intersection)
         {
             if (Intersect(P, R).Count > 0) list.Add(P);
+
         }
 
         return new Finite_Static_Seqence<Point>(list);
@@ -454,7 +560,7 @@ static class Functions
 
     public static int Approx_Compare_Double(double A, double B)
     {
-        const double Epsilon = 1E-12;
+        const double Epsilon = 1E-9;
         if (Math.Abs(A - B) <= Epsilon) return 0;
         if (A < B) return -1;
         // (A > B) 
@@ -471,4 +577,5 @@ static class Functions
 
     
     #endregion
+
 }

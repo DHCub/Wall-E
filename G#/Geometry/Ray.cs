@@ -17,4 +17,7 @@ public partial class Ray : GeoExpr
         this.First_Point = First_Point;
         this.Director_Vector = Second_Point - First_Point;
     }
+
+    public static Ray Point_DirectorVec(Point Point, Point Direction_Vector)
+        => new(Point, Point + Direction_Vector);
 }

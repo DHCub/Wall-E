@@ -4,8 +4,11 @@ using Godot;
 
 public abstract class GeoExpr : IDrawable
 {
-    public static RandomNumberGenerator rnd = new RandomNumberGenerator();
+    public static RandomNumberGenerator rnd = new();
+}
 
+public interface IDrawable
+{
     public static float Window_StartX {get; private set;}
     public static float Window_EndX {get; private set;}
     public static float Window_StartY {get; private set;}
@@ -21,6 +24,4 @@ public abstract class GeoExpr : IDrawable
         Window_EndY = endY;
     }
 }
-
-public interface IDrawable{}
 

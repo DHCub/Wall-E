@@ -12,14 +12,14 @@ public partial class Circle : GeoExpr
     {
         this.Center = new Point();
         
-        float XMin = Math.Abs((float)Center.X_Coord - Window_StartX);
-        XMin = Math.Min(XMin, Math.Abs((float)Center.X_Coord - Window_EndX));
+        float XMin = Math.Abs((float)Center.X_Coord - IDrawable.Window_StartX);
+        XMin = Math.Min(XMin, Math.Abs((float)Center.X_Coord - IDrawable.Window_EndX));
 
-        float YMin = Math.Abs((float)Center.Y_Coord - Window_StartY);
-        YMin = Math.Min(YMin, Math.Abs((float)Center.Y_Coord - Window_EndY));
+        float YMin = Math.Abs((float)Center.Y_Coord - IDrawable.Window_StartY);
+        YMin = Math.Min(YMin, Math.Abs((float)Center.Y_Coord - IDrawable.Window_EndY));
 
         float rad = Math.Min(XMin, YMin);
-        rad = Math.Max(rad, 10*Point_Representation_Radius);
+        rad = Math.Max(rad, 10*IDrawable.Point_Representation_Radius);
 
         this.Radius = rad;
     }

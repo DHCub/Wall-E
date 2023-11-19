@@ -1,5 +1,7 @@
 using Godot;
 using Geometry;
+using System;
+using GSharp;
 
 
 
@@ -23,52 +25,51 @@ public partial class Control : Godot.Control
 		var code = GetNode<TextEdit>("Code_Edit_Marg/Code_Edit");
 		var draw_area = GetNode<Node2D>("Draw_Area_Marg/Viewport_Container/SubViewport/Background/Node2D");
 
+		void ShowIntersect(params GeoExpr[] arr)
+		{
+			for (int i = 0; i < arr.Length - 1; i++)
+			{
+				for (int j = i + 1; j < arr.Length; j++)
+				{
+					var intersect = Functions.Intersect(arr[i], arr[j]);
+
+					if (intersect is Finite_Static_Seqence<Point> Seq)
+					{
+						draw_area.AddDrawable(Colors.Red, Seq.GetRemainder(0));
+					}
+				}
+			}
+		}
+
 		// var txt = code.Text;
 		// var data = txt.Split('\n');
 		// var v1 = double.Parse(data[0]);
 		// var v2 = -double.Parse(data[1]);
 		// var rad = double.Parse(data[2]);
 
-		// draw_area.Clear();
-		draw_area.AddDrawable(
-			new Arc(
-				new(new(0, 0), new(1, 1)),
-				new(new(0, 0), new(0, 1)),
-				100
-			),
-			new(1000)
-		);
-		draw_area.AddDrawable(
-			new Line(new(0, 0), new(1, 0)),
-			new(1000)
-		);
-		draw_area.AddDrawable(
-			new Ray(
-				new(0, 0),
-				new(1, 1)
-			),
-			new(1000)
-		);
-		draw_area.AddDrawable(
-			new Segment(
-				new(-100, 100),
-				new(-100, -200)
-			),
-			new(1000)
-		);
-		draw_area.AddDrawable(
-			new Point(500, -100),
-			new(1000)
-		);
-		draw_area.AddDrawable(
-			new Circle(
-				new(-100, 100),
-				200
-			),
-			new(1, 0, 0)
-		);
+		draw_area.Clear();
+		
+		Point p1 = new(), p2 = new();
 
-		GD.Print(new Point(1, 0).AngleTo(new Point(1, 0)));
+		Line Base_Line = new(p1, p2);
+
+		var Height = Ray.Point_DirectorVec(p2, Base_Line.Direction_Vector.Orthogonal());
+
+		var m = p1.Distance_To(p2);
+
+		Circle C1 = new(p2, m);
+
+		Point p3 = Functions.Intersect(C1, Height)[0];
+		Point p4 = p3 + p1 - p2;
+
+		draw_area.AddDrawable(Colors.RebeccaPurple, p1, p2, p3, p4);
+
+		Segment S1 = new(p1, p2);
+		Segment S2 = new(p2, p3);
+		Segment S3 = new(p3, p4);
+		Segment S4 = new(p4, p1);
+
+		draw_area.AddDrawable(Colors.Green, S1, S2, S3, S4);
 
 		draw_area.QueueRedraw();
 		// GD.Print(txt);
@@ -86,7 +87,7 @@ public partial class Control : Godot.Control
 	{
 		var draw_area_container = GetNode<MarginContainer>("Draw_Area_Marg");		
 
-		GeoExpr.UpdateWindow(
+		IDrawable.UpdateWindow(
 			-draw_area_container.Size.X/2, draw_area_container.Size.X/2,
 			-draw_area_container.Size.Y/2, draw_area_container.Size.Y/2
 		);
