@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <NoWarn>S2699,CS8600,CS8625,CS8625,CS8604,CS8603,CS0649,CS8618,CS4014,CS1998</NoWarn>
+  </PropertyGroup>
+
+</Project>

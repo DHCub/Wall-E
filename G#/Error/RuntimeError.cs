@@ -1,7 +1,6 @@
 namespace GSharp;
-using System;
 
-public partial class RuntimeError : Exception
+public class RuntimeError : Exception
 {
   public readonly string tokenStr;
 

@@ -1,6 +1,6 @@
 namespace GSharp;
 
-public partial class Token
+public class Token
 {
   public TokenType type { get; private set; }
   public string lexeme { get; private set; }

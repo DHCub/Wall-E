@@ -1,7 +1,6 @@
 namespace GSharp;
-using System;
 
-public partial class ConsoleLogger : ILogger
+public class ConsoleLogger : ILogger
 {
   public bool hadError { get; private set; }
 

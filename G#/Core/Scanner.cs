@@ -1,9 +1,8 @@
 namespace GSharp;
 
-using System.Collections.Generic;
 using static TokenType;
 
-public partial class Scanner
+public class Scanner
 {
   private static readonly Dictionary<string, TokenType> keywords = new Dictionary<string, TokenType>
   {
@@ -42,7 +41,6 @@ public partial class Scanner
     {"white", WHITE},
     {"black", BLACK},
 
-    {"_", UNDERSCORE},
     {"undefined", UNDEFINED}
   };
 
@@ -131,23 +129,23 @@ public partial class Scanner
         break;
       case '>':
         AddToken(Eat('=') ? GREATER_EQUAL : GREATER);
-        break;  
+        break;
       case '.':
-        bool found = false;
-        if (Eat('.')) {
-          if (Eat('.')) {
-            AddToken(DOTS);
-          } else {
-            found = true;
-          }
-        } else {
-          found = true;
+        bool errorFound = false;
+        if (Eat('.') && Eat('.'))
+        {
+          AddToken(DOTS);
+        }
+        else
+        {
+          errorFound = true;
         }
 
-        if (found) {
+        if (errorFound)
+        {
           // unexpected character
           Token invalid = new Token(STRING, c.ToString(), null, line, current);
-          logger.Error("LEXICAL", invalid, "Unexpected character.");  
+          logger.Error("LEXICAL", invalid, "Unexpected character.");
         }
 
         break;
@@ -272,7 +270,7 @@ public partial class Scanner
 
   private char Next()
   {
-    if (current + 1 >= source.Length) return '\0';
+    if (current + 1 >= source.Count()) return '\0';
     return source[current + 1];
   }
 
@@ -295,7 +293,7 @@ public partial class Scanner
 
   private bool IsAtEnd()
   {
-    return current >= source.Length;
+    return current >= source.Count();
   }
 
   private char Advance()

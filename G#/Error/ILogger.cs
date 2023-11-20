@@ -1,6 +1,5 @@
 namespace GSharp;
 
-
 public interface ILogger
 {
   bool hadError { get; }

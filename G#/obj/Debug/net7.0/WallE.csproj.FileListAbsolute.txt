@@ -1,0 +1,15 @@
+/home/eblabrada/Workspaces/Wall-E/G#/obj/Debug/net7.0/WallE.csproj.AssemblyReference.cache
+/home/eblabrada/Workspaces/Wall-E/G#/obj/Debug/net7.0/WallE.GeneratedMSBuildEditorConfig.editorconfig
+/home/eblabrada/Workspaces/Wall-E/G#/obj/Debug/net7.0/WallE.AssemblyInfoInputs.cache
+/home/eblabrada/Workspaces/Wall-E/G#/obj/Debug/net7.0/WallE.AssemblyInfo.cs
+/home/eblabrada/Workspaces/Wall-E/G#/obj/Debug/net7.0/WallE.csproj.CoreCompileInputs.cache
+/home/eblabrada/Workspaces/Wall-E/G#/bin/Debug/net7.0/WallE
+/home/eblabrada/Workspaces/Wall-E/G#/bin/Debug/net7.0/WallE.deps.json
+/home/eblabrada/Workspaces/Wall-E/G#/bin/Debug/net7.0/WallE.runtimeconfig.json
+/home/eblabrada/Workspaces/Wall-E/G#/bin/Debug/net7.0/WallE.dll
+/home/eblabrada/Workspaces/Wall-E/G#/bin/Debug/net7.0/WallE.pdb
+/home/eblabrada/Workspaces/Wall-E/G#/obj/Debug/net7.0/WallE.dll
+/home/eblabrada/Workspaces/Wall-E/G#/obj/Debug/net7.0/refint/WallE.dll
+/home/eblabrada/Workspaces/Wall-E/G#/obj/Debug/net7.0/WallE.pdb
+/home/eblabrada/Workspaces/Wall-E/G#/obj/Debug/net7.0/WallE.genruntimeconfig.cache
+/home/eblabrada/Workspaces/Wall-E/G#/obj/Debug/net7.0/ref/WallE.dll
