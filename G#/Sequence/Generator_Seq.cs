@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System;
 using System.Collections;
 
-public partial class Generator_Sequence<T> : Infinite_Static_Sequence<T>, IEnumerable<T> where T:class
+public partial class Generator_Sequence<T> : Infinite_Static_Sequence<T>, IEnumerable<T> where T : class
 {
     Func<T> GeneratorFunction; // this must not return null
     public Generator_Sequence(Func<T> GeneratorFunction, ICollection<T> items = null) : base(items == null ? new List<T>() : items)
@@ -12,15 +12,17 @@ public partial class Generator_Sequence<T> : Infinite_Static_Sequence<T>, IEnume
         this.GeneratorFunction = GeneratorFunction;
     }
 
-    IEnumerator IEnumerable.GetEnumerator(){
+    IEnumerator IEnumerable.GetEnumerator()
+    {
         int i = 0;
-        while(true)
+        while (true)
             yield return this[i++];
     }
 
-    IEnumerator<T> IEnumerable<T>.GetEnumerator(){
+    IEnumerator<T> IEnumerable<T>.GetEnumerator()
+    {
         int i = 0;
-        while(true)
+        while (true)
             yield return this[i++];
     }
 

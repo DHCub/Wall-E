@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 
-public abstract class Sequence<T> : IEnumerable<T> where T:class
+public abstract class Sequence<T> : IEnumerable<T> where T : class
 {
     IEnumerator<T> IEnumerable<T>.GetEnumerator() => this.items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => this.items.GetEnumerator();
     protected List<T> items;
 
-    protected int Count {get {return items.Count;} }
+    protected int Count { get { return items.Count; } }
 
     public Sequence(ICollection<T> items)
     {
