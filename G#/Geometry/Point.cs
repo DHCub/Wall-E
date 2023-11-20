@@ -81,4 +81,14 @@ public partial class Point : GeoExpr
 
     public double Distance_To(Line L)
         => Functions.Distance(this, L);
+
+    public Point GetRotatedAsVector(double Angle)
+    {
+        var x2 = Math.Cos(Angle)*X_Coord - Math.Sin(Angle)*Y_Coord;
+        var y2 = Math.Sin(Angle)*X_Coord + Math.Cos(Angle)*Y_Coord;
+
+        return new(x2, y2);
+    }
+
+    public override Point Sample() => this;
 }

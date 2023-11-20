@@ -5,6 +5,8 @@ using Godot;
 public abstract class GeoExpr : IDrawable
 {
     public static RandomNumberGenerator rnd = new();
+
+    public abstract Point Sample();
 }
 
 public interface IDrawable

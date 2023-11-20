@@ -45,4 +45,9 @@ public partial class Line : GeoExpr
 
     public static Line Point_DirectorVec(Point Point, Point Direction_Vector)
         => new(Point, Point + Direction_Vector);
+
+    public override Point Sample()
+    {
+        throw new NotImplementedException();
+    }
 }

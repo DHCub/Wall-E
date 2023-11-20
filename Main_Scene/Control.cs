@@ -7,6 +7,7 @@ using GSharp;
 
 public partial class Control : Godot.Control
 {
+	static readonly Segment S = new(new(0, 0), new(200, 200));
 	// Declare member variables here. Examples:
 	// private int a = 2;
 	// private string b = "text";
@@ -16,6 +17,9 @@ public partial class Control : Godot.Control
 	{
 		Center_Transform();
 		Update_GeoExpr_Window();
+
+		GetNode<Node2D>("Draw_Area_Marg/Viewport_Container/SubViewport/Background/Node2D")
+		.AddDrawable(Colors.Black, S);	
 	}
 
 
@@ -46,30 +50,9 @@ public partial class Control : Godot.Control
 		// var v1 = double.Parse(data[0]);
 		// var v2 = -double.Parse(data[1]);
 		// var rad = double.Parse(data[2]);
-
-		draw_area.Clear();
 		
-		Point p1 = new(), p2 = new();
+		draw_area.AddDrawable(Colors.Crimson, S.Sample());
 
-		Line Base_Line = new(p1, p2);
-
-		var Height = Ray.Point_DirectorVec(p2, Base_Line.Direction_Vector.Orthogonal());
-
-		var m = p1.Distance_To(p2);
-
-		Circle C1 = new(p2, m);
-
-		Point p3 = Functions.Intersect(C1, Height)[0];
-		Point p4 = p3 + p1 - p2;
-
-		draw_area.AddDrawable(Colors.RebeccaPurple, p1, p2, p3, p4);
-
-		Segment S1 = new(p1, p2);
-		Segment S2 = new(p2, p3);
-		Segment S3 = new(p3, p4);
-		Segment S4 = new(p4, p1);
-
-		draw_area.AddDrawable(Colors.Green, S1, S2, S3, S4);
 
 		draw_area.QueueRedraw();
 		// GD.Print(txt);
