@@ -30,4 +30,15 @@ public partial class Arc : GeoExpr
 
         Angle = Start_Ray.Director_Vector.AngleTo(End_Ray.Director_Vector);
     }
+
+    public override Point Sample()
+    {
+        var newAngle = GeoExpr.rnd.RandfRange(0, (float)Angle);
+
+        var vector = this.Start_Ray.Director_Vector.GetRotatedAsVector(newAngle);
+
+        vector = (this.Radius/vector.Norm)*vector;
+
+        return vector + this.Center;
+    }
 }

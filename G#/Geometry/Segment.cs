@@ -15,4 +15,16 @@ public partial class Segment : GeoExpr
         this.A_Point = A_Point;
         this.B_Point = B_Point;
     }
+
+    public override Point Sample()
+    {
+        var Vector = this.B_Point - this.A_Point;
+
+        var norm = Vector.Norm;
+        var length = GeoExpr.rnd.RandfRange(0, (float)norm);
+
+        Vector = (length/norm)*Vector;
+
+        return A_Point + Vector;
+    }
 }

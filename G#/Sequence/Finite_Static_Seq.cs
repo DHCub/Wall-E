@@ -2,8 +2,9 @@
 namespace GSharp;
 
 using System.Collections.Generic;
+using Geometry;
 
-public partial class Finite_Static_Seqence<T> : Sequence<T>, IEnumerable<T> where T : class
+public partial class Finite_Static_Seqence<T> : Sequence<T>, IEnumerable<T>, IDrawable where T: GeoExpr
 {
     public new int Count { get { return base.Count; } }
 
