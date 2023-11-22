@@ -538,7 +538,6 @@ public class Parser
         case SEGMENT:
         case IMPORT:
         case LET:
-        case FUNCTION:
           return;
       }
 
