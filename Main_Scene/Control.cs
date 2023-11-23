@@ -46,11 +46,13 @@ public partial class Control : Godot.Control
 		}
 
 		var txt = code.Text;
-		
 
+		var logger = new GodotLogger();
+		var scanner = new Scanner(logger, txt);
+		var parser = new Parser(logger, scanner.ScanTokens());
+		var analyzer = new Semantic_Analyzer(logger, parser.Parse());
 
-		draw_area.AddDrawable(Colors.Crimson, S.Sample());
-
+		analyzer.Analyze();
 
 		draw_area.QueueRedraw();
 		// GD.Print(txt);

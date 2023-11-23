@@ -5,6 +5,9 @@ using System.Linq;
 
 public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GSharpType?>
 {
+    public GSharpType? VisitVarStmt(Var var) => throw new NotImplementedException();
+    private readonly Token PlaceholderTok = new(TokenType.UNDEFINED, "PLACEHOLDER", null, -1, -1);
+
     private const string SEMANTIC = "SEMANTIC";
     private List<Stmt> Statements;
     private ILogger Logger;
@@ -27,8 +30,6 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
             const string RANDOMS = "randoms";
             const string POINTS = "points"; // sample figure
             const string SAMPLES = "samples";
-
-            BuiltIns = new();
             
             BuiltIns.Define(LINE, new Fun_Symbol(
                 LINE,
@@ -125,6 +126,8 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
             ), 0);
 
         }
+
+        BuiltIns = new();
 
         DefineBuiltIns();
 

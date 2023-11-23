@@ -10,6 +10,7 @@ public partial class Node2D : Godot.Node2D
 {
     private const float PointRadius = 5;
     private List<(IDrawable drawable, Godot.Color color)> shapes = new();
+    private List<(IDrawable drawable, Godot.Color color)> shapes = new();
     
     public override void _Ready()
     {

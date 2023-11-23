@@ -235,6 +235,7 @@ public class Parser
   }
 
   private List<Stmt> Instructions()
+  private List<Stmt> Instructions()
   {
     List<Stmt> instructions = new List<Stmt>();
     while (!Check(IN) && !IsAtEnd())
