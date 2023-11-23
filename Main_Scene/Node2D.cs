@@ -9,7 +9,7 @@ using System.Collections.Generic;
 public partial class Node2D : Godot.Node2D
 {
     private const float PointRadius = 5;
-    private List<(IDrawable drawable, Color color)> shapes = new();
+    private List<(IDrawable drawable, Godot.Color color)> shapes = new();
     
     public override void _Ready()
     {
@@ -19,7 +19,7 @@ public partial class Node2D : Godot.Node2D
     public override void _Draw()
     {
 
-        void draw_segment(Line L, Point P1, Point P2, Color color, bool P1_inf = false, bool P2_inf = false)
+        void draw_segment(Line L, Point P1, Point P2, Godot.Color color, bool P1_inf = false, bool P2_inf = false)
         {
             if (Functions.Equal_Vectors_Approx(P1, P2)) 
                 throw new ArgumentException("Cannot Draw Line Passing Through Equal Points");
@@ -153,7 +153,7 @@ public partial class Node2D : Godot.Node2D
 
     }
 
-    public void AddDrawable(Color color, params IDrawable[] drawable_array)
+    public void AddDrawable(Godot.Color color, params IDrawable[] drawable_array)
     {
         foreach(var drawable in drawable_array)
         {

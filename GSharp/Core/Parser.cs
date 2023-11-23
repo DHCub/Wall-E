@@ -33,8 +33,8 @@ public class Parser
 
   private Expr Expression()
   {
-    if (Match(IF)) return IfExpression();
-    if (Match(LET)) return LetInExpression();
+    if (Match(IF)) return IfExpression(Previous());
+    if (Match(LET)) return LetInExpression(Previous());
     return Assignment();
   }
 
@@ -69,7 +69,7 @@ public class Parser
   {
     if (Match(DRAW))
     {
-      return DrawStatement();
+      return DrawStatement(Previous());
     }
 
     if (Match(COLOR))
@@ -102,7 +102,7 @@ public class Parser
     return new Expression(expr);
   }
 
-  private Expr IfExpression()
+  private Expr IfExpression(Token ifTk)
   {
     Expr condition = Expression();
     Eat(THEN, "Expected if <expr> then <expr> else <expr>.");
@@ -110,7 +110,7 @@ public class Parser
     Expr thenBranch = Expression();
     Eat(ELSE, "Expected if <expr> then <expr> else <expr>.");
     Expr elseBranch = Expression();
-    return new Conditional(condition, thenBranch, elseBranch);
+    return new Conditional(ifTk, condition, thenBranch, elseBranch);
   }
 
   private Stmt FunDeclaration()
@@ -137,7 +137,7 @@ public class Parser
     return new Function(name, parameters, body);
   }
 
-  private Stmt DrawStatement()
+  private Stmt DrawStatement(Token DrawCommand)
   {
     Expr elements = Expression();
 
@@ -148,7 +148,7 @@ public class Parser
     }
 
     Eat(SEMICOLON, "Expected 'l' after draw command.");
-    return new Draw(elements, nameId);
+    return new Draw(elements, DrawCommand, nameId);
   }
 
   private Stmt ColorStatement()
@@ -244,7 +244,7 @@ public class Parser
     return instructions;
   }
 
-  private Expr SequenceDeclaration()
+  private Expr SequenceDeclaration(Token openBraceTk)
   {
     List<Expr> items = new List<Expr>();
     if (!Check(RIGHT_BRACE))
@@ -276,15 +276,15 @@ public class Parser
 
     Eat(RIGHT_BRACE, "Expected '}' after sequence declaration.");
 
-    return new Sequence(items);
+    return new Sequence(openBraceTk, items);
   }
 
-  private Expr LetInExpression()
+  private Expr LetInExpression(Token letTk)
   {
     var instructions = Instructions();
     Eat(IN, "Expected 'in' at end of 'let-in' expression.");
     Expr body = Expression();
-    return new LetIn(instructions, body);
+    return new LetIn(letTk, instructions, body);
   }
 
   private Expr Assignment()
@@ -449,7 +449,7 @@ public class Parser
 
     if (Match(LEFT_BRACE))
     {
-      return SequenceDeclaration();
+      return SequenceDeclaration(Previous());
     }
 
     throw Error(Peek(), "Expected expression.");

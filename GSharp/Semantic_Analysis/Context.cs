@@ -15,6 +15,7 @@ public class Context
     public Context(Context Enclosing = null)
     {
         this.Enclosing = Enclosing;
+        this.Assignments = new();
     }
 
     #nullable enable

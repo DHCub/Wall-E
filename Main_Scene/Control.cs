@@ -45,12 +45,10 @@ public partial class Control : Godot.Control
 			}
 		}
 
-		// var txt = code.Text;
-		// var data = txt.Split('\n');
-		// var v1 = double.Parse(data[0]);
-		// var v2 = -double.Parse(data[1]);
-		// var rad = double.Parse(data[2]);
+		var txt = code.Text;
 		
+
+
 		draw_area.AddDrawable(Colors.Crimson, S.Sample());
 
 

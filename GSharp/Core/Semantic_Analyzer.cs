@@ -133,6 +133,23 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
         this.Logger = Logger;
     }
 
+    public void Analyze()
+    {
+        foreach(var stmt in Statements)
+            TypeCheck(stmt);
+    }
+
+    public GSharpType? VisitVarStmt(Var var_stmt)
+    {
+        throw new NotImplementedException();
+    }
+
+    public GSharpType? VisitPrintStmt(Print print)
+    {
+        // everything is printable
+        return null;   
+    }
+
     private GSharpType? TypeCheck(Stmt stmt)
     {
         return stmt.Accept(this);
@@ -229,7 +246,7 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
         
         var expType = TypeCheck(draw.elements);
         if (!expType.Matches(drawable))
-            Logger.Error(SEMANTIC, );
+            Logger.Error(SEMANTIC, draw.commandTk, $"Object to draw must be drawable, {expType} passed instead");
 
         return null;
     }
@@ -260,14 +277,14 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
         var condition_Expr_T = TypeCheck(conditional.condition);
 
         if (!condition_Expr_T.Matches(new Constant_SimpleType(GSharpType.Types.Boolean)))
-            Logger.Error(SEMANTIC, );
+            Logger.Error(SEMANTIC, conditional.ifTk, $"Conditional Expression must be boolean, {condition_Expr_T} Passed instead");
 
         var then_branch_T = TypeCheck(conditional.thenBranch);
         var else_branch_T = TypeCheck(conditional.elseBranch);
 
         if (!then_branch_T.Matches(else_branch_T))
         {
-            Logger.Error(SEMANTIC, );
+            Logger.Error(SEMANTIC, conditional.ifTk, $"Conditional Expression must have matching return types, {then_branch_T} and {else_branch_T} returned instead");
             return new Undefined_Type();
         }
 
@@ -495,7 +512,7 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
     {
         var nameTok = ((Variable)call.calle).name;
 
-        var Fun_Symbol = CurrentContext.Get_Symbol(nameTok.lexeme, call.Arity);
+        var Fun_Symbol = BuiltIns.Get_Symbol(nameTok.lexeme, call.Arity) ?? CurrentContext.Get_Symbol(nameTok.lexeme, call.Arity);
         
         if (Fun_Symbol == null)
         {
@@ -591,7 +608,7 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
             {
                 if (!MostRestrainedType.Matches(element_Types[i]))
                 {
-                    Logger.Error(SEMANTIC, sequence.items[i]);
+                    Logger.Error(SEMANTIC, sequence.openBraceTk, "Sequence declared with differently typed elements");
                     error = true;
                 }
             }
