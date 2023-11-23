@@ -32,6 +32,7 @@ public class Scanner
     {"draw", DRAW},
     {"color", COLOR},
     {"restore", RESTORE},
+    {"print", PRINT},
 
     {"red", RED},
     {"green", GREEN},
@@ -237,7 +238,7 @@ public class Scanner
     // unterminated string
     if (IsAtEnd())
     {
-      string text = source.Substring(start, current);
+      string text = source.Substring(start, current - start - 1);
       Token invalid = new Token(STRING, text, null, line, current);
       logger.Error("LEXICAL", invalid, "Unterminated string.");
       return;

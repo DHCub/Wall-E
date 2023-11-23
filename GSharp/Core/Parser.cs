@@ -35,7 +35,6 @@ public class Parser
   {
     if (Match(IF)) return IfExpression();
     if (Match(LET)) return LetInExpression();
-    // if (Match(LEFT_BRACE)) return SequenceDeclaration();
     return Assignment();
   }
 
@@ -53,31 +52,10 @@ public class Parser
         return VarDeclaration(Previous());
       }
 
-      if (Match(IDENTIFIER))
+      if (IsConstant() && Match(IDENTIFIER))
       {
         return ConstDeclaration();
       }
-
-      if (Match(DRAW))
-      {
-        return DrawCommand();
-      }
-
-      if (Match(COLOR))
-      {
-        return ColorCommand();
-      }
-
-      if (Match(RESTORE))
-      {
-        return RestoreCommand();
-      }
-
-      if (Match(IMPORT))
-      {
-        return ImportLibrary();
-      }
-
       return Statement();
     }
     catch
@@ -89,13 +67,38 @@ public class Parser
 
   private Stmt Statement()
   {
+    if (Match(DRAW))
+    {
+      return DrawStatement();
+    }
+
+    if (Match(COLOR))
+    {
+      return ColorStatement();
+    }
+
+    if (Match(RESTORE))
+    {
+      return RestoreStatement();
+    }
+
+    if (Match(IMPORT))
+    {
+      return ImportStatement();
+    }
+
+    if (Match(PRINT))
+    {
+      return PrintStatement();
+    }
+
     return ExpressionStatement();
   }
 
   private Stmt ExpressionStatement()
   {
     Expr expr = Expression();
-
+    Eat(SEMICOLON, "Expected ';' after expression.");
     return new Expression(expr);
   }
 
@@ -134,7 +137,7 @@ public class Parser
     return new Function(name, parameters, body);
   }
 
-  private Stmt DrawCommand()
+  private Stmt DrawStatement()
   {
     Expr elements = Expression();
 
@@ -148,7 +151,7 @@ public class Parser
     return new Draw(elements, nameId);
   }
 
-  private Stmt ColorCommand()
+  private Stmt ColorStatement()
   {
     if (Match(BLUE, RED, YELLOW, GREEN, CYAN, MAGENTA, WHITE, GRAY, BLACK))
     {
@@ -163,16 +166,28 @@ public class Parser
     }
   }
 
-  private Stmt RestoreCommand()
+  private Stmt RestoreStatement()
   {
     Eat(SEMICOLON, "Expected ';' after restore command.");
     return null;
   }
 
-  private Stmt ImportLibrary()
+  private Stmt ImportStatement()
   {
     Token dirName = Eat(STRING, "Expected directory name.");
+    Eat(SEMICOLON, "Expected ';' after import statement.");
     return new Import(dirName);
+  }
+
+  private Stmt PrintStatement()
+  {
+    List<Expr> printe = new List<Expr>();
+    while (!Check(SEMICOLON) && !IsAtEnd())
+    {
+      printe.Add(Expression());
+    }
+    Eat(SEMICOLON, "Expected ';' after print statement.");
+    return new Print(printe);
   }
 
   private Stmt VarDeclaration(Token type)
@@ -219,24 +234,12 @@ public class Parser
     return new Constant(constNames, initializer);
   }
 
-  private List<Assign> Instructions()
+  private List<Stmt> Instructions()
   {
-    List<Assign> instructions = new List<Assign>();
-    while (!Check(IN))
+    List<Stmt> instructions = new List<Stmt>();
+    while (!Check(IN) && !IsAtEnd())
     {
-      if (Check(IN)) break;
-
-      if (!Match(IDENTIFIER))
-      {
-        Error(Peek(), "Invalid token in 'let-in' expression.");
-        return null;
-      }
-
-      List<Token> names = GetNames();
-      Eat(EQUAL, "Expected '=' after variable.");
-      Expr value = Expression();
-      Eat(SEMICOLON, "Expected ';' after instruction.");
-      instructions.Add(new Assign(names, value));
+      instructions.Add(Declaration());
     }
     return instructions;
   }
@@ -389,9 +392,9 @@ public class Parser
       } while (Match(COMMA));
     }
 
-    Eat(RIGHT_PARENTESIS, "Expected ')' after parameters.");
+    Token paren = Eat(RIGHT_PARENTESIS, "Expected ')' after parameters.");
 
-    return new Call(calle, parameters);
+    return new Call(calle, paren, parameters);
   }
 
   private Expr Call()
@@ -419,7 +422,7 @@ public class Parser
 
     if (Match(TRUE))
     {
-      return new Literal(TRUE);
+      return new Literal(true);
     }
 
     if (Match(UNDEFINED))
@@ -432,7 +435,7 @@ public class Parser
       return new Literal(Previous().literal);
     }
 
-    if (Match(IDENTIFIER, LINE, SEGMENT, RAY, ARC, CIRCLE))
+    if (Match(IDENTIFIER, POINT, LINE, SEGMENT, RAY, ARC, CIRCLE))
     {
       return new Variable(Previous());
     }
@@ -486,7 +489,27 @@ public class Parser
 
   private bool IsFunction()
   {
-    return Check(IDENTIFIER) && CheckNext(LEFT_PARENTESIS);
+    if (Check(IDENTIFIER) && CheckNext(LEFT_PARENTESIS))
+    {
+      for (int i = current; tokens[i].type != EOF; i++)
+      {
+        if (tokens[i].type == RIGHT_PARENTESIS)
+        {
+          return tokens[i + 1].type == EQUAL;
+        }
+      }
+    }
+    return false;
+  }
+
+  private bool IsConstant()
+  {
+    if (Check(IDENTIFIER) && CheckNext(LEFT_PARENTESIS))
+    {
+      return false;
+    }
+
+    return Check(IDENTIFIER);
   }
 
   private Token Advance()
@@ -497,7 +520,7 @@ public class Parser
 
   private bool IsAtEnd()
   {
-    return Peek().type == TokenType.EOF;
+    return Peek().type == EOF;
   }
 
   private Token Peek()

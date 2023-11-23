@@ -10,6 +10,7 @@ public abstract class Stmt
     R VisitExpressionStmt(Expression stmt);
     R VisitFunctionStmt(Function stmt);
     R VisitImportStmt(Import stmt);
+    R VisitPrintStmt(Print stmt);
     R VisitRestoreStmt(Restore stmt);
     R VisitVarStmt(Var stmt);
   }

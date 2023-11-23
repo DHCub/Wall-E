@@ -4,11 +4,13 @@ using System.Collections.Generic;
 public class Call : Expr
 {
   public readonly Expr calle;
+  public readonly Token paren;
   public readonly List<Expr> parameters;
 
-  public Call(Expr calle, List<Expr> parameters)
+  public Call(Expr calle, Token paren, List<Expr> parameters)
   {
     this.calle = calle;
+    this.paren = paren;
     this.parameters = parameters;
   }
 
