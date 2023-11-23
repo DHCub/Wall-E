@@ -17,6 +17,11 @@ mono_crash.*.json
 
 open_godot.sh
 
+G#/Semantic_Analysis/Equation_System.cs
+G#/Semantic_Analysis/Type_Equations.cs
+
+TODO
+
 # User-specific files
 *.rsuser
 *.suo

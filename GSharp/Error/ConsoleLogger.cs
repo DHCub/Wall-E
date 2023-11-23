@@ -1,4 +1,5 @@
 namespace GSharp;
+using System;
 
 public class ConsoleLogger : ILogger
 {

@@ -1,6 +1,9 @@
 namespace GSharp;
 
 using static TokenType;
+using System.Collections.Generic;
+using System;
+using System.Linq;
 
 public class Scanner
 {

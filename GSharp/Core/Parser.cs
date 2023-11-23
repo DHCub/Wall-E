@@ -3,6 +3,8 @@ namespace GSharp;
 using System.Linq.Expressions;
 using System.Reflection.Emit;
 using static TokenType;
+using System;
+using System.Collections.Generic;
 
 public class Parser
 {
@@ -395,14 +397,16 @@ public class Parser
   private Expr Call()
   {
     Expr expr = Primary();
-    while (true)
-    {
-      if (Match(LEFT_PARENTESIS))
-      {
-        expr = FinishCall(expr);
+
+    if (expr is Variable funName) {
+      if (funName.name.type == IDENTIFIER) {
+        if (Match(LEFT_PARENTESIS))
+        {
+          expr = FinishCall(expr);
+        }
       }
-      else break;
     }
+    
     return expr;
   }
 

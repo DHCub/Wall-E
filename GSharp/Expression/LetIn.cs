@@ -1,11 +1,12 @@
 namespace GSharp;
+using System.Collections.Generic;
 
 public class LetIn : Expr
 {
-  public readonly List<Assign> instructions;
+  public readonly List<Stmt> instructions;
   public readonly Expr body;
 
-  public LetIn(List<Assign> instructions, Expr body)
+  public LetIn(List<Stmt> instructions, Expr body)
   {
     this.instructions = instructions;
     this.body = body;
