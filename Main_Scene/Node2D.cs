@@ -10,7 +10,6 @@ public partial class Node2D : Godot.Node2D
 {
     private const float PointRadius = 5;
     private List<(IDrawable drawable, Godot.Color color)> shapes = new();
-    private List<(IDrawable drawable, Godot.Color color)> shapes = new();
     
     public override void _Ready()
     {
@@ -19,6 +18,11 @@ public partial class Node2D : Godot.Node2D
 
     public override void _Draw()
     {
+        var lineWidth = 2/Transform.X.X;
+
+        var container = GetNode<Draw_Area_Marg>("../../../..");
+        DrawCircle(Transform.Origin, PointRadius, Colors.Green);
+        DrawCircle(container.Size/2, PointRadius, Colors.Green);
 
         void draw_segment(Line L, Point P1, Point P2, Godot.Color color, bool P1_inf = false, bool P2_inf = false)
         {
@@ -82,7 +86,7 @@ public partial class Node2D : Godot.Node2D
                 new Vector2((float)x1, (float)y1),
                 new Vector2((float)x2, (float)y2),
                 color,
-                width: 2,
+                width: lineWidth,
                 antialiased:true
             );
            
@@ -92,7 +96,7 @@ public partial class Node2D : Godot.Node2D
         {
             if (drawable is Point P)
             {
-                DrawCircle((Vector2)P, PointRadius, color);
+                DrawCircle((Vector2)P, PointRadius/Transform.X.X, color);
             }
             else if (drawable is Line L)
             {
@@ -131,7 +135,7 @@ public partial class Node2D : Godot.Node2D
                     10000,
                     color,
                     antialiased: true,
-                    width: 2);
+                    width: lineWidth);
             }
             else if (drawable is Arc Arc)
             {
@@ -145,12 +149,14 @@ public partial class Node2D : Godot.Node2D
                     (float)(start_angle + Arc.Angle),
                     10000,
                     color,
-                    2,
+                    width:lineWidth,
                     true
                 );
             }
+            
         
         }
+
 
     }
 
@@ -158,11 +164,7 @@ public partial class Node2D : Godot.Node2D
     {
         foreach(var drawable in drawable_array)
         {
-            if (drawable is Finite_Static_Seqence<GeoExpr> Sequence)
-            {
-                AddDrawable(color, Sequence.GetRemainder(0));
-            }
-            else this.shapes.Add((drawable, color));
+            this.shapes.Add((drawable, color));
         }
     }
 
@@ -170,14 +172,12 @@ public partial class Node2D : Godot.Node2D
     {
         this.shapes.Clear();
         QueueRedraw();
-    }
+    }        
 
-
-    
-//  // Called every frame. 'delta' is the elapsed time since the previous frame.
-//  public override void _Process(float delta)
-//  {
-//      
-//  }
+    //  // Called every frame. 'delta' is the elapsed time since the previous frame.
+    //  public override void _Process(float delta)
+    //  {
+    //      
+    //  }
 }
 

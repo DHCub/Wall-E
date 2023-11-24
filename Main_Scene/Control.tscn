@@ -1,7 +1,9 @@
-[gd_scene load_steps=5 format=3 uid="uid://d3yslyxw1h4yg"]
+[gd_scene load_steps=7 format=3 uid="uid://d3yslyxw1h4yg"]
 
 [ext_resource type="Script" path="res://Main_Scene/Control.cs" id="1"]
+[ext_resource type="Script" path="res://Main_Scene/CodeEdit.cs" id="2_5ew5k"]
 [ext_resource type="Script" path="res://Main_Scene/Node2D.cs" id="3"]
+[ext_resource type="Script" path="res://Main_Scene/Draw_Area_Marg.cs" id="3_np2pc"]
 
 [sub_resource type="Theme" id="1"]
 
@@ -21,11 +23,13 @@ layout_mode = 0
 anchor_right = 0.321
 anchor_bottom = 0.734
 
-[node name="Code_Edit" type="TextEdit" parent="Code_Edit_Marg"]
+[node name="CodeEdit" type="CodeEdit" parent="Code_Edit_Marg"]
 layout_mode = 2
-text = "100
-100
-100"
+focus_mode = 1
+gutters_draw_line_numbers = true
+auto_brace_completion_enabled = true
+auto_brace_completion_highlight_matching = true
+script = ExtResource("2_5ew5k")
 
 [node name="Console_Margin" type="MarginContainer" parent="."]
 layout_mode = 0
@@ -43,6 +47,8 @@ layout_mode = 0
 anchor_left = 0.33
 anchor_right = 1.0
 anchor_bottom = 1.0
+focus_mode = 1
+script = ExtResource("3_np2pc")
 
 [node name="Viewport_Container" type="SubViewportContainer" parent="Draw_Area_Marg"]
 layout_mode = 2
@@ -78,7 +84,8 @@ anchor_bottom = 0.788
 
 [node name="Draw_Button" type="Button" parent="Button_Margin"]
 layout_mode = 2
+focus_mode = 1
 text = "Draw"
 
-[connection signal="item_rect_changed" from="Draw_Area_Marg" to="." method="_on_draw_area_marg_item_rect_changed"]
+[connection signal="item_rect_changed" from="Draw_Area_Marg" to="Draw_Area_Marg" method="_on_item_rect_changed"]
 [connection signal="pressed" from="Button_Margin/Draw_Button" to="." method="_on_Button_pressed"]
