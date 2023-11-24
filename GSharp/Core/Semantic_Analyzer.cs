@@ -5,7 +5,6 @@ using System.Linq;
 
 public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GSharpType?>
 {
-    public GSharpType? VisitVarStmt(Var var) => throw new NotImplementedException();
     private readonly Token PlaceholderTok = new(TokenType.UNDEFINED, "PLACEHOLDER", null, -1, -1);
 
     private const string SEMANTIC = "SEMANTIC";
@@ -19,6 +18,7 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
     {
         void DefineBuiltIns()
         {
+            const string POINT = "point";
             const string LINE = "line";
             const string RAY = "ray";
             const string SEGMENT = "segment";
@@ -31,6 +31,15 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
             const string POINTS = "points"; // sample figure
             const string SAMPLES = "samples";
             
+            BuiltIns.Define(POINT, new Fun_Symbol(
+                POINT,
+                new List<(GSharpType, string)>{
+                    (new Constant_SimpleType(GSharpType.Types.Scalar), "x"),
+                    (new Constant_SimpleType(GSharpType.Types.Scalar), "y")
+                },
+                new Constant_SimpleType(GSharpType.Types.Point)
+            ), 2);
+
             BuiltIns.Define(LINE, new Fun_Symbol(
                 LINE,
                 new List<(GSharpType, string)>{
@@ -139,17 +148,38 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
     public void Analyze()
     {
         foreach(var stmt in Statements)
-            TypeCheck(stmt);
+        {
+            if (stmt is not null) TypeCheck(stmt);
+        }
     }
 
     public GSharpType? VisitVarStmt(Var var_stmt)
     {
-        throw new NotImplementedException();
+        GSharpType Type = var_stmt.type.type switch 
+        {
+            TokenType.POINT => new Constant_SimpleType(GSharpType.Types.Point),
+            TokenType.LINE => new Constant_SimpleType(GSharpType.Types.Line),
+            TokenType.RAY => new Constant_SimpleType(GSharpType.Types.Ray),
+            TokenType.SEGMENT => new Constant_SimpleType(GSharpType.Types.Segment),
+            TokenType.CIRCLE => new Constant_SimpleType(GSharpType.Types.Circle),
+            TokenType.ARC => new Constant_SimpleType(GSharpType.Types.Arc),  
+            _ => null
+        } ?? throw new Exception("VARIABLE DECLARATION TYPE UNSUPPORTED");
+
+        if (var_stmt.isSequence)
+            Type = new Sequence_Type(Type);
+
+        if (!CurrentContext.Define(var_stmt.name.lexeme, new Variable_Symbol(Type, var_stmt.name.lexeme)))
+            Logger.Error(SEMANTIC, var_stmt.name, "Variable " + var_stmt.name.lexeme + " Redefined");
+
+        return null;
     }
 
     public GSharpType? VisitPrintStmt(Print print)
     {
-        // everything is printable
+        foreach(var expr in print.printe)
+            TypeCheck(expr);
+        
         return null;   
     }
 
@@ -309,16 +339,17 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
         
         void RedefinedError(Token VarNanme)
         {
-            const string VARIABLE_ = "Variable ";
-            const string _REDEFINED = " Redefined";
-
-            Logger.Error(SEMANTIC, VarNanme, VARIABLE_ + VarNanme.lexeme + _REDEFINED);
+            Logger.Error(SEMANTIC, VarNanme, "Variable " + VarNanme.lexeme + " Redefined");
         }
+
+        bool IsUnderscore(Token name)
+            => name.lexeme == "_";
 
         if (ValueType is Sequence_Type seq)
         {
             for (int i = 0; i < assign.name.Count - 1; i++)
             {
+                if (IsUnderscore(assign.name[i])) continue;
                 if (!CurrentContext.Define(
                         assign.name[i].lexeme,
                         new Variable_Symbol(seq.Type, assign.name[i].lexeme)
@@ -327,7 +358,7 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
                     
             }
 
-            if (!CurrentContext.Define(
+            if (!IsUnderscore(assign.name.Last()) && !CurrentContext.Define(
                     assign.name.Last().lexeme,
                     new Variable_Symbol(seq, assign.name.Last().lexeme)
                 ))
@@ -339,7 +370,7 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
             if (assign.name.Count > 1)
                 Logger.Error(SEMANTIC, assign.name[0], "Cannot destructure a non-sequence object");
             
-            if (!CurrentContext.Define(
+            if (!IsUnderscore(assign.name[0]) && !CurrentContext.Define(
                     assign.name[0].lexeme,
                     new Variable_Symbol(simpleType, assign.name[0].lexeme)
                 ))
@@ -347,6 +378,7 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
             
             for (int i = 1; i < assign.name.Count; i++)
             {
+                if (IsUnderscore(assign.name[i])) continue;
                 if (!CurrentContext.Define(
                         assign.name[i].lexeme,
                         new Variable_Symbol(new Undefined_Type(), assign.name[i].lexeme)
@@ -359,7 +391,8 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
         {
             foreach(var VarName in assign.name)
             {
-                if (!CurrentContext.Define(
+                if (!IsUnderscore(VarName) && 
+                    !CurrentContext.Define(
                         VarName.lexeme,
                         new Variable_Symbol(u, VarName.lexeme)
                     ))
@@ -371,7 +404,8 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
         {
             foreach(var VarName in assign.name)
             {
-                if (!CurrentContext.Define(
+                if (!IsUnderscore(VarName) &&
+                    !CurrentContext.Define(
                         VarName.lexeme,
                         new Variable_Symbol(d, VarName.lexeme)
                     ))
@@ -389,7 +423,7 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
 
         void Operator_Doesnt_Support_Operands_Error()
         {
-            Logger.Error(SEMANTIC, binary.oper, $"Operands {TLeft} and {TRight} of {binary.oper.lexeme} operator don't match");
+            Logger.Error(SEMANTIC, binary.oper, $"Operator {binary.oper.lexeme} does not support operands of type {TLeft} and {TRight} ");
         }
 
         Constant_SimpleType numeric = new(GSharpType.Types.Scalar);
@@ -519,7 +553,7 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
         
         if (Fun_Symbol == null)
         {
-            Logger.Error(SEMANTIC, nameTok, $"Function {nameTok.lexeme} is Undefined in this Context");
+            Logger.Error(SEMANTIC, nameTok, $"Function {nameTok.lexeme} with {call.Arity} parameter{((call.Arity > 1)?"s":"")} is Undefined in this Context");
             return new Undefined_Type();
         }
         
@@ -533,7 +567,7 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
                 Logger.Error(
                     SEMANTIC, 
                     nameTok, 
-                    $"Parameter #{i} of {nameTok.lexeme} must be {symbolParam_T}, {callArg_T} passed instead"
+                    $"Parameter #{i + 1} of {nameTok.lexeme} must be {symbolParam_T}, {callArg_T} passed instead"
                 );
             }
         }
@@ -609,7 +643,7 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
         {
             for (int i = 0; i < element_Types.Count; i++)
             {
-                if (!MostRestrainedType.Matches(element_Types[i]))
+                if (!error && !MostRestrainedType.Matches(element_Types[i]))
                 {
                     Logger.Error(SEMANTIC, sequence.openBraceTk, "Sequence declared with differently typed elements");
                     error = true;

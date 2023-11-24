@@ -37,8 +37,12 @@ public class Constant_SimpleType : GSharpType
     }
 
     public override bool Matches(GSharpType other)
-        => other is Constant_SimpleType CST && CST.Type == this.Type ||
-           other.Matches(this);
+    {
+        if (other is Constant_SimpleType CST)
+            return this.Type == CST.Type;
+        
+        return other.Matches(this);
+    }
 
     public override string ToString() => this.Type.ToString();
 
@@ -82,7 +86,7 @@ public class Sequence_Type : GSharpType
     }
 
     public override bool Matches(GSharpType other)
-        => other is Sequence_Type ST && ST.Type.Matches(this.Type) ||
+        => other is Sequence_Type ST && this.Type.Matches(ST.Type) ||
            other is Undefined_Type || 
            other is Drawable_Type d && this.Type.Matches(d) ||
            other is Constant_SimpleType CST && CST.Type == Types.Boolean;

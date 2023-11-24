@@ -1,7 +1,7 @@
 namespace GSharp;
 using System.Collections.Generic;
 
-public class Assign : Expr
+public class Assign : Stmt
 {
   public readonly List<Token> name;
   public readonly Expr value;

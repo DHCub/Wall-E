@@ -47,7 +47,7 @@ public class Parser
         return FunDeclaration();
       }
 
-      if (Match(POINT, LINE, SEGMENT, RAY, CIRCLE))
+      if (Match(POINT, LINE, SEGMENT, RAY, CIRCLE, ARC))
       {
         return VarDeclaration(Previous());
       }
@@ -235,7 +235,6 @@ public class Parser
   }
 
   private List<Stmt> Instructions()
-  private List<Stmt> Instructions()
   {
     List<Stmt> instructions = new List<Stmt>();
     while (!Check(IN) && !IsAtEnd())
@@ -403,11 +402,20 @@ public class Parser
     Expr expr = Primary();
 
     if (expr is Variable funName) {
-      if (funName.name.type == IDENTIFIER) {
+      switch (funName.name.type)
+      {
+        case IDENTIFIER:
+        case POINT:
+        case LINE:
+        case SEGMENT:
+        case RAY:
+        case ARC:
+        case CIRCLE:
         if (Match(LEFT_PARENTESIS))
         {
           expr = FinishCall(expr);
         }
+        break;
       }
     }
     
