@@ -58,17 +58,17 @@ public partial class Node2D : Godot.Node2D
             double Window_X_Size = IDrawable.Window_EndX - IDrawable.Window_StartX;
             double Window_Y_Size = IDrawable.Window_EndY - IDrawable.Window_StartY;
 
-            if (Functions.Greater_Than_Approx(Math.Abs(B), Math.Abs(A)))
+            if (Functions.Greater_Than_Approx(Math.Abs(A), Math.Abs(B)))
             {
                 if (P1_inf)
                 {
                     y1 = IDrawable.Window_StartY - Window_Y_Size/2;
-                    if (!Functions.Equal_Approx(A, 0)) x1 = -C/A - B/A*y1;
+                    x1 = -C/A - B/A*y1;
                 }
                 if (P2_inf)
                 {
                     y2 = IDrawable.Window_EndY + Window_Y_Size/2;
-                    if (!Functions.Equal_Approx(A, 0)) x2 = -C/A - B/A*y2;
+                    x2 = -C/A - B/A*y2;
                 }
             }
             else
