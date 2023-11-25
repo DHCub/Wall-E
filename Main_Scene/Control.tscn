@@ -43,12 +43,14 @@ theme = SubResource("1")
 
 [node name="Draw_Area_Marg" type="MarginContainer" parent="."]
 material = SubResource("2")
-layout_mode = 0
+layout_mode = 1
+anchors_preset = -1
 anchor_left = 0.33
 anchor_right = 1.0
 anchor_bottom = 1.0
 focus_mode = 1
 script = ExtResource("3_np2pc")
+metadata/_edit_use_anchors_ = true
 
 [node name="Viewport_Container" type="SubViewportContainer" parent="Draw_Area_Marg"]
 layout_mode = 2
@@ -74,6 +76,17 @@ grow_vertical = 2
 position = Vector2(380.16, 0)
 script = ExtResource("3")
 
+[node name="Center_Button_Marg" type="MarginContainer" parent="Draw_Area_Marg"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+size_flags_stretch_ratio = 0.0
+
+[node name="Button" type="Button" parent="Draw_Area_Marg/Center_Button_Marg"]
+layout_mode = 2
+text = "Center"
+
 [node name="Button_Margin" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = -1
@@ -88,4 +101,5 @@ focus_mode = 1
 text = "Draw"
 
 [connection signal="item_rect_changed" from="Draw_Area_Marg" to="Draw_Area_Marg" method="_on_item_rect_changed"]
+[connection signal="pressed" from="Draw_Area_Marg/Center_Button_Marg/Button" to="Draw_Area_Marg" method="_on_button_pressed"]
 [connection signal="pressed" from="Button_Margin/Draw_Button" to="." method="_on_Button_pressed"]

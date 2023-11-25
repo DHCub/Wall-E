@@ -25,6 +25,10 @@ public abstract class GSharpType
     public abstract bool IsAddable();
     public abstract bool IsSubstractable();
     public abstract bool IsComparable();
+
+    public abstract bool Is_Multiplyable_By(GSharpType other);
+
+    public abstract bool Is_Dividable_By(GSharpType other);
 }
 
 public class Constant_SimpleType : GSharpType
@@ -52,7 +56,7 @@ public class Constant_SimpleType : GSharpType
     {
         return this.Type switch
         {
-            Types.Scalar or Types.Measure or Types.String => true,
+            Types.Point or Types.Scalar or Types.Measure or Types.String => true,
             _ => false,
         };
     }
@@ -61,7 +65,7 @@ public class Constant_SimpleType : GSharpType
     {
         return this.Type switch
         {
-            Types.Measure or Types.Scalar => true,
+            Types.Point or Types.Measure or Types.Scalar => true,
             _ => false,
         };
     }
@@ -73,6 +77,55 @@ public class Constant_SimpleType : GSharpType
             Types.Scalar or Types.Measure => true,
             _ => false
         };
+    }
+
+    public override bool Is_Multiplyable_By(GSharpType other)
+    {
+        if (other is Constant_SimpleType CST)
+        {
+            if (this.Type == Types.Scalar)
+            {
+                return CST.Type switch{
+                    Types.Point or Types.Measure or Types.Scalar => true,
+                    _ => false
+                };
+            }
+
+            if (this.Type == Types.Measure)
+            {
+                return CST.Type == Types.Scalar;
+            }
+
+            if (this.Type == Types.Point)
+            {
+                return CST.Type == Types.Scalar;
+            }
+
+            return false;
+        }
+
+        return other.Is_Multiplyable_By(this); // multiplication is conmutative in this case
+    }
+
+    public override bool Is_Dividable_By(GSharpType other)
+    {
+        if (other is Constant_SimpleType CST)
+        {
+            if (CST.Type != Types.Scalar) return false;
+            
+            return this.Type switch{
+                Types.Scalar or Types.Point or Types.Measure => true,
+                _ => false
+            };
+        }
+
+        if (other is Drawable_Type) return false;
+
+        if (other is Sequence_Type) return false;
+
+        if (other is Undefined_Type) return false;
+
+        throw new System.Exception("UNRECOGNIZED TYPE");
     }
 }
 
@@ -100,6 +153,10 @@ public class Sequence_Type : GSharpType
     public override bool IsComparable() => false;
 
     public override bool IsSubstractable() => false;
+
+    public override bool Is_Multiplyable_By(GSharpType other) => false;
+
+    public override bool Is_Dividable_By(GSharpType other) => false;
 }
 
 public class Drawable_Type : GSharpType
@@ -126,11 +183,21 @@ public class Drawable_Type : GSharpType
     public override string ToString() => "FIGURE";
 
     public override bool IsUndefined() => false;
-    public override bool IsAddable() => false;
+    public override bool IsAddable() => true; // bc points are addable
 
-    public override bool IsSubstractable() => false;
+    public override bool IsSubstractable() => true; // bc points are substractable
 
     public override bool IsComparable() => false;
+
+    public override bool Is_Multiplyable_By(GSharpType other) 
+        => other is Constant_SimpleType CST && CST.Type == Types.Scalar;
+
+    public override bool Is_Dividable_By(GSharpType other)
+    {
+        if (other is not Constant_SimpleType CST) return false;
+
+        return CST.Type == Types.Scalar;
+    }
 }
 
 public class Undefined_Type : GSharpType
@@ -147,6 +214,10 @@ public class Undefined_Type : GSharpType
     public override bool IsComparable() => true;
 
     public override bool IsSubstractable() => true;
+
+    public override bool Is_Multiplyable_By(GSharpType other) => true;
+
+    public override bool Is_Dividable_By(GSharpType other) => true;
 }
 
 // public class Type_Variable : GSharpType

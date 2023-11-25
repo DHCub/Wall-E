@@ -500,37 +500,29 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
             if (!TLeft.Matches(TRight))
                 error = true;
 
-            Operator_Doesnt_Support_Operands_Error();
+            if (error) Operator_Doesnt_Support_Operands_Error();
             return new Constant_SimpleType(GSharpType.Types.Boolean);
     
         case TokenType.DIV:
+            
+            if (!TLeft.Is_Dividable_By(TRight))
+            {
+                Operator_Doesnt_Support_Operands_Error();
+                return new Undefined_Type();
+            }
+
+            return TLeft;
+
         case TokenType.MUL:
 
-            if (!TLeft.Matches(numeric) && !TRight.Matches(numeric))
+            if (!TLeft.Is_Multiplyable_By(TRight))
             {
                 Operator_Doesnt_Support_Operands_Error();
                 return new Undefined_Type();
             }
 
-            if (TLeft.Matches(numeric))
-            {
-                if (TRight.Matches(numeric))
-                    return numeric;
-                if (TRight.Matches(measure))
-                    return measure;
-
-                Operator_Doesnt_Support_Operands_Error();
-                return new Undefined_Type();
-            }    
-
-            if (TRight.Matches(numeric))
-            {
-                if (TLeft.Matches(measure))
-                    return measure;
-            }
-
-            Operator_Doesnt_Support_Operands_Error();
-            return new Undefined_Type();            
+            return TLeft;
+              
 
         case TokenType.POWER:
         case TokenType.MOD:

@@ -54,7 +54,6 @@ public partial class Draw_Area_Marg : MarginContainer
 		var x = this.Size.X/2;
 		var y = this.Size.Y/2;
 
-		GD.Print("SIZE: " ,this.Size);
 		draw_area.Transform = new Transform2D(
 			new Vector2(axesVectorMultiplier, 0),
 			new Vector2(0, -axesVectorMultiplier), 
@@ -62,9 +61,16 @@ public partial class Draw_Area_Marg : MarginContainer
 		);
 
 		draw_area.Translate(Translation);
+	}
 
-		GD.Print("ORIGIN: ", draw_area.Transform.Origin);
-		GD.Print("TRANSLATION: ", Translation);
+	private void ResetTransform()
+	{
+		var draw_area = GetNode<Node2D>("Viewport_Container/SubViewport/Background/Node2D");
+		Translation = new(0, 0);
+		axesVectorMultiplier = 1;
+		Center_Transform();
+		Update_IDrawable_Window();
+		draw_area.QueueRedraw();
 	}
 
 	void _on_item_rect_changed()
@@ -135,6 +141,11 @@ public partial class Draw_Area_Marg : MarginContainer
 
 
 		}
+	}
+
+	void _on_button_pressed()
+	{
+		ResetTransform();
 	}
 
 }
