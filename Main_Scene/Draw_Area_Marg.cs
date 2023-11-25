@@ -6,14 +6,14 @@ public partial class Draw_Area_Marg : MarginContainer
 {
 	private float axesVectorMultiplier = 1;
 	private Node2D draw_area;
-	public Vector2 Traslation;
+	public Vector2 Translation;
 
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		Traslation = new(0, 0);
+		Translation = new(0, 0);
 		Center_Transform();
-		Update_GeoExpr_Window();
+		Update_IDrawable_Window();
 		draw_area = GetNode<Node2D>("Viewport_Container/SubViewport/Background/Node2D");
 	}
 
@@ -22,24 +22,17 @@ public partial class Draw_Area_Marg : MarginContainer
 	{
 	}
 
-	private void Update_GeoExpr_Window()
+	private void Update_IDrawable_Window()
 	{	
 		draw_area = GetNode<Node2D>("Viewport_Container/SubViewport/Background/Node2D");
-		var Center = draw_area.Transform.Origin;
+		var Center = -Translation/axesVectorMultiplier;
 		// Center/=axesVectorMultiplier;
 
-		float x1 = Center.X - Size.X/2;
-		float x2 = Center.X + Size.X/2;
+		float x1 = Center.X - Size.X/2/axesVectorMultiplier;
+		float x2 = Center.X + Size.X/2/axesVectorMultiplier;
 
-		// GD.Print("x1: ", x1);
-		// GD.Print("x2: ", x2);
-		// GD.Print("ctr: ", Center);
-		// GD.Print("x2 - x1 = ", x2 - x1);
-		// GD.Print();
-
-
-		float y1 = Center.Y - Size.Y/2;
-		float y2 = Center.Y + Size.Y/2;
+		float y1 = -Center.Y - Size.Y/2/axesVectorMultiplier;
+		float y2 = -Center.Y + Size.Y/2/axesVectorMultiplier;
 		
 		// IDrawable.UpdateWindow(
 		// 	-this.Size.X/2/axesVectorMultiplier, this.Size.X/2/axesVectorMultiplier,
@@ -48,7 +41,8 @@ public partial class Draw_Area_Marg : MarginContainer
 
 		IDrawable.UpdateWindow(
 			x1, x2,
-			y1, y2
+			y1, y2,
+			axesVectorMultiplier
 		);
 
 	}
@@ -67,14 +61,18 @@ public partial class Draw_Area_Marg : MarginContainer
 			new(x, y)
 		);
 
+		draw_area.Translate(Translation);
+
 		GD.Print("ORIGIN: ", draw_area.Transform.Origin);
-		GD.Print("TRANSLATION: ", Traslation);
+		GD.Print("TRANSLATION: ", Translation);
 	}
 
 	void _on_item_rect_changed()
 	{
+		draw_area = GetNode<Node2D>("Viewport_Container/SubViewport/Background/Node2D");
 		Center_Transform();
-		Update_GeoExpr_Window();
+		Update_IDrawable_Window();
+		draw_area.QueueRedraw();
 	}
 
 	private void ZoomIn()
@@ -83,10 +81,10 @@ public partial class Draw_Area_Marg : MarginContainer
 		Vector2 curCenter = this.Size/2;
 
 		var trasVector = -draw_area.Transform.Origin + curCenter;
-		Traslation -= trasVector*0.1f;
+		Translation -= trasVector*0.1f;
 
 		Center_Transform();
-		Update_GeoExpr_Window();
+		Update_IDrawable_Window();
 		draw_area.QueueRedraw();
 	}
 
@@ -97,18 +95,18 @@ public partial class Draw_Area_Marg : MarginContainer
 		Vector2 curCenter = this.Size/2;
 
 		var trasVector = -draw_area.Transform.Origin + curCenter;
-		Traslation += trasVector*0.1f;
+		Translation += trasVector*0.1f;
 
 		Center_Transform();
-		Update_GeoExpr_Window();
+		Update_IDrawable_Window();
 		draw_area.QueueRedraw();
 	}
 
 	private void Move(Vector2 vector)
 	{
-		Traslation += vector;
+		Translation += vector;
 		Center_Transform();
-		Update_GeoExpr_Window();
+		Update_IDrawable_Window();
 		draw_area.QueueRedraw();
 	}
 

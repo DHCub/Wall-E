@@ -19,7 +19,7 @@ public partial class Circle : GeoExpr
         YMin = Math.Min(YMin, Math.Abs((float)Center.Y_Coord - IDrawable.Window_EndY));
 
         float rad = Math.Min(XMin, YMin);
-        rad = Math.Max(rad, 10*IDrawable.Point_Representation_Radius);
+        rad = Math.Max(rad, 10*IDrawable.Point_Representation_Radius/IDrawable.ZoomFactor);
 
         this.Radius = rad;
     }

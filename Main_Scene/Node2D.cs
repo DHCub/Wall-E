@@ -21,8 +21,7 @@ public partial class Node2D : Godot.Node2D
         var lineWidth = 2/Transform.X.X;
 
         var container = GetNode<Draw_Area_Marg>("../../../..");
-        DrawCircle(Transform.Origin, PointRadius, Colors.Green);
-        DrawCircle(container.Size/2, PointRadius, Colors.Green);
+        // DrawCircle(container.Size/2, PointRadius, Colors.Green);
 
         void draw_segment(Line L, Point P1, Point P2, Godot.Color color, bool P1_inf = false, bool P2_inf = false)
         {
@@ -56,28 +55,31 @@ public partial class Node2D : Godot.Node2D
             double B = L.Normal_Vector.Y_Coord;
             double C = L.Algebraic_Trace;
 
+            double Window_X_Size = IDrawable.Window_EndX - IDrawable.Window_StartX;
+            double Window_Y_Size = IDrawable.Window_EndY - IDrawable.Window_StartY;
+
             if (Functions.Equal_Approx(P1.X_Coord, P2.X_Coord))
             {
                 if (P1_inf)
                 {
-                    y1 = 3*IDrawable.Window_StartY/2;
+                    y1 = IDrawable.Window_StartY - Window_Y_Size/2;
                 }
                 if (P2_inf)
                 {
-                    y2 = 3*IDrawable.Window_EndY/2;
+                    y2 = IDrawable.Window_EndY + Window_Y_Size/2;
                 }
             }
             else
             {
                 if (P1_inf)
                 {
-                    x1 = 3*IDrawable.Window_StartX/2;
+                    x1 = IDrawable.Window_StartX - Window_X_Size/2;
                     y1 = -C/B - A/B*x1;
                 }
 
                 if (P2_inf)
                 {
-                    x2 = 3*IDrawable.Window_EndX/2;
+                    x2 = IDrawable.Window_EndX + Window_Y_Size/2;
                     y2 = -C/B - A/B*x2;
                 }
             }
