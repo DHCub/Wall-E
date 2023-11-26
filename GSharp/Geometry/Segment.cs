@@ -6,7 +6,13 @@ public partial class Segment : GeoExpr
     public Point A_Point {get;}
     public Point B_Point {get;}
 
-    public Segment() : this(new Point(), new Point()) {}
+    public Segment()
+    {
+        (Point p1, Point p2) = Point.TwoDifferentPoints();
+
+        this.A_Point = p1;
+        this.B_Point = p2;
+    }
 
     public Segment(Point A_Point, Point B_Point)
     {

@@ -91,4 +91,19 @@ public partial class Point : GeoExpr
     }
 
     public override Point Sample() => this;
+
+    public static (Point p1, Point p2) TwoDifferentPoints()
+    {
+        Point p1 = new();
+        Point p2 = new();
+
+        if (!Functions.Equal_Vectors_Approx(p1, p2)) return (p1, p2);
+
+        p2 = new Point(1E-7, 0);
+        p2 = p2.GetRotatedAsVector(GeoExpr.rnd.RandfRange(0, (float)(2*Math.PI)));
+
+        p2 = p1 + p2;
+
+        return (p1, p2);
+    }
 }

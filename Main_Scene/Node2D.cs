@@ -8,8 +8,15 @@ using System.Collections.Generic;
 
 public partial class Node2D : Godot.Node2D
 {
-    private const float PointRadius = 5;
     private List<(IDrawable drawable, Godot.Color color)> shapes = new();
+
+    private bool ShowAxes;
+
+    public void ToggleAxes() 
+    {
+        ShowAxes = !ShowAxes;
+        QueueRedraw();
+    }
     
     public override void _Ready()
     {
@@ -20,7 +27,6 @@ public partial class Node2D : Godot.Node2D
     {
         var lineWidth = 2/Transform.X.X;
 
-        var container = GetNode<Draw_Area_Marg>("../../../..");
         // DrawCircle(container.Size/2, PointRadius, Colors.Green);
 
         void draw_segment(Line L, Point P1, Point P2, Godot.Color color, bool P1_inf = false, bool P2_inf = false)
@@ -96,18 +102,29 @@ public partial class Node2D : Godot.Node2D
            
         }
 
+        void show_axes()
+        {
+            var X = new Line(new(0, 0), new(1, 0));
+            var Y = new Line(new(0, 0), new(0, 1));
+
+            draw_segment(X, new(0, 0), new(1, 0), Colors.Black, true, true);
+            draw_segment(Y, new(0, 0), new(0, 1), Colors.Black, true, true);
+        }
+
+        if (ShowAxes) show_axes();
+
         foreach(var (drawable, color) in shapes)
         {
             if (drawable is Point P)
             {
-                DrawCircle((Vector2)P, PointRadius/Transform.X.X, color);
+                DrawCircle((Vector2)P, IDrawable.Point_Representation_Radius/Transform.X.X, color);
             }
             else if (drawable is Line L)
             {
                 draw_segment(
                     L,
                     L.A_Point,
-                    L.A_Point + L.Direction_Vector,
+                    L.A_Point + L.Director_Vector,
                     color,
                     true,
                     true

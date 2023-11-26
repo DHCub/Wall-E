@@ -7,7 +7,13 @@ public partial class Ray : GeoExpr
 
     public Point Director_Vector {get;}
 
-    public Ray() : this(new Point(), new Point()) {}
+    public Ray()
+    {
+        (Point p1, Point p2) = Point.TwoDifferentPoints();
+
+        this.First_Point = p1;
+        this.Director_Vector = p2 - First_Point;
+    }   
 
     public Ray(Point First_Point, Point Second_Point)
     {

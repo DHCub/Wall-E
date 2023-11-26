@@ -16,8 +16,8 @@ public partial class Control : Godot.Control
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		
 	}
-
 
 	public void _on_Button_pressed() 
 	{
@@ -82,12 +82,8 @@ public partial class Control : Godot.Control
 			return;
 		}
 
-		var X = new Line(new(0, 0), new(1, 0));
-		var Y = new Line(new(0, 0), new(0, 1));
 
-
-
-		Line l1 = new();		
+		Line l1 = new();
 		Line l2 = new();		
 		Line l3 = new();		
 		Line l4 = new();
@@ -102,14 +98,13 @@ public partial class Control : Godot.Control
 		Circle C3 = new();	
 		Circle C4 = new();	
 
-		draw_area.AddDrawable(Colors.Red, X, Y);
+
 		draw_area.AddDrawable(Colors.RebeccaPurple, l1, l2, l3, l4, A1, A2, A3, A4, C1, C2, C3, C4);
 
-		ShowIntersect(X, Y, l1, l2, l3, l4, A1, A2, A3, A4, C1, C2, C3, C4);
-
+		// ShowIntersect(X, Y, l1, l2, l3, l4, A1, A2, A3, A4, C1, C2, C3, C4);
+		draw_area.AddDrawable(Colors.Red, l1);
 		draw_area.QueueRedraw();
 
-		GD.Print("drawn");
 		// GD.Print(txt);
 	}
 

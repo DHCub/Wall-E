@@ -143,9 +143,15 @@ public partial class Draw_Area_Marg : MarginContainer
 		}
 	}
 
-	void _on_button_pressed()
+	void _on_center_button_pressed()
 	{
 		ResetTransform();
+	}
+
+	void _on_show_axes_button_pressed()
+	{
+		var draw_area = GetNode<Node2D>("Viewport_Container/SubViewport/Background/Node2D");
+		draw_area.ToggleAxes();
 	}
 
 }

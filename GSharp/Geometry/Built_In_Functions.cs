@@ -162,7 +162,7 @@ static class Functions
 
     public static Finite_Static_Seqence<Point> Intersect(Line L, Point Point)
     {
-        if ((L.A_Point - Point).IsColinear(L.Direction_Vector))
+        if ((L.A_Point - Point).IsColinear(L.Director_Vector))
             return new Finite_Static_Seqence<Point>(new List<Point>(new Point[]{Point}));
         
         return new Finite_Static_Seqence<Point>();
@@ -251,7 +251,7 @@ static class Functions
 
 
         // we move the circle to the origin, we move the line with it
-        var L_Prime = Line.Point_DirectorVec(L.A_Point - C.Center, L.Direction_Vector);
+        var L_Prime = Line.Point_DirectorVec(L.A_Point - C.Center, L.Director_Vector);
 
         var origin = new Point(0, 0);
         // here we are taking the point in L which is closest to the origin
@@ -276,7 +276,7 @@ static class Functions
 
             var Point_To_Intersection_D = Math.Sqrt(C.Radius * C.Radius - d * d);
 
-            var scaled_Direction = scale_Vector(L.Direction_Vector, Point_To_Intersection_D);
+            var scaled_Direction = scale_Vector(L.Director_Vector, Point_To_Intersection_D);
 
             list.Add(Line_Point + scaled_Direction + C.Center);
             list.Add(Line_Point - scaled_Direction + C.Center);
@@ -285,7 +285,7 @@ static class Functions
         }
 
 
-        var radius_Vector = scale_Vector(L.Direction_Vector, C.Radius);
+        var radius_Vector = scale_Vector(L.Director_Vector, C.Radius);
 
         list.Add(origin + radius_Vector + C.Center);
         list.Add(origin - radius_Vector + C.Center);

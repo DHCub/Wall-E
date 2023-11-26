@@ -76,16 +76,25 @@ grow_vertical = 2
 position = Vector2(380.16, 0)
 script = ExtResource("3")
 
-[node name="Center_Button_Marg" type="MarginContainer" parent="Draw_Area_Marg"]
-custom_minimum_size = Vector2(50, 50)
+[node name="Graph_Buttons" type="MarginContainer" parent="Draw_Area_Marg"]
+custom_minimum_size = Vector2(50, 105)
 layout_mode = 2
 size_flags_horizontal = 8
 size_flags_vertical = 8
 size_flags_stretch_ratio = 0.0
 
-[node name="Button" type="Button" parent="Draw_Area_Marg/Center_Button_Marg"]
+[node name="Center_Button" type="Button" parent="Draw_Area_Marg/Graph_Buttons"]
+custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
+size_flags_vertical = 8
 text = "Center"
+
+[node name="Show_Axes_Button" type="Button" parent="Draw_Area_Marg/Graph_Buttons"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+size_flags_vertical = 0
+text = "Show
+Axes"
 
 [node name="Button_Margin" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -101,5 +110,6 @@ focus_mode = 1
 text = "Draw"
 
 [connection signal="item_rect_changed" from="Draw_Area_Marg" to="Draw_Area_Marg" method="_on_item_rect_changed"]
-[connection signal="pressed" from="Draw_Area_Marg/Center_Button_Marg/Button" to="Draw_Area_Marg" method="_on_button_pressed"]
+[connection signal="pressed" from="Draw_Area_Marg/Graph_Buttons/Center_Button" to="Draw_Area_Marg" method="_on_center_button_pressed"]
+[connection signal="pressed" from="Draw_Area_Marg/Graph_Buttons/Show_Axes_Button" to="Draw_Area_Marg" method="_on_show_axes_button_pressed"]
 [connection signal="pressed" from="Button_Margin/Draw_Button" to="." method="_on_Button_pressed"]

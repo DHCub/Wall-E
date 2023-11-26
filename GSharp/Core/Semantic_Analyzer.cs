@@ -521,7 +521,7 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
                 return new Undefined_Type();
             }
 
-            return TLeft;
+            return (TLeft is Constant_SimpleType CST && CST.Type == GSharpType.Types.Scalar) ? TRight : TLeft;
               
 
         case TokenType.POWER:
