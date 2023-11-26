@@ -2,7 +2,7 @@ namespace Geometry;
 using System;
 using Godot;
 
-public partial class Point : GeoExpr
+public partial class Point : IDrawable
 {
     public double X_Coord { get; }
     public double Y_Coord { get; }
@@ -21,8 +21,8 @@ public partial class Point : GeoExpr
     }
 
     public Point() : this(
-        GeoExpr.rnd.RandfRange(IDrawable.Window_StartX, IDrawable.Window_EndX), 
-        GeoExpr.rnd.RandfRange(IDrawable.Window_StartY, IDrawable.Window_EndY))
+        IDrawable.rnd.RandfRange(IDrawable.Window_StartX, IDrawable.Window_EndX), 
+        IDrawable.rnd.RandfRange(IDrawable.Window_StartY, IDrawable.Window_EndY))
     {}
 
     public Point(double X_Coord, double Y_Coord)
@@ -90,7 +90,7 @@ public partial class Point : GeoExpr
         return new(x2, y2);
     }
 
-    public override Point Sample() => this;
+    public Point Sample() => this;
 
     public static (Point p1, Point p2) TwoDifferentPoints()
     {
@@ -100,7 +100,7 @@ public partial class Point : GeoExpr
         if (!Functions.Equal_Vectors_Approx(p1, p2)) return (p1, p2);
 
         p2 = new Point(1E-7, 0);
-        p2 = p2.GetRotatedAsVector(GeoExpr.rnd.RandfRange(0, (float)(2*Math.PI)));
+        p2 = p2.GetRotatedAsVector(IDrawable.rnd.RandfRange(0, (float)(2*Math.PI)));
 
         p2 = p1 + p2;
 

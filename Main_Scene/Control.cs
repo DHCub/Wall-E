@@ -26,7 +26,7 @@ public partial class Control : Godot.Control
 		var console = GetNode<RichTextLabel>("Console_Margin/Console");
 		console.Text = "";
 
-		void ShowIntersect(params GeoExpr[] arr)
+		void ShowIntersect(params IDrawable[] arr)
 		{
 			for (int i = 0; i < arr.Length - 1; i++)
 			{

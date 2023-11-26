@@ -1,7 +1,7 @@
 namespace Geometry;
 using System;
 
-public partial class Ray : GeoExpr
+public partial class Ray : IDrawable
 {
     public Point First_Point {get;}
 
@@ -27,7 +27,7 @@ public partial class Ray : GeoExpr
     public static Ray Point_DirectorVec(Point Point, Point Direction_Vector)
         => new(Point, Point + Direction_Vector);
 
-    public override Point Sample()
+    public Point Sample()
     {
         throw new NotImplementedException();
     }

@@ -1,7 +1,7 @@
 namespace Geometry;
 using System;
 
-public partial class Segment : GeoExpr
+public partial class Segment : IDrawable
 {
     public Point A_Point {get;}
     public Point B_Point {get;}
@@ -22,12 +22,12 @@ public partial class Segment : GeoExpr
         this.B_Point = B_Point;
     }
 
-    public override Point Sample()
+    public Point Sample()
     {
         var Vector = this.B_Point - this.A_Point;
 
         var norm = Vector.Norm;
-        var length = GeoExpr.rnd.RandfRange(0, (float)norm);
+        var length = IDrawable.rnd.RandfRange(0, (float)norm);
 
         Vector = (length/norm)*Vector;
 

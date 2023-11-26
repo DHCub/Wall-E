@@ -5,7 +5,7 @@ using System.Collections;
 using System.Linq;
 using Geometry;
 
-public abstract class Sequence<T> : IEnumerable<T> where T:GeoExpr
+public abstract class Sequence<T> : IEnumerable<T> where T:class
 {
     IEnumerator<T> IEnumerable<T>.GetEnumerator() => this.items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => this.items.GetEnumerator();
@@ -18,7 +18,9 @@ public abstract class Sequence<T> : IEnumerable<T> where T:GeoExpr
         this.items = items.ToList();
     }
 
-    public virtual T this[int i]
+    #nullable enable
+
+    public virtual T? this[int i]
     {
         get
         {
@@ -26,6 +28,8 @@ public abstract class Sequence<T> : IEnumerable<T> where T:GeoExpr
             return items[i];
         }
     }
+
+    #nullable disable
 
     protected List<T> GetAllElementsFromStart(int start)
     {

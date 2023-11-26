@@ -3,7 +3,7 @@ namespace Geometry;
 using System;
 // using Godot;
 
-public partial class Arc : GeoExpr
+public partial class Arc : IDrawable
 {
     public Ray Start_Ray {get;}
 
@@ -17,7 +17,7 @@ public partial class Arc : GeoExpr
         var core = new Circle();
         
         this.Start_Ray = new Ray(core.Center, new Point());
-        this.Angle = GeoExpr.rnd.RandfRange(0, (float)(2*Math.PI));
+        this.Angle = IDrawable.rnd.RandfRange(0, (float)(2*Math.PI));
         this.Center = core.Center;
         this.Radius = core.Radius;
     }
@@ -31,9 +31,9 @@ public partial class Arc : GeoExpr
         Angle = Start_Ray.Director_Vector.AngleTo(End_Ray.Director_Vector);
     }
 
-    public override Point Sample()
+    public Point Sample()
     {
-        var newAngle = GeoExpr.rnd.RandfRange(0, (float)Angle);
+        var newAngle = IDrawable.rnd.RandfRange(0, (float)Angle);
 
         var vector = this.Start_Ray.Director_Vector.GetRotatedAsVector(newAngle);
 

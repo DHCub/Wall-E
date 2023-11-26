@@ -2,7 +2,7 @@ namespace Geometry;
 using System;
 using Godot;
 
-public partial class Circle : GeoExpr
+public partial class Circle : IDrawable
 {
     public double Radius {get;}
 
@@ -30,9 +30,9 @@ public partial class Circle : GeoExpr
         this.Radius = Radius;
     }
 
-    public override Point Sample()
+    public Point Sample()
     {
-        var angle = rnd.RandfRange(0, (float)(2*Math.PI));
+        var angle = IDrawable.rnd.RandfRange(0, (float)(2*Math.PI));
 
         var vector = new Point(200, 0).GetRotatedAsVector(angle);
 

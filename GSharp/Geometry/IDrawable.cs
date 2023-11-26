@@ -2,15 +2,10 @@ namespace Geometry;
 using System;
 using Godot;
 
-public abstract class GeoExpr : IDrawable
+public interface IDrawable
 {
     public static RandomNumberGenerator rnd = new();
 
-    public abstract Point Sample();
-}
-
-public interface IDrawable
-{
     public static float Window_StartX {get; private set;}
     public static float Window_EndX {get; private set;}
     public static float Window_StartY {get; private set;}
@@ -28,5 +23,7 @@ public interface IDrawable
         Window_EndY = endY;
         ZoomFactor = zoomFactor;
     }
+    public Point Sample();
+
 }
 

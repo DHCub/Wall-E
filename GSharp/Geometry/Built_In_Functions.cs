@@ -17,7 +17,7 @@ static class Functions
     public static double Distance(Line L, Point P)
         => Distance(P, L);
 
-    public static Sequence<Point> Intersect(GeoExpr A, GeoExpr B)
+    public static Sequence<Point> Intersect(IDrawable A, IDrawable B)
     {
         if (A is Point P)
         {
@@ -114,7 +114,7 @@ static class Functions
         else if (A is Arc Arc && B is Arc Arc2)
             return Intersect(Arc, Arc2);
 
-        throw new Exception("UNRECOGNIZED GEOEXPR");
+        throw new Exception("UNRECOGNIZED IDrawable");
 
     }
 

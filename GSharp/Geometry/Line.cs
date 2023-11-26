@@ -1,7 +1,7 @@
 namespace Geometry;
 using System;
 
-public partial class Line : GeoExpr
+public partial class Line : IDrawable
 {
 
     public Point A_Point {get;}
@@ -54,7 +54,7 @@ public partial class Line : GeoExpr
     public static Line Point_DirectorVec(Point Point, Point Direction_Vector)
         => new(Point, Point + Direction_Vector);
 
-    public override Point Sample()
+    public Point Sample()
     {
         var A = this.Normal_Vector.X_Coord;
         var B = this.Normal_Vector.Y_Coord;
@@ -62,12 +62,12 @@ public partial class Line : GeoExpr
 
         if(Functions.Greater_Than_Approx(Math.Abs(A), Math.Abs(B)))
         {
-            var y = GeoExpr.rnd.RandfRange(IDrawable.Window_StartY, IDrawable.Window_EndY);
+            var y = IDrawable.rnd.RandfRange(IDrawable.Window_StartY, IDrawable.Window_EndY);
 
             return new Point(-C/A - B/A*y, y);
         }
 
-        var x = GeoExpr.rnd.RandfRange(IDrawable.Window_StartX, IDrawable.Window_EndX); 
+        var x = IDrawable.rnd.RandfRange(IDrawable.Window_StartX, IDrawable.Window_EndX); 
         return new Point(x, -C/B - A/B*x);
     }
 }
