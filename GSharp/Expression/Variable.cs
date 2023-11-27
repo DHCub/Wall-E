@@ -1,6 +1,6 @@
 namespace GSharp
 {
-  namespace Expr
+  namespace Expression
   {
     public class Variable : Expr
     {

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace GSharp
 {
-  namespace Expr
+  namespace Expression
   {
     public class Sequence : Expr
     {
