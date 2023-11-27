@@ -1,4 +1,6 @@
-namespace GSharp;
+namespace GSharp.Statement;
+
+using GSharp.Expression;
 
 public class Draw : Stmt
 {

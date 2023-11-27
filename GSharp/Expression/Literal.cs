@@ -1,19 +1,15 @@
-namespace GSharp
-{
-  namespace Expression
-  {
-    public class Literal : Expr
-    {
-      public readonly object value;
-      public Literal(object value)
-      {
-        this.value = value;
-      }
+namespace GSharp.Expression;
 
-      public override R Accept<R>(IVisitor<R> visitor)
-      {
-        return visitor.VisitLiteralExpr(this);
-      }
-    }
+public class Literal : Expr
+{
+  public readonly object value;
+  public Literal(object value)
+  {
+    this.value = value;
+  }
+
+  public override R Accept<R>(IVisitor<R> visitor)
+  {
+    return visitor.VisitLiteralExpr(this);
   }
 }

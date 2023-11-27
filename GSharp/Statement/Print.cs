@@ -1,5 +1,8 @@
-namespace GSharp;
+namespace GSharp.Statement;
+
+using GSharp.Expression;
 using System.Collections.Generic;
+
 public class Print : Stmt
 {
   public readonly List<Expr> printe;

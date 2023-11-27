@@ -1,4 +1,7 @@
-namespace GSharp;
+namespace GSharp.Statement;
+
+using GSharp.Expression;
+
 using System.Collections.Generic;
 
 public class Constant : Stmt

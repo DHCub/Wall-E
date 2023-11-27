@@ -1,4 +1,4 @@
-namespace GSharp;
+namespace GSharp.Statement;
 
 public class Restore : Stmt
 {

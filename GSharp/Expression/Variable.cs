@@ -1,20 +1,16 @@
-namespace GSharp
+namespace GSharp.Expression;
+
+public class Variable : Expr
 {
-  namespace Expression
+  public readonly Token name;
+
+  public Variable(Token name)
   {
-    public class Variable : Expr
-    {
-      public readonly Token name;
+    this.name = name;
+  }
 
-      public Variable(Token name)
-      {
-        this.name = name;
-      }
-
-      public override R Accept<R>(IVisitor<R> visitor)
-      {
-        return visitor.VisitVariableExpr(this);
-      }
-    }
+  public override R Accept<R>(IVisitor<R> visitor)
+  {
+    return visitor.VisitVariableExpr(this);
   }
 }

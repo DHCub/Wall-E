@@ -1,28 +1,24 @@
+namespace GSharp.Expression;
+
 using System.Collections.Generic;
 
-namespace GSharp
+public class Call : Expr
 {
-  namespace Expression
+  public readonly Expr calle;
+  public readonly Token paren;
+  public readonly List<Expr> parameters;
+
+  public Call(Expr calle, Token paren, List<Expr> parameters)
   {
-    public class Call : Expr
-    {
-      public readonly Expr calle;
-      public readonly Token paren;
-      public readonly List<Expr> parameters;
+    this.calle = calle;
+    this.paren = paren;
+    this.parameters = parameters;
+  }
 
-      public Call(Expr calle, Token paren, List<Expr> parameters)
-      {
-        this.calle = calle;
-        this.paren = paren;
-        this.parameters = parameters;
-      }
+  public int Arity => parameters.Count;
 
-      public int Arity => parameters.Count;
-
-      public override R Accept<R>(IVisitor<R> visitor)
-      {
-        return visitor.VisitCallExpr(this);
-      }
-    }
+  public override R Accept<R>(IVisitor<R> visitor)
+  {
+    return visitor.VisitCallExpr(this);
   }
 }

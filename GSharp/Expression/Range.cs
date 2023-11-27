@@ -1,22 +1,18 @@
-namespace GSharp
+namespace GSharp.Expression;
+
+public class Range : Expr
 {
-  namespace Expression
+  public readonly Token left;
+  public readonly Token right;
+
+  public Range(Token left, Token right)
   {
-    public class Range : Expr
-    {
-      public readonly Token left;
-      public readonly Token right;
+    this.left = left;
+    this.right = right;
+  }
 
-      public Range(Token left, Token right)
-      {
-        this.left = left;
-        this.right = right;
-      }
-
-      public override R Accept<R>(IVisitor<R> visitor)
-      {
-        return visitor.VisitRangeExpr(this);
-      }
-    }
+  public override R Accept<R>(IVisitor<R> visitor)
+  {
+    return visitor.VisitRangeExpr(this);
   }
 }

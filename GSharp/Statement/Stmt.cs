@@ -1,4 +1,4 @@
-namespace GSharp;
+namespace GSharp.Statement;
 
 public abstract class Stmt
 {
@@ -14,7 +14,6 @@ public abstract class Stmt
     R VisitRestoreStmt(Restore stmt);
     R VisitVarStmt(Var stmt);
     R VisitAssignExpr(Assign expr);
-
   }
 
   public abstract R Accept<R>(IVisitor<R> visitor);
