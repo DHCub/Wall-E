@@ -1,11 +1,15 @@
-namespace GSharp;
-
-public class Undefined : Expr
+namespace GSharp
 {
-  public Undefined() { }
-
-  public override R Accept<R>(IVisitor<R> visitor)
+  namespace Expr
   {
-    return visitor.VisitUndefinedExpr(this);
+    public class Undefined : Expr
+    {
+      public Undefined() { }
+
+      public override R Accept<R>(IVisitor<R> visitor)
+      {
+        return visitor.VisitUndefinedExpr(this);
+      }
+    }
   }
 }

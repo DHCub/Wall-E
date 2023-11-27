@@ -1,21 +1,26 @@
-namespace GSharp;
 using System.Collections.Generic;
 
-public class LetIn : Expr
+namespace GSharp
 {
-  public readonly Token letTk;
-  public readonly List<Stmt> instructions;
-  public readonly Expr body;
-
-  public LetIn(Token letTk, List<Stmt> instructions, Expr body)
+  namespace Expr
   {
-    this.instructions = instructions;
-    this.body = body;
-    this.letTk = letTk;
-  }
+    public class LetIn : Expr
+    {
+      public readonly Token letTk;
+      public readonly List<Stmt> instructions;
+      public readonly Expr body;
 
-  public override R Accept<R>(IVisitor<R> visitor)
-  {
-    return visitor.VisitLetInExpr(this);
+      public LetIn(Token letTk, List<Stmt> instructions, Expr body)
+      {
+        this.instructions = instructions;
+        this.body = body;
+        this.letTk = letTk;
+      }
+
+      public override R Accept<R>(IVisitor<R> visitor)
+      {
+        return visitor.VisitLetInExpr(this);
+      }
+    }
   }
 }

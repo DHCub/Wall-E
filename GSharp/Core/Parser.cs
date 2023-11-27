@@ -401,7 +401,8 @@ public class Parser
   {
     Expr expr = Primary();
 
-    if (expr is Variable funName) {
+    if (expr is Variable funName)
+    {
       switch (funName.name.type)
       {
         case IDENTIFIER:
@@ -411,14 +412,14 @@ public class Parser
         case RAY:
         case ARC:
         case CIRCLE:
-        if (Match(LEFT_PARENTESIS))
-        {
-          expr = FinishCall(expr);
-        }
-        break;
+          if (Match(LEFT_PARENTESIS))
+          {
+            expr = FinishCall(expr);
+          }
+          break;
       }
     }
-    
+
     return expr;
   }
 

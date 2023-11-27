@@ -1,18 +1,22 @@
-namespace GSharp;
-
-public class Unary : Expr
+namespace GSharp
 {
-  public readonly Token oper;
-  public readonly Expr right;
-
-  public Unary(Token oper, Expr right)
+  namespace Expr
   {
-    this.oper = oper;
-    this.right = right;
-  }
+    public class Unary : Expr
+    {
+      public readonly Token oper;
+      public readonly Expr right;
 
-  public override R Accept<R>(IVisitor<R> visitor)
-  {
-    return visitor.VisitUnaryExpr(this);
+      public Unary(Token oper, Expr right)
+      {
+        this.oper = oper;
+        this.right = right;
+      }
+
+      public override R Accept<R>(IVisitor<R> visitor)
+      {
+        return visitor.VisitUnaryExpr(this);
+      }
+    }
   }
 }
