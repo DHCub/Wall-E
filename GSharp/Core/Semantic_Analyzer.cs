@@ -1,20 +1,22 @@
-namespace GSharp;
-using System.Collections.Generic;
+namespace GSharp.Core;
+
 using System;
 using System.Linq;
+using System.Collections.Generic;
+using GSharp.Expression;
 
-public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GSharpType?>
+public class Semantic_Analyzer : Expression.Expr.IVisitor<GSharpType?>, Statement.Stmt.IVisitor<GSharpType?>
 {
 	private readonly Token PlaceholderTok = new(TokenType.UNDEFINED, "PLACEHOLDER", null, -1, -1);
 
 	private const string SEMANTIC = "SEMANTIC";
-	private List<Stmt> Statements;
+	private List<Statement.Stmt> Statements;
 	private ILogger Logger;
 
 	private Context BuiltIns;
 	private Context CurrentContext;
 
-	public Semantic_Analyzer(ILogger Logger, List<Stmt> Statements)
+	public Semantic_Analyzer(ILogger Logger, List<Statement.Stmt> Statements)
 	{
 		void DefineBuiltIns()
 		{
@@ -30,7 +32,7 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
 			const string RANDOMS = "randoms";
 			const string POINTS = "points"; // sample figure
 			const string SAMPLES = "samples";
-			
+
 			BuiltIns.Define(POINT, new Fun_Symbol(
 				POINT,
 				new List<(GSharpType, string)>{
@@ -147,22 +149,22 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
 
 	public void Analyze()
 	{
-		foreach(var stmt in Statements)
+		foreach (var stmt in Statements)
 		{
 			if (stmt is not null) TypeCheck(stmt);
 		}
 	}
 
-	public GSharpType? VisitVarStmt(Var var_stmt)
+	public GSharpType? VisitVarStmt(Statement.Var var_stmt)
 	{
-		GSharpType Type = var_stmt.type.type switch 
+		GSharpType Type = var_stmt.type.type switch
 		{
 			TokenType.POINT => new Constant_SimpleType(GSharpType.Types.Point),
 			TokenType.LINE => new Constant_SimpleType(GSharpType.Types.Line),
 			TokenType.RAY => new Constant_SimpleType(GSharpType.Types.Ray),
 			TokenType.SEGMENT => new Constant_SimpleType(GSharpType.Types.Segment),
 			TokenType.CIRCLE => new Constant_SimpleType(GSharpType.Types.Circle),
-			TokenType.ARC => new Constant_SimpleType(GSharpType.Types.Arc),  
+			TokenType.ARC => new Constant_SimpleType(GSharpType.Types.Arc),
 			_ => null
 		} ?? throw new Exception("VARIABLE DECLARATION TYPE UNSUPPORTED");
 
@@ -175,25 +177,25 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
 		return null;
 	}
 
-	public GSharpType? VisitPrintStmt(Print print)
+	public GSharpType? VisitPrintStmt(Statement.Print print)
 	{
-		foreach(var expr in print.printe)
+		foreach (var expr in print.printe)
 			TypeCheck(expr);
-		
-		return null;   
+
+		return null;
 	}
 
-	private GSharpType? TypeCheck(Stmt stmt)
+	private GSharpType? TypeCheck(Statement.Stmt stmt)
 	{
 		return stmt.Accept(this);
 	}
 
-	private GSharpType? TypeCheck(Expr expr)
+	private GSharpType? TypeCheck(Expression.Expr expr)
 	{
 		return expr.Accept(this);
 	}
 
-	public GSharpType? VisitFunctionStmt(Function function)
+	public GSharpType? VisitFunctionStmt(Statement.Function function)
 	{
 
 		#region check if function is defined
@@ -201,8 +203,8 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
 			CurrentContext.Get_Symbol(function.name.lexeme, function.Arity) != null)
 		{
 			Logger.Error(
-				SEMANTIC, 
-				function.name, 
+				SEMANTIC,
+				function.name,
 				$"A function called {function.name.lexeme} with {function.Arity} parameters is already defined in this Context"
 			);
 
@@ -218,14 +220,14 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
 
 		List<(GSharpType type, string name)> Parameters = new();
 
-		foreach(var param in function.parameters)
+		foreach (var param in function.parameters)
 		{
 			(GSharpType type, string name) parameter_info = (new Undefined_Type(), param.lexeme);
 
 			Parameters.Add(parameter_info);
 
 			Function_Context.Define(
-				parameter_info.name, 
+				parameter_info.name,
 				new Variable_Symbol(new Undefined_Type(), parameter_info.name)
 			);
 		}
@@ -233,8 +235,8 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
 		Undefined_Type return_type = new();
 
 		Fun_Symbol Function_Symbol = new(
-			function.name.lexeme, 
-			Parameters, 
+			function.name.lexeme,
+			Parameters,
 			return_type
 		);
 
@@ -246,7 +248,7 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
 
 		#endregion
 
-		var ogContext = CurrentContext; 
+		var ogContext = CurrentContext;
 
 		CurrentContext = Function_Context;
 
@@ -265,18 +267,18 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
 		return null;
 	}
 
-	public GSharpType? VisitColorStmt(Color color) => null;
+	public GSharpType? VisitColorStmt(Statement.Color color) => null;
 
-	public GSharpType? VisitConstantStmt(Constant constant)
+	public GSharpType? VisitConstantStmt(Statement.Constant constant)
 	{
-		var assign = new Assign(constant.constNames, constant.initializer);
+		var assign = new Statement.Assign(constant.constNames, constant.initializer);
 		return TypeCheck(assign);
 	}
 
-	public GSharpType? VisitDrawStmt (Draw draw)
+	public GSharpType? VisitDrawStmt(Statement.Draw draw)
 	{
 		Drawable_Type drawable = new();
-		
+
 		var expType = TypeCheck(draw.elements);
 		if (!expType.Matches(drawable))
 			Logger.Error(SEMANTIC, draw.commandTk, $"Object to draw must be drawable, {expType} passed instead");
@@ -284,18 +286,18 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
 		return null;
 	}
 
-	public GSharpType? VisitExpressionStmt (Expression expression) => TypeCheck(expression.expression);
+	public GSharpType? VisitExpressionStmt(Statement.Expression expression) => TypeCheck(expression.expression);
 
-	public GSharpType? VisitImportStmt (Import import) => null;
+	public GSharpType? VisitImportStmt(Statement.Import import) => null;
 
-	public GSharpType? VisitRestoreStmt(Restore restore) => null;
+	public GSharpType? VisitRestoreStmt(Statement.Restore restore) => null;
 
-	public GSharpType? VisitLetInExpr (LetIn letIn)
+	public GSharpType? VisitLetInExpr(Expression.LetIn letIn)
 	{
 		var ogContext = CurrentContext;
 		CurrentContext = new(CurrentContext);
 
-		foreach(var instruction in letIn.instructions)
+		foreach (var instruction in letIn.instructions)
 			TypeCheck(instruction);
 
 		var return_type = TypeCheck(letIn.body);
@@ -333,10 +335,10 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
 		else throw new Exception("LITERAL NOT SUPPORTED");
 	}
 
-	public GSharpType? VisitAssignExpr(Assign assign)
+	public GSharpType? VisitAssignExpr(Statement.Assign assign)
 	{
 		GSharpType ValueType = TypeCheck(assign.value);
-		
+
 		void RedefinedError(Token VarNanme)
 		{
 			Logger.Error(SEMANTIC, VarNanme, "Variable " + VarNanme.lexeme + " Redefined");
@@ -355,7 +357,7 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
 						new Variable_Symbol(seq.Type, assign.name[i].lexeme)
 					))
 					RedefinedError(assign.name[i]);
-					
+
 			}
 
 			if (!IsUnderscore(assign.name.Last()) && !CurrentContext.Define(
@@ -369,13 +371,13 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
 		{
 			if (assign.name.Count > 1)
 				Logger.Error(SEMANTIC, assign.name[0], "Cannot destructure a non-sequence object");
-			
+
 			if (!IsUnderscore(assign.name[0]) && !CurrentContext.Define(
 					assign.name[0].lexeme,
 					new Variable_Symbol(simpleType, assign.name[0].lexeme)
 				))
 				RedefinedError(assign.name[0]);
-			
+
 			for (int i = 1; i < assign.name.Count; i++)
 			{
 				if (IsUnderscore(assign.name[i])) continue;
@@ -389,9 +391,9 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
 
 		else if (ValueType is Undefined_Type u)
 		{
-			foreach(var VarName in assign.name)
+			foreach (var VarName in assign.name)
 			{
-				if (!IsUnderscore(VarName) && 
+				if (!IsUnderscore(VarName) &&
 					!CurrentContext.Define(
 						VarName.lexeme,
 						new Variable_Symbol(u, VarName.lexeme)
@@ -402,7 +404,7 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
 
 		else if (ValueType is Drawable_Type d)
 		{
-			foreach(var VarName in assign.name)
+			foreach (var VarName in assign.name)
 			{
 				if (!IsUnderscore(VarName) &&
 					!CurrentContext.Define(
@@ -433,123 +435,123 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
 
 		switch (binary.oper.type)
 		{
-		case TokenType.PLUS:
-			if (!TLeft.IsAddable())
-				error = true;
+			case TokenType.PLUS:
+				if (!TLeft.IsAddable())
+					error = true;
 
-			if (!TRight.IsAddable())
-				error = true;
+				if (!TRight.IsAddable())
+					error = true;
 
-			if (!error)
-			{
+				if (!error)
+				{
+					if (!TLeft.Matches(TRight))
+					{
+						Operator_Doesnt_Support_Operands_Error();
+						return new Undefined_Type();
+					}
+
+					if (TLeft is Undefined_Type)
+						return TRight;
+
+					return TLeft;
+				}
+
+				Operator_Doesnt_Support_Operands_Error();
+				return new Undefined_Type();
+
+			case TokenType.MINUS:
+				if (!TLeft.IsSubstractable())
+					error = true;
+
+				if (!TRight.IsSubstractable())
+					error = true;
+
+				if (!error)
+				{
+					if (!TLeft.Matches(TRight))
+					{
+						Operator_Doesnt_Support_Operands_Error();
+						return new Undefined_Type();
+					}
+
+					if (TLeft is Undefined_Type)
+						return TRight;
+
+					return TLeft;
+				}
+
+				Operator_Doesnt_Support_Operands_Error();
+				return new Undefined_Type();
+
+
+			case TokenType.EQUAL_EQUAL:
+			case TokenType.NOT_EQUAL:
+				return new Constant_SimpleType(GSharpType.Types.Boolean);
+
+			case TokenType.LESS_EQUAL:
+			case TokenType.LESS:
+			case TokenType.GREATER:
+			case TokenType.GREATER_EQUAL:
+
+				if (!TLeft.IsComparable())
+					error = true;
+
+				if (!TRight.IsComparable())
+					error = true;
+
 				if (!TLeft.Matches(TRight))
+					error = true;
+
+				if (error) Operator_Doesnt_Support_Operands_Error();
+				return new Constant_SimpleType(GSharpType.Types.Boolean);
+
+			case TokenType.DIV:
+
+				if (!TLeft.Is_Dividable_By(TRight))
 				{
 					Operator_Doesnt_Support_Operands_Error();
 					return new Undefined_Type();
 				}
 
-				if (TLeft is Undefined_Type)
-					return TRight;
-				
 				return TLeft;
-			}
-			
-			Operator_Doesnt_Support_Operands_Error();
-			return new Undefined_Type();
-		
-		case TokenType.MINUS:
-			if (!TLeft.IsSubstractable())
-				error = true;
 
-			if (!TRight.IsSubstractable())
-				error = true;
+			case TokenType.MUL:
 
-			if(!error)
-			{
-				if (!TLeft.Matches(TRight))
+				if (!TLeft.Is_Multiplyable_By(TRight))
 				{
 					Operator_Doesnt_Support_Operands_Error();
 					return new Undefined_Type();
 				}
 
-				if (TLeft is Undefined_Type)
-					return TRight;
-				
-				return TLeft;                
-			}
+				return (TLeft is Constant_SimpleType CST && CST.Type == GSharpType.Types.Scalar) ? TRight : TLeft;
 
-			Operator_Doesnt_Support_Operands_Error();
-			return new Undefined_Type();
 
-	
-		case TokenType.EQUAL_EQUAL:
-		case TokenType.NOT_EQUAL:
-			return new Constant_SimpleType(GSharpType.Types.Boolean);   
+			case TokenType.POWER:
+			case TokenType.MOD:
 
-		case TokenType.LESS_EQUAL:
-		case TokenType.LESS:
-		case TokenType.GREATER:
-		case TokenType.GREATER_EQUAL:
-			
-			if (!TLeft.IsComparable())
-				error = true;
-			
-			if (!TRight.IsComparable())
-				error = true;
-			
-			if (!TLeft.Matches(TRight))
-				error = true;
+				if (!TLeft.Matches(numeric) || !TRight.Matches(numeric))
+					Operator_Doesnt_Support_Operands_Error();
 
-			if (error) Operator_Doesnt_Support_Operands_Error();
-			return new Constant_SimpleType(GSharpType.Types.Boolean);
-	
-		case TokenType.DIV:
-			
-			if (!TLeft.Is_Dividable_By(TRight))
-			{
-				Operator_Doesnt_Support_Operands_Error();
-				return new Undefined_Type();
-			}
+				return numeric;
 
-			return TLeft;
-
-		case TokenType.MUL:
-
-			if (!TLeft.Is_Multiplyable_By(TRight))
-			{
-				Operator_Doesnt_Support_Operands_Error();
-				return new Undefined_Type();
-			}
-
-			return (TLeft is Constant_SimpleType CST && CST.Type == GSharpType.Types.Scalar) ? TRight : TLeft;
-			  
-
-		case TokenType.POWER:
-		case TokenType.MOD:
-			
-			if (!TLeft.Matches(numeric) || !TRight.Matches(numeric))
-				Operator_Doesnt_Support_Operands_Error();
-
-			return numeric;
-
-		default: throw new Exception("BINARY OPERATOR UNSUPPORTED");        
+			default: throw new Exception("BINARY OPERATOR UNSUPPORTED");
 		}
-	
+
 	}
 
-	public GSharpType? VisitCallExpr (Call call)
+	public GSharpType? VisitCallExpr(Call call)
 	{
 		var nameTok = ((Variable)call.calle).name;
 
 		var Fun_Symbol = BuiltIns.Get_Symbol(nameTok.lexeme, call.Arity) ?? CurrentContext.Get_Symbol(nameTok.lexeme, call.Arity);
-		
+
 		if (Fun_Symbol == null)
 		{
-			Logger.Error(SEMANTIC, nameTok, $"Function {nameTok.lexeme} with {call.Arity} parameter{((call.Arity > 1)?"s":"")} is Undefined in this Context");
+			Logger.Error(SEMANTIC, nameTok, $"Function {nameTok.lexeme} with {call.Arity} parameter{((call.Arity > 1) ? "s" : "")} is Undefined in this Context");
 			return new Undefined_Type();
 		}
-		
-		for(int i = 0; i < Fun_Symbol.Parameters.Count; i++)
+
+		for (int i = 0; i < Fun_Symbol.Parameters.Count; i++)
 		{
 			var symbolParam_T = Fun_Symbol.Parameters[i].Type;
 			var callArg_T = TypeCheck(call.parameters[i]);
@@ -557,8 +559,8 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
 			if (!symbolParam_T.Matches(callArg_T))
 			{
 				Logger.Error(
-					SEMANTIC, 
-					nameTok, 
+					SEMANTIC,
+					nameTok,
 					$"Parameter #{i + 1} of {nameTok.lexeme} must be {symbolParam_T}, {callArg_T} passed instead"
 				);
 			}
@@ -567,9 +569,9 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
 		return Fun_Symbol.ReturnType;
 	}
 
-	public GSharpType? VisitLogicalExpr (Logical logical)
+	public GSharpType? VisitLogicalExpr(Logical logical)
 	{
-		
+
 		GSharpType TLeft = TypeCheck(logical.left);
 		GSharpType TRight = TypeCheck(logical.right);
 
@@ -592,7 +594,7 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
 		return boolean;
 	}
 
-	public GSharpType? VisitRangeExpr(Range range)
+	public GSharpType? VisitRangeExpr(Expression.Range range)
 	{
 		if (range.left.literal is not double)
 		{
@@ -603,7 +605,7 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
 
 		if (!double.IsInteger((double)range.left.literal))
 			Logger.Error(SEMANTIC, range.left, ERROR_MESSAGE);
-		
+
 		if (!double.IsInteger((double)range.right.literal))
 			Logger.Error(SEMANTIC, range.right, ERROR_MESSAGE);
 
@@ -647,28 +649,28 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Stmt.IVisitor<GShar
 		return new Sequence_Type(new Undefined_Type());
 	}
 
-	public GSharpType? VisitUnaryExpr (Unary unary)
+	public GSharpType? VisitUnaryExpr(Unary unary)
 	{
 		GSharpType TRight = TypeCheck(unary.right);
-		switch(unary.oper.type)
+		switch (unary.oper.type)
 		{
-		case TokenType.NOT:
-			Constant_SimpleType boolean = new(GSharpType.Types.Boolean);
-			if (!TRight.Matches(boolean))
-				Logger.Error(SEMANTIC, unary.oper, $"Logical NOT must have boolean value as right operand {TRight} not supported");
-			
-			return boolean;
-		case TokenType.MINUS:
-			Constant_SimpleType scalar = new(GSharpType.Types.Scalar);
-			Constant_SimpleType measure = new(GSharpType.Types.Measure);
+			case TokenType.NOT:
+				Constant_SimpleType boolean = new(GSharpType.Types.Boolean);
+				if (!TRight.Matches(boolean))
+					Logger.Error(SEMANTIC, unary.oper, $"Logical NOT must have boolean value as right operand {TRight} not supported");
 
-			if (TRight.Matches(scalar)) return scalar;
-			if (TRight.Matches(measure)) return measure;
+				return boolean;
+			case TokenType.MINUS:
+				Constant_SimpleType scalar = new(GSharpType.Types.Scalar);
+				Constant_SimpleType measure = new(GSharpType.Types.Measure);
 
-			Logger.Error(SEMANTIC, unary.oper, $"Minus Unary Operator does not suppot {TRight} as Right Operand");
-			return new Undefined_Type();
+				if (TRight.Matches(scalar)) return scalar;
+				if (TRight.Matches(measure)) return measure;
 
-		default: throw new Exception("UNARY OPERATOR NOT SUPPORTED");
+				Logger.Error(SEMANTIC, unary.oper, $"Minus Unary Operator does not suppot {TRight} as Right Operand");
+				return new Undefined_Type();
+
+			default: throw new Exception("UNARY OPERATOR NOT SUPPORTED");
 		}
 	}
 
