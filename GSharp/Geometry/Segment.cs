@@ -3,8 +3,8 @@ using System;
 
 public partial class Segment : IDrawable
 {
-    public Point A_Point {get;}
-    public Point B_Point {get;}
+    public Point A_Point { get; }
+    public Point B_Point { get; }
 
     public Segment()
     {
@@ -29,7 +29,7 @@ public partial class Segment : IDrawable
         var norm = Vector.Norm;
         var length = IDrawable.rnd.RandfRange(0, (float)norm);
 
-        Vector = (length/norm)*Vector;
+        Vector = (length / norm) * Vector;
 
         return A_Point + Vector;
     }

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Collections.Generic;
 using GSharp.Expression;
 
-public class Semantic_Analyzer : Expression.Expr.IVisitor<GSharpType?>, Statement.Stmt.IVisitor<GSharpType?>
+public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Statement.Stmt.IVisitor<GSharpType?>
 {
 	private readonly Token PlaceholderTok = new(TokenType.UNDEFINED, "PLACEHOLDER", null, -1, -1);
 
@@ -190,7 +190,7 @@ public class Semantic_Analyzer : Expression.Expr.IVisitor<GSharpType?>, Statemen
 		return stmt.Accept(this);
 	}
 
-	private GSharpType? TypeCheck(Expression.Expr expr)
+	private GSharpType? TypeCheck(Expr expr)
 	{
 		return expr.Accept(this);
 	}
@@ -271,8 +271,85 @@ public class Semantic_Analyzer : Expression.Expr.IVisitor<GSharpType?>, Statemen
 
 	public GSharpType? VisitConstantStmt(Statement.Constant constant)
 	{
-		var assign = new Statement.Assign(constant.constNames, constant.initializer);
-		return TypeCheck(assign);
+		GSharpType ValueType = TypeCheck(constant.initializer);
+
+		void RedefinedError(Token VarNanme)
+		{
+			Logger.Error(SEMANTIC, VarNanme, "Variable " + VarNanme.lexeme + " Redefined");
+		}
+
+		bool IsUnderscore(Token name)
+			=> name.lexeme == "_";
+
+		if (ValueType is Sequence_Type seq)
+		{
+			for (int i = 0; i < constant.constNames.Count - 1; i++)
+			{
+				if (IsUnderscore(constant.constNames[i])) continue;
+				if (!CurrentContext.Define(
+						constant.constNames[i].lexeme,
+						new Variable_Symbol(seq.Type, constant.constNames[i].lexeme)
+					))
+					RedefinedError(constant.constNames[i]);
+
+			}
+
+			if (!IsUnderscore(constant.constNames.Last()) && !CurrentContext.Define(
+					constant.constNames.Last().lexeme,
+					new Variable_Symbol(seq, constant.constNames.Last().lexeme)
+				))
+				RedefinedError(constant.constNames.Last());
+		}
+
+		else if (ValueType is Constant_SimpleType simpleType)
+		{
+			if (constant.constNames.Count > 1)
+				Logger.Error(SEMANTIC, constant.constNames[0], "Cannot destructure a non-sequence object");
+
+			if (!IsUnderscore(constant.constNames[0]) && !CurrentContext.Define(
+					constant.constNames[0].lexeme,
+					new Variable_Symbol(simpleType, constant.constNames[0].lexeme)
+				))
+				RedefinedError(constant.constNames[0]);
+
+			for (int i = 1; i < constant.constNames.Count; i++)
+			{
+				if (IsUnderscore(constant.constNames[i])) continue;
+				if (!CurrentContext.Define(
+						constant.constNames[i].lexeme,
+						new Variable_Symbol(new Undefined_Type(), constant.constNames[i].lexeme)
+					))
+					RedefinedError(constant.constNames[i]);
+			}
+		}
+
+		else if (ValueType is Undefined_Type u)
+		{
+			foreach (var VarName in constant.constNames)
+			{
+				if (!IsUnderscore(VarName) &&
+					!CurrentContext.Define(
+						VarName.lexeme,
+						new Variable_Symbol(u, VarName.lexeme)
+					))
+					RedefinedError(VarName);
+			}
+		}
+
+		else if (ValueType is Drawable_Type d)
+		{
+			foreach (var VarName in constant.constNames)
+			{
+				if (!IsUnderscore(VarName) &&
+					!CurrentContext.Define(
+						VarName.lexeme,
+						new Variable_Symbol(d, VarName.lexeme)
+					))
+					RedefinedError(VarName);
+			}
+		}
+
+		return null;
 	}
 
 	public GSharpType? VisitDrawStmt(Statement.Draw draw)
@@ -286,13 +363,13 @@ public class Semantic_Analyzer : Expression.Expr.IVisitor<GSharpType?>, Statemen
 		return null;
 	}
 
-	public GSharpType? VisitExpressionStmt(Statement.Expression expression) => TypeCheck(expression.expression);
+	public GSharpType? VisitExpressionStmt(Statement.Expression expression) => TypeCheck(expression);
 
 	public GSharpType? VisitImportStmt(Statement.Import import) => null;
 
 	public GSharpType? VisitRestoreStmt(Statement.Restore restore) => null;
 
-	public GSharpType? VisitLetInExpr(Expression.LetIn letIn)
+	public GSharpType? VisitLetInExpr(LetIn letIn)
 	{
 		var ogContext = CurrentContext;
 		CurrentContext = new(CurrentContext);
@@ -333,89 +410,6 @@ public class Semantic_Analyzer : Expression.Expr.IVisitor<GSharpType?>, Statemen
 		else if (literal.value is string) return new Constant_SimpleType(GSharpType.Types.String);
 
 		else throw new Exception("LITERAL NOT SUPPORTED");
-	}
-
-	public GSharpType? VisitAssignExpr(Statement.Assign assign)
-	{
-		GSharpType ValueType = TypeCheck(assign.value);
-
-		void RedefinedError(Token VarNanme)
-		{
-			Logger.Error(SEMANTIC, VarNanme, "Variable " + VarNanme.lexeme + " Redefined");
-		}
-
-		bool IsUnderscore(Token name)
-			=> name.lexeme == "_";
-
-		if (ValueType is Sequence_Type seq)
-		{
-			for (int i = 0; i < assign.name.Count - 1; i++)
-			{
-				if (IsUnderscore(assign.name[i])) continue;
-				if (!CurrentContext.Define(
-						assign.name[i].lexeme,
-						new Variable_Symbol(seq.Type, assign.name[i].lexeme)
-					))
-					RedefinedError(assign.name[i]);
-
-			}
-
-			if (!IsUnderscore(assign.name.Last()) && !CurrentContext.Define(
-					assign.name.Last().lexeme,
-					new Variable_Symbol(seq, assign.name.Last().lexeme)
-				))
-				RedefinedError(assign.name.Last());
-		}
-
-		else if (ValueType is Constant_SimpleType simpleType)
-		{
-			if (assign.name.Count > 1)
-				Logger.Error(SEMANTIC, assign.name[0], "Cannot destructure a non-sequence object");
-
-			if (!IsUnderscore(assign.name[0]) && !CurrentContext.Define(
-					assign.name[0].lexeme,
-					new Variable_Symbol(simpleType, assign.name[0].lexeme)
-				))
-				RedefinedError(assign.name[0]);
-
-			for (int i = 1; i < assign.name.Count; i++)
-			{
-				if (IsUnderscore(assign.name[i])) continue;
-				if (!CurrentContext.Define(
-						assign.name[i].lexeme,
-						new Variable_Symbol(new Undefined_Type(), assign.name[i].lexeme)
-					))
-					RedefinedError(assign.name[i]);
-			}
-		}
-
-		else if (ValueType is Undefined_Type u)
-		{
-			foreach (var VarName in assign.name)
-			{
-				if (!IsUnderscore(VarName) &&
-					!CurrentContext.Define(
-						VarName.lexeme,
-						new Variable_Symbol(u, VarName.lexeme)
-					))
-					RedefinedError(VarName);
-			}
-		}
-
-		else if (ValueType is Drawable_Type d)
-		{
-			foreach (var VarName in assign.name)
-			{
-				if (!IsUnderscore(VarName) &&
-					!CurrentContext.Define(
-						VarName.lexeme,
-						new Variable_Symbol(d, VarName.lexeme)
-					))
-					RedefinedError(VarName);
-			}
-		}
-
-		return null;
 	}
 
 	public GSharpType? VisitBinaryExpr(Binary binary)
@@ -554,7 +548,7 @@ public class Semantic_Analyzer : Expression.Expr.IVisitor<GSharpType?>, Statemen
 		for (int i = 0; i < Fun_Symbol.Parameters.Count; i++)
 		{
 			var symbolParam_T = Fun_Symbol.Parameters[i].Type;
-			var callArg_T = TypeCheck(call.parameters[i]);
+			var callArg_T = TypeCheck(call.arguments[i]);
 
 			if (!symbolParam_T.Matches(callArg_T))
 			{
@@ -594,7 +588,7 @@ public class Semantic_Analyzer : Expression.Expr.IVisitor<GSharpType?>, Statemen
 		return boolean;
 	}
 
-	public GSharpType? VisitRangeExpr(Expression.Range range)
+	public GSharpType? VisitIntRangeExpr(IntRange range)
 	{
 		if (range.left.literal is not double)
 		{
@@ -610,6 +604,11 @@ public class Semantic_Analyzer : Expression.Expr.IVisitor<GSharpType?>, Statemen
 			Logger.Error(SEMANTIC, range.right, ERROR_MESSAGE);
 
 		return new Constant_SimpleType(GSharpType.Types.Scalar);
+	}
+
+	public GSharpType? VisitGroupingExpr(Grouping expr)
+	{
+		return TypeCheck(expr.expression);
 	}
 
 	public GSharpType? VisitSequenceExpr(Sequence sequence)

@@ -1,11 +1,11 @@
-namespace GSharp;
+namespace GSharp.Collections;
 
 using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using Geometry;
 
-public abstract class Sequence<T> : IEnumerable<T> where T:class
+public abstract class Sequence<T> : IEnumerable<T>
 {
     IEnumerator<T> IEnumerable<T>.GetEnumerator() => this.items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => this.items.GetEnumerator();
@@ -18,18 +18,18 @@ public abstract class Sequence<T> : IEnumerable<T> where T:class
         this.items = items.ToList();
     }
 
-    #nullable enable
+#nullable enable
 
     public virtual T? this[int i]
     {
         get
         {
-            if (i >= items.Count) return null;
+            if (i >= items.Count) return default;
             return items[i];
         }
     }
 
-    #nullable disable
+#nullable disable
 
     protected List<T> GetAllElementsFromStart(int start)
     {

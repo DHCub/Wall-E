@@ -1,15 +1,21 @@
+namespace GSharp;
+
 using System.Collections.Generic;
-using GSharp;
 
 public class Environment
 {
-
   public readonly Environment enclosing;
   private readonly Dictionary<string, object> values;
 
-  Environment()
+  public Environment()
   {
     this.enclosing = null;
+    this.values = new Dictionary<string, object>();
+  }
+
+  public Environment(Environment enclosing)
+  {
+    this.enclosing = enclosing;
     this.values = new Dictionary<string, object>();
   }
 

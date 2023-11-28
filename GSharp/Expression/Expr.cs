@@ -7,10 +7,11 @@ public abstract class Expr
     R VisitBinaryExpr(Binary expr);
     R VisitCallExpr(Call expr);
     R VisitConditionalExpr(Conditional expr);
+    R VisitGroupingExpr(Grouping expr);
+    R VisitIntRangeExpr(IntRange expr);
     R VisitLetInExpr(LetIn expr);
     R VisitLiteralExpr(Literal expr);
     R VisitLogicalExpr(Logical expr);
-    R VisitRangeExpr(Range expr);
     R VisitSequenceExpr(Sequence expr);
     R VisitUnaryExpr(Unary expr);
     R VisitUndefinedExpr(Undefined expr);

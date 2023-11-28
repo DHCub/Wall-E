@@ -13,7 +13,6 @@ public abstract class Stmt
     R VisitPrintStmt(Print stmt);
     R VisitRestoreStmt(Restore stmt);
     R VisitVarStmt(Var stmt);
-    R VisitAssignExpr(Assign expr);
   }
 
   public abstract R Accept<R>(IVisitor<R> visitor);

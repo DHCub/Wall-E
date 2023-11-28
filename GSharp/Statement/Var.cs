@@ -1,13 +1,15 @@
 namespace GSharp.Statement;
 
+using GSharp.Expression;
+
 public class Var : Stmt
 {
   public readonly Token type;
   public readonly Token name;
-  public readonly Stmt initializer;
+  public readonly Expr initializer;
   public readonly bool isSequence;
 
-  public Var(Token type, Token name, Stmt initializer, bool isSequence = true)
+  public Var(Token type, Token name, Expr initializer, bool isSequence = false)
   {
     this.type = type;
     this.name = name;

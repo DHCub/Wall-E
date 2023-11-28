@@ -6,16 +6,16 @@ public class Call : Expr
 {
   public readonly Expr calle;
   public readonly Token paren;
-  public readonly List<Expr> parameters;
+  public readonly List<Expr> arguments;
 
-  public Call(Expr calle, Token paren, List<Expr> parameters)
+  public Call(Expr calle, Token paren, List<Expr> arguments)
   {
     this.calle = calle;
     this.paren = paren;
-    this.parameters = parameters;
+    this.arguments = arguments;
   }
 
-  public int Arity => parameters.Count;
+  public int Arity => arguments.Count;
 
   public override R Accept<R>(IVisitor<R> visitor)
   {

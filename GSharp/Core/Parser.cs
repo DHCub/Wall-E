@@ -1,8 +1,10 @@
 namespace GSharp.Core;
 
-
 using System;
 using System.Collections.Generic;
+
+using GSharp.Expression;
+using GSharp.Statement;
 using static TokenType;
 
 public class Parser
@@ -20,9 +22,9 @@ public class Parser
     this.tokens = tokens;
   }
 
-  public List<Statement.Stmt> Parse()
+  public List<Stmt> Parse()
   {
-    List<Statement.Stmt> result = new List<Statement.Stmt>();
+    List<Stmt> result = new List<Stmt>();
     while (!IsAtEnd())
     {
       result.Add(Declaration());
@@ -30,14 +32,14 @@ public class Parser
     return result;
   }
 
-  private Expression.Expr Expression()
+  private Expr Expression()
   {
     if (Match(IF)) return IfExpression(Previous());
     if (Match(LET)) return LetInExpression(Previous());
     return Assignment();
   }
 
-  private Statement.Stmt Declaration()
+  private Stmt Declaration()
   {
     try
     {
@@ -55,6 +57,7 @@ public class Parser
       {
         return ConstDeclaration();
       }
+
       return Statement();
     }
     catch
@@ -64,7 +67,7 @@ public class Parser
     }
   }
 
-  private Statement.Stmt Statement()
+  private Stmt Statement()
   {
     if (Match(DRAW))
     {
@@ -94,25 +97,25 @@ public class Parser
     return ExpressionStatement();
   }
 
-  private Statement.Stmt ExpressionStatement()
+  private Stmt ExpressionStatement()
   {
-    Expression.Expr expr = Expression();
+    Expr expr = Expression();
     Eat(SEMICOLON, "Expected ';' after expression.");
-    return new Statement.Expression(expr);
+    return new Expression(expr);
   }
 
-  private Expression.Expr IfExpression(Token ifTk)
+  private Expr IfExpression(Token ifTk)
   {
-    Expression.Expr condition = Expression();
+    Expr condition = Expression();
     Eat(THEN, "Expected if <expr> then <expr> else <expr>.");
 
-    Expression.Expr thenBranch = Expression();
+    Expr thenBranch = Expression();
     Eat(ELSE, "Expected if <expr> then <expr> else <expr>.");
-    Expression.Expr elseBranch = Expression();
-    return new Expression.Conditional(ifTk, condition, thenBranch, elseBranch);
+    Expr elseBranch = Expression();
+    return new Conditional(ifTk, condition, thenBranch, elseBranch);
   }
 
-  private Statement.Stmt FunDeclaration()
+  private Stmt FunDeclaration()
   {
     Token name = Eat(IDENTIFIER, "Expected function name.");
     Eat(LEFT_PARENTESIS, "Expected '(' after function name.");
@@ -131,14 +134,14 @@ public class Parser
     }
     Eat(RIGHT_PARENTESIS, "Expected ')' after parameters.");
     Eat(EQUAL, "Expected '=' before function's body.");
-    Expression.Expr body = Expression();
+    Expr body = Expression();
     Eat(SEMICOLON, "Expected ';' after function declaration.");
-    return new Statement.Function(name, parameters, body);
+    return new Function(name, parameters, body);
   }
 
-  private Statement.Stmt DrawStatement(Token DrawCommand)
+  private Stmt DrawStatement(Token DrawCommand)
   {
-    Expression.Expr elements = Expression();
+    Expr elements = Expression();
 
     Token nameId = null;
     if (Check(STRING))
@@ -147,16 +150,16 @@ public class Parser
     }
 
     Eat(SEMICOLON, "Expected 'l' after draw command.");
-    return new Statement.Draw(elements, DrawCommand, nameId);
+    return new Draw(elements, DrawCommand, nameId);
   }
 
-  private Statement.Stmt ColorStatement()
+  private Stmt ColorStatement()
   {
     if (Match(BLUE, RED, YELLOW, GREEN, CYAN, MAGENTA, WHITE, GRAY, BLACK))
     {
       Token color = Previous();
       Eat(SEMICOLON, "Expected ';' after color command.");
-      return new Statement.Color(color);
+      return new Color(color);
     }
     else
     {
@@ -165,31 +168,40 @@ public class Parser
     }
   }
 
-  private Statement.Stmt RestoreStatement()
+  private Stmt RestoreStatement()
   {
     Eat(SEMICOLON, "Expected ';' after restore command.");
     return null;
   }
 
-  private Statement.Stmt ImportStatement()
+  private Stmt ImportStatement()
   {
     Token dirName = Eat(STRING, "Expected directory name.");
-    Eat(SEMICOLON, "Expected ';' after import statement.");
-    return new Statement.Import(dirName);
+    Eat(SEMICOLON, "Expected ';' after import ");
+    return new Import(dirName);
   }
 
-  private Statement.Stmt PrintStatement()
+  private Stmt PrintStatement()
   {
-    List<Expression.Expr> printe = new List<Expression.Expr>();
-    while (!Check(SEMICOLON) && !IsAtEnd())
+    List<Expr> printe = new List<Expr>();
+    if (!Check(SEMICOLON))
     {
-      printe.Add(Expression());
+      do
+      {
+        if (printe.Count >= 1024)
+        {
+          Error(Peek(), "Can't have more than 1024 items.");
+        }
+
+        printe.Add(Expression());
+      } while (Match(COMMA));
     }
-    Eat(SEMICOLON, "Expected ';' after print statement.");
-    return new Statement.Print(printe);
+
+    Eat(SEMICOLON, "Expected ';' after print expressions.");
+    return new Print(printe);
   }
 
-  private Statement.Stmt VarDeclaration(Token type)
+  private Stmt VarDeclaration(Token type)
   {
     bool isSequence = false;
     if (Match(SEQUENCE))
@@ -199,10 +211,10 @@ public class Parser
 
     Token name = Eat(IDENTIFIER, "Expected variable name.");
 
-    Statement.Stmt initializer = null;
+    Expr initializer = null;
 
     Eat(SEMICOLON, "Expected ';' after variable declaration.");
-    return new Statement.Var(type, name, initializer, isSequence);
+    return new Var(type, name, initializer, isSequence);
   }
 
   private List<Token> GetNames()
@@ -224,18 +236,18 @@ public class Parser
     return names;
   }
 
-  private Statement.Stmt ConstDeclaration()
+  private Stmt ConstDeclaration()
   {
     List<Token> constNames = GetNames();
     Eat(EQUAL, "Expected '=' after constant name.");
-    Expression.Expr initializer = Expression();
+    Expr initializer = Expression();
     Eat(SEMICOLON, "Expected ';' after constant declaration.");
-    return new Statement.Constant(constNames, initializer);
+    return new Constant(constNames, initializer);
   }
 
-  private List<Statement.Stmt> Instructions()
+  private List<Stmt> Instructions()
   {
-    List<Statement.Stmt> instructions = new List<Statement.Stmt>();
+    List<Stmt> instructions = new List<Stmt>();
     while (!Check(IN) && !IsAtEnd())
     {
       instructions.Add(Declaration());
@@ -243,9 +255,9 @@ public class Parser
     return instructions;
   }
 
-  private Expression.Expr SequenceDeclaration(Token openBraceTk)
+  private Expr SequenceDeclaration(Token openBraceTk)
   {
-    List<Expression.Expr> items = new List<Expression.Expr>();
+    List<Expr> items = new List<Expr>();
     if (!Check(RIGHT_BRACE))
     {
       do
@@ -258,13 +270,13 @@ public class Parser
         if (CheckNext(DOTS))
         {
           Token left = Eat(NUMBER, "Range limit must be a integer constant.");
-          Eat(DOTS, "Expected '...' after left limit of range.");
+          Token dots = Eat(DOTS, "Expected '...' after left limit of range.");
 
           Token right = null;
           if (Check(NUMBER))
             right = Eat(NUMBER, "Range limit must be a integer constant.");
 
-          items.Add(new GSharp.Expression.Range(left, right));
+          items.Add(new IntRange(left, dots, right));
         }
         else
         {
@@ -275,132 +287,132 @@ public class Parser
 
     Eat(RIGHT_BRACE, "Expected '}' after sequence declaration.");
 
-    return new Expression.Sequence(openBraceTk, items);
+    return new Sequence(openBraceTk, items);
   }
 
-  private Expression.Expr LetInExpression(Token letTk)
+  private Expr LetInExpression(Token letTk)
   {
     var instructions = Instructions();
-    Eat(IN, "Expected 'in' at end of 'let-in' expression.");
-    Expression.Expr body = Expression();
-    return new Expression.LetIn(letTk, instructions, body);
+    Eat(IN, "Expected 'in' at end of 'let-in' ");
+    Expr body = Expression();
+    return new LetIn(letTk, instructions, body);
   }
 
-  private Expression.Expr Assignment()
+  private Expr Assignment()
   {
-    Expression.Expr expr = Or();
+    Expr expr = Or();
     return expr;
   }
 
-  private Expression.Expr Or()
+  private Expr Or()
   {
-    Expression.Expr expr = And();
+    Expr expr = And();
     while (Match(OR))
     {
       Token oper = Previous();
-      Expression.Expr right = And();
-      expr = new Expression.Logical(expr, oper, right);
+      Expr right = And();
+      expr = new Logical(expr, oper, right);
     }
     return expr;
   }
 
-  private Expression.Expr And()
+  private Expr And()
   {
-    Expression.Expr expr = Equality();
+    Expr expr = Equality();
     while (Match(AND))
     {
       Token oper = Previous();
-      Expression.Expr right = Equality();
-      expr = new Expression.Logical(expr, oper, right);
+      Expr right = Equality();
+      expr = new Logical(expr, oper, right);
     }
     return expr;
   }
 
-  private Expression.Expr Equality()
+  private Expr Equality()
   {
-    Expression.Expr expr = Comparison();
+    Expr expr = Comparison();
     while (Match(NOT_EQUAL, EQUAL_EQUAL))
     {
       Token oper = Previous();
-      Expression.Expr right = Comparison();
-      expr = new Expression.Binary(expr, oper, right);
+      Expr right = Comparison();
+      expr = new Binary(expr, oper, right);
     }
     return expr;
   }
 
-  private Expression.Expr Comparison()
+  private Expr Comparison()
   {
-    Expression.Expr expr = Term();
+    Expr expr = Term();
     while (Match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL))
     {
       Token oper = Previous();
-      Expression.Expr right = Term();
-      expr = new Expression.Binary(expr, oper, right);
+      Expr right = Term();
+      expr = new Binary(expr, oper, right);
     }
     return expr;
   }
 
-  private Expression.Expr Term()
+  private Expr Term()
   {
-    Expression.Expr expr = Factor();
+    Expr expr = Factor();
     while (Match(MINUS, PLUS))
     {
       Token oper = Previous();
-      Expression.Expr right = Factor();
-      expr = new Expression.Binary(expr, oper, right);
+      Expr right = Factor();
+      expr = new Binary(expr, oper, right);
     }
     return expr;
   }
 
-  private Expression.Expr Factor()
+  private Expr Factor()
   {
-    Expression.Expr expr = Unary();
+    Expr expr = Unary();
     while (Match(DIV, MUL))
     {
       Token oper = Previous();
-      Expression.Expr right = Unary();
-      expr = new Expression.Binary(expr, oper, right);
+      Expr right = Unary();
+      expr = new Binary(expr, oper, right);
     }
     return expr;
   }
 
-  private Expression.Expr Unary()
+  private Expr Unary()
   {
     if (Match(NOT, MINUS))
     {
       Token oper = Previous();
-      Expression.Expr right = Unary();
-      return new Expression.Unary(oper, right);
+      Expr right = Unary();
+      return new Unary(oper, right);
     }
 
     return Call();
   }
 
-  private Expression.Expr FinishCall(Expression.Expr calle)
+  private Expr FinishCall(Expr calle)
   {
-    List<Expression.Expr> parameters = new List<Expression.Expr>();
+    List<Expr> arguments = new List<Expr>();
     if (!Check(RIGHT_PARENTESIS))
     {
       do
       {
-        if (parameters.Count >= 1024)
+        if (arguments.Count >= 1024)
         {
-          Error(Peek(), "Can't have more than 1024 parameters.");
+          Error(Peek(), "Can't have more than 1024 arguments.");
         }
-        parameters.Add(Expression());
+        arguments.Add(Expression());
       } while (Match(COMMA));
     }
 
-    Token paren = Eat(RIGHT_PARENTESIS, "Expected ')' after parameters.");
+    Token paren = Eat(RIGHT_PARENTESIS, "Expected ')' after arguments.");
 
-    return new Expression.Call(calle, paren, parameters);
+    return new Call(calle, paren, arguments);
   }
 
-  private Expression.Expr Call()
+  private Expr Call()
   {
-    Expression.Expr expr = Primary();
+    Expr expr = Primary();
 
-    if (expr is Expression.Variable funName)
+    if (expr is Variable funName)
     {
       switch (funName.name.type)
       {
@@ -422,38 +434,38 @@ public class Parser
     return expr;
   }
 
-  private Expression.Expr Primary()
+  private Expr Primary()
   {
     if (Match(FALSE))
     {
-      return new Expression.Literal(false);
+      return new Literal(false);
     }
 
     if (Match(TRUE))
     {
-      return new Expression.Literal(true);
+      return new Literal(true);
     }
 
     if (Match(UNDEFINED))
     {
-      return new Expression.Undefined();
+      return new Undefined();
     }
 
     if (Match(NUMBER, STRING))
     {
-      return new Expression.Literal(Previous().literal);
+      return new Literal(Previous().literal);
     }
 
     if (Match(IDENTIFIER, POINT, LINE, SEGMENT, RAY, ARC, CIRCLE))
     {
-      return new Expression.Variable(Previous());
+      return new Variable(Previous());
     }
 
     if (Match(LEFT_PARENTESIS))
     {
-      Expression.Expr expr = Expression();
-      Eat(RIGHT_PARENTESIS, "Expected ')' after expression.");
-      return expr;
+      Expr expr = Expression();
+      Eat(RIGHT_PARENTESIS, "Expected ')' after ");
+      return new Grouping(expr);
     }
 
     if (Match(LEFT_BRACE))
@@ -461,7 +473,7 @@ public class Parser
       return SequenceDeclaration(Previous());
     }
 
-    throw Error(Peek(), "Expected expression.");
+    throw Error(Peek(), "Expected ");
   }
 
   private bool Match(params TokenType[] types)

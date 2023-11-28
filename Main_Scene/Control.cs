@@ -2,9 +2,9 @@ using Godot;
 using Geometry;
 using System;
 using GSharp;
+using GSharp.Collections;
+using GSharp.Core;
 using System.Collections.Generic;
-
-
 
 public partial class Control : Godot.Control
 {
@@ -35,7 +35,7 @@ public partial class Control : Godot.Control
 					if (i == j) continue;
 					var intersect = Functions.Intersect(arr[i], arr[j]);
 				
-					if (intersect is Finite_Static_Seqence<Point> Seq)
+					if (intersect is FiniteStaticSequence<Point> Seq)
 					{
 						foreach(var P in Seq)
 							draw_area.AddDrawable(Colors.Black, P);
@@ -82,28 +82,36 @@ public partial class Control : Godot.Control
 			return;
 		}
 
+		var interpreter = new Interpreter(logger);
 
-		Line l1 = new();
-		Line l2 = new();		
-		Line l3 = new();		
-		Line l4 = new();
+		interpreter.Interpret(parser.Parse());
+		
+		if (logger.hadError) {
+			WriteErrors(logger);
+			return;
+		}
 
-		Arc A1 = new();		
-		Arc A2 = new();		
-		Arc A3 = new();		
-		Arc A4 = new();
+		// Line l1 = new();
+		// Line l2 = new();		
+		// Line l3 = new();		
+		// Line l4 = new();
 
-		Circle C1 = new();	
-		Circle C2 = new();	
-		Circle C3 = new();	
-		Circle C4 = new();	
+		// Arc A1 = new();		
+		// Arc A2 = new();		
+		// Arc A3 = new();		
+		// Arc A4 = new();
+
+		// Circle C1 = new();	
+		// Circle C2 = new();	
+		// Circle C3 = new();	
+		// Circle C4 = new();	
 
 
-		draw_area.AddDrawable(Colors.RebeccaPurple, l1, l2, l3, l4, A1, A2, A3, A4, C1, C2, C3, C4);
+		// draw_area.AddDrawable(Colors.RebeccaPurple, l1, l2, l3, l4, A1, A2, A3, A4, C1, C2, C3, C4);
 
 		// ShowIntersect(X, Y, l1, l2, l3, l4, A1, A2, A3, A4, C1, C2, C3, C4);
-		draw_area.AddDrawable(Colors.Red, l1);
-		draw_area.QueueRedraw();
+		// draw_area.AddDrawable(Colors.Red, l1);
+		// draw_area.QueueRedraw();
 
 		// GD.Print(txt);
 	}

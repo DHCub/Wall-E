@@ -23,17 +23,17 @@ public partial class Draw_Area_Marg : MarginContainer
 	}
 
 	private void Update_IDrawable_Window()
-	{	
+	{
 		draw_area = GetNode<Node2D>("Viewport_Container/SubViewport/Background/Node2D");
-		var Center = -Translation/axesVectorMultiplier;
+		var Center = -Translation / axesVectorMultiplier;
 		// Center/=axesVectorMultiplier;
 
-		float x1 = Center.X - Size.X/2/axesVectorMultiplier;
-		float x2 = Center.X + Size.X/2/axesVectorMultiplier;
+		float x1 = Center.X - Size.X / 2 / axesVectorMultiplier;
+		float x2 = Center.X + Size.X / 2 / axesVectorMultiplier;
 
-		float y1 = -Center.Y - Size.Y/2/axesVectorMultiplier;
-		float y2 = -Center.Y + Size.Y/2/axesVectorMultiplier;
-		
+		float y1 = -Center.Y - Size.Y / 2 / axesVectorMultiplier;
+		float y2 = -Center.Y + Size.Y / 2 / axesVectorMultiplier;
+
 		// IDrawable.UpdateWindow(
 		// 	-this.Size.X/2/axesVectorMultiplier, this.Size.X/2/axesVectorMultiplier,
 		// 	-this.Size.Y/2/axesVectorMultiplier, this.Size.Y/2/axesVectorMultiplier
@@ -51,12 +51,12 @@ public partial class Draw_Area_Marg : MarginContainer
 	{
 		var draw_area = GetNode<Node2D>("Viewport_Container/SubViewport/Background/Node2D");
 
-		var x = this.Size.X/2;
-		var y = this.Size.Y/2;
+		var x = this.Size.X / 2;
+		var y = this.Size.Y / 2;
 
 		draw_area.Transform = new Transform2D(
 			new Vector2(axesVectorMultiplier, 0),
-			new Vector2(0, -axesVectorMultiplier), 
+			new Vector2(0, -axesVectorMultiplier),
 			new(x, y)
 		);
 
@@ -83,11 +83,11 @@ public partial class Draw_Area_Marg : MarginContainer
 
 	private void ZoomIn()
 	{
-		axesVectorMultiplier*=1.1f;
-		Vector2 curCenter = this.Size/2;
+		axesVectorMultiplier *= 1.1f;
+		Vector2 curCenter = this.Size / 2;
 
 		var trasVector = -draw_area.Transform.Origin + curCenter;
-		Translation -= trasVector*0.1f;
+		Translation -= trasVector * 0.1f;
 
 		Center_Transform();
 		Update_IDrawable_Window();
@@ -96,12 +96,12 @@ public partial class Draw_Area_Marg : MarginContainer
 
 	private void ZoomOut()
 	{
-		axesVectorMultiplier*=0.9f;
+		axesVectorMultiplier *= 0.9f;
 
-		Vector2 curCenter = this.Size/2;
+		Vector2 curCenter = this.Size / 2;
 
 		var trasVector = -draw_area.Transform.Origin + curCenter;
-		Translation += trasVector*0.1f;
+		Translation += trasVector * 0.1f;
 
 		Center_Transform();
 		Update_IDrawable_Window();
@@ -116,8 +116,8 @@ public partial class Draw_Area_Marg : MarginContainer
 		draw_area.QueueRedraw();
 	}
 
-    public override void _Input(InputEvent @event)
-    {
+	public override void _Input(InputEvent @event)
+	{
 		if (!HasFocus()) return;
 
 		if (@event is InputEventKey key && key.Pressed)
@@ -128,16 +128,16 @@ public partial class Draw_Area_Marg : MarginContainer
 				ZoomOut();
 
 			else if (key.Keycode == Key.Up)
-				Move(new(0, this.Size.Y/50));
+				Move(new(0, this.Size.Y / 50));
 
 			else if (key.Keycode == Key.Down)
-				Move(new(0, -this.Size.Y/50));
+				Move(new(0, -this.Size.Y / 50));
 
 			else if (key.Keycode == Key.Left)
-				Move(new(this.Size.Y/50, 0));
+				Move(new(this.Size.Y / 50, 0));
 
 			else if (key.Keycode == Key.Right)
-				Move(new(-this.Size.Y/50, 0));
+				Move(new(-this.Size.Y / 50, 0));
 
 
 		}

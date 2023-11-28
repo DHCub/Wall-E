@@ -21,9 +21,9 @@ public partial class Point : IDrawable
     }
 
     public Point() : this(
-        IDrawable.rnd.RandfRange(IDrawable.Window_StartX, IDrawable.Window_EndX), 
+        IDrawable.rnd.RandfRange(IDrawable.Window_StartX, IDrawable.Window_EndX),
         IDrawable.rnd.RandfRange(IDrawable.Window_StartY, IDrawable.Window_EndY))
-    {}
+    { }
 
     public Point(double X_Coord, double Y_Coord)
     {
@@ -31,14 +31,14 @@ public partial class Point : IDrawable
         this.Y_Coord = Y_Coord;
     }
 
-    public static Point operator-(Point A, Point B)
+    public static Point operator -(Point A, Point B)
         => new(A.X_Coord - B.X_Coord, A.Y_Coord - B.Y_Coord);
 
-    public static Point operator+(Point A, Point B)
+    public static Point operator +(Point A, Point B)
         => new(A.X_Coord + B.X_Coord, A.Y_Coord + B.Y_Coord);
 
-    public static Point operator*(double alpha, Point A)
-        => new(A.X_Coord*alpha, A.Y_Coord*alpha);
+    public static Point operator *(double alpha, Point A)
+        => new(A.X_Coord * alpha, A.Y_Coord * alpha);
 
     public double Dot_Product(Point other) => this.X_Coord * other.X_Coord + this.Y_Coord * other.Y_Coord;
 
@@ -57,7 +57,7 @@ public partial class Point : IDrawable
     public double AngleTo(Point other)
     {
         var cos_times_Norm = this.Dot_Product(other);
-        var sin_times_Norm = this.X_Coord*other.Y_Coord - this.Y_Coord*other.X_Coord;
+        var sin_times_Norm = this.X_Coord * other.Y_Coord - this.Y_Coord * other.X_Coord;
 
         var angle = Math.Atan2(sin_times_Norm, cos_times_Norm);
         if (angle < 0) angle = angle + 2 * Math.PI;
@@ -84,8 +84,8 @@ public partial class Point : IDrawable
 
     public Point GetRotatedAsVector(double Angle)
     {
-        var x2 = Math.Cos(Angle)*X_Coord - Math.Sin(Angle)*Y_Coord;
-        var y2 = Math.Sin(Angle)*X_Coord + Math.Cos(Angle)*Y_Coord;
+        var x2 = Math.Cos(Angle) * X_Coord - Math.Sin(Angle) * Y_Coord;
+        var y2 = Math.Sin(Angle) * X_Coord + Math.Cos(Angle) * Y_Coord;
 
         return new(x2, y2);
     }
@@ -100,7 +100,7 @@ public partial class Point : IDrawable
         if (!Functions.Equal_Vectors_Approx(p1, p2)) return (p1, p2);
 
         p2 = new Point(1E-7, 0);
-        p2 = p2.GetRotatedAsVector(IDrawable.rnd.RandfRange(0, (float)(2*Math.PI)));
+        p2 = p2.GetRotatedAsVector(IDrawable.rnd.RandfRange(0, (float)(2 * Math.PI)));
 
         p2 = p1 + p2;
 

@@ -5,40 +5,40 @@ using System;
 
 public partial class Arc : IDrawable
 {
-    public Ray Start_Ray {get;}
+  public Ray Start_Ray { get; }
 
-    public Point Center {get;}
+  public Point Center { get; }
 
-    public double Radius {get;}
-    public double Angle {get;}
- 
-    public Arc()
-    {
-        var core = new Circle();
-        
-        this.Start_Ray = new Ray(core.Center, new Point());
-        this.Angle = IDrawable.rnd.RandfRange(0, (float)(2*Math.PI));
-        this.Center = core.Center;
-        this.Radius = core.Radius;
-    }
+  public double Radius { get; }
+  public double Angle { get; }
 
-    public Arc(Ray Start_Ray, Ray End_Ray, double Radius)
-    {
-        this.Start_Ray = Start_Ray;
-        this.Center = Start_Ray.First_Point;
-        this.Radius = Radius;
+  public Arc()
+  {
+    var core = new Circle();
 
-        Angle = Start_Ray.Director_Vector.AngleTo(End_Ray.Director_Vector);
-    }
+    this.Start_Ray = new Ray(core.Center, new Point());
+    this.Angle = IDrawable.rnd.RandfRange(0, (float)(2 * Math.PI));
+    this.Center = core.Center;
+    this.Radius = core.Radius;
+  }
 
-    public Point Sample()
-    {
-        var newAngle = IDrawable.rnd.RandfRange(0, (float)Angle);
+  public Arc(Ray Start_Ray, Ray End_Ray, double Radius)
+  {
+    this.Start_Ray = Start_Ray;
+    this.Center = Start_Ray.First_Point;
+    this.Radius = Radius;
 
-        var vector = this.Start_Ray.Director_Vector.GetRotatedAsVector(newAngle);
+    Angle = Start_Ray.Director_Vector.AngleTo(End_Ray.Director_Vector);
+  }
 
-        vector = (this.Radius/vector.Norm)*vector;
+  public Point Sample()
+  {
+    var newAngle = IDrawable.rnd.RandfRange(0, (float)Angle);
 
-        return vector + this.Center;
-    }
+    var vector = this.Start_Ray.Director_Vector.GetRotatedAsVector(newAngle);
+
+    vector = (this.Radius / vector.Norm) * vector;
+
+    return vector + this.Center;
+  }
 }

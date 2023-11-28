@@ -1,14 +1,14 @@
-namespace GSharp;
+namespace GSharp.Collections;
 
 using System.Collections.Generic;
 using System;
 using System.Collections;
 using Geometry;
 
-public partial class Generator_Sequence<T> : Infinite_Static_Sequence<T>, IEnumerable<T> where T:class
+public partial class GeneratorSequence<T> : InfiniteStaticSequence<T>, IEnumerable<T>
 {
     Func<T> GeneratorFunction; // this must not return null
-    public Generator_Sequence(Func<T> GeneratorFunction, ICollection<T> items = null) : base(items == null ? new List<T>() : items)
+    public GeneratorSequence(Func<T> GeneratorFunction, ICollection<T> items = null) : base(items == null ? new List<T>() : items)
     {
         this.GeneratorFunction = GeneratorFunction;
     }
@@ -44,9 +44,9 @@ public partial class Generator_Sequence<T> : Infinite_Static_Sequence<T>, IEnume
         }
     }
 
-    public override Generator_Sequence<T> GetRemainder(int start)
+    public override GeneratorSequence<T> GetRemainder(int start)
     {
         var items = GetAllElementsFromStart(start);
-        return new Generator_Sequence<T>(GeneratorFunction, items);
+        return new GeneratorSequence<T>(GeneratorFunction, items);
     }
 }
