@@ -1,7 +1,7 @@
 namespace Geometry;
 
 using Godot;
-using GSharp.ToCheck;
+using GSharp.Collections;
 using System;
 using System.Collections.Generic;
 
@@ -23,8 +23,8 @@ static class Functions
     {
       if (B is Point P2)
         if (Equal_Vectors_Approx(P, P2))
-          return new Finite_Static_Seqence<Point>(new Point[] { P });
-        else return new Finite_Static_Seqence<Point>();
+          return new FiniteStaticSequence<Point>(new Point[] { P });
+        else return new FiniteStaticSequence<Point>();
 
       if (B is Line L1)
         return Intersect(P, L1);
@@ -121,10 +121,10 @@ static class Functions
 
   #region Point
 
-  public static Finite_Static_Seqence<Point> Intersect(Point Point, Line L) => Intersect(L, Point);
-  public static Finite_Static_Seqence<Point> Intersect(Point Point, Ray R) => Intersect(R, Point);
+  public static FiniteStaticSequence<Point> Intersect(Point Point, Line L) => Intersect(L, Point);
+  public static FiniteStaticSequence<Point> Intersect(Point Point, Ray R) => Intersect(R, Point);
 
-  public static Finite_Static_Seqence<Point> Intersect(Point Point, Segment S)
+  public static FiniteStaticSequence<Point> Intersect(Point Point, Segment S)
   {
     Ray R1 = new(S.A_Point, S.B_Point);
     Ray R2 = new(S.B_Point, S.A_Point);
@@ -135,15 +135,15 @@ static class Functions
     return Intersect(intersect[0], R2);
   }
 
-  public static Finite_Static_Seqence<Point> Intersect(Point Point, Circle C)
+  public static FiniteStaticSequence<Point> Intersect(Point Point, Circle C)
   {
     if (Equal_Approx(Distance(Point, C.Center), C.Radius))
-      return new Finite_Static_Seqence<Point>(new Point[] { Point });
+      return new FiniteStaticSequence<Point>(new Point[] { Point });
 
-    return new Finite_Static_Seqence<Point>();
+    return new FiniteStaticSequence<Point>();
   }
 
-  public static Finite_Static_Seqence<Point> Intersect(Point Point, Arc A)
+  public static FiniteStaticSequence<Point> Intersect(Point Point, Arc A)
   {
     var list = new List<Point>();
 
@@ -153,19 +153,19 @@ static class Functions
       if (Less_Equal_Approx(A.Start_Ray.Director_Vector.AngleTo(CP_Vector), A.Angle)) list.Add(Point);
     }
 
-    return new Finite_Static_Seqence<Point>(list);
+    return new FiniteStaticSequence<Point>(list);
   }
 
   #endregion
 
   #region Line
 
-  public static Finite_Static_Seqence<Point> Intersect(Line L, Point Point)
+  public static FiniteStaticSequence<Point> Intersect(Line L, Point Point)
   {
     if ((L.A_Point - Point).IsColinear(L.Director_Vector))
-      return new Finite_Static_Seqence<Point>(new List<Point>(new Point[] { Point }));
+      return new FiniteStaticSequence<Point>(new List<Point>(new Point[] { Point }));
 
-    return new Finite_Static_Seqence<Point>();
+    return new FiniteStaticSequence<Point>();
   }
 
 
@@ -185,17 +185,17 @@ static class Functions
     {
       // same lines
       if (Equal_Approx(C1, C2))
-        return new Infinite_Static_Sequence<Point>();
+        return new InfiniteStaticSequence<Point>();
 
       // no intersection
-      return new Finite_Static_Seqence<Point>();
+      return new FiniteStaticSequence<Point>();
     }
 
     var intersection = new Point((C1 * B2 - B1 * C2) / Determinant, (A1 * C2 - C1 * A2) / Determinant);
     var list = new List<Point>();
     list.Add(intersection);
 
-    return new Finite_Static_Seqence<Point>(list);
+    return new FiniteStaticSequence<Point>(list);
   }
 
   public static Sequence<Point> Intersect(Line A, Ray R)
@@ -203,9 +203,9 @@ static class Functions
     Line R_Line = Line.Point_DirectorVec(R.First_Point, R.Director_Vector);
     var Line_intersect = Intersect(A, R_Line);
 
-    if (Line_intersect is Finite_Static_Seqence<Point>)
+    if (Line_intersect is FiniteStaticSequence<Point>)
     {
-      var intersection = (Finite_Static_Seqence<Point>)Line_intersect;
+      var intersection = (FiniteStaticSequence<Point>)Line_intersect;
 
       if (intersection.Count == 0) return intersection;
 
@@ -223,7 +223,7 @@ static class Functions
 
     var line_intersection = Intersect(A, S_Line);
 
-    if (line_intersection is Finite_Static_Seqence<Point> intersect)
+    if (line_intersection is FiniteStaticSequence<Point> intersect)
     {
       // parallel lines
       if (intersect.Count == 0) return intersect;
@@ -234,7 +234,7 @@ static class Functions
     return line_intersection;
 
   }
-  public static Finite_Static_Seqence<Point> Intersect(Line L, Circle C)
+  public static FiniteStaticSequence<Point> Intersect(Line L, Circle C)
   {
 
     if (Equal_Approx(C.Radius, 0))
@@ -268,10 +268,10 @@ static class Functions
       {
         // this would mean the line is tangent to the centered circumference
         list.Add(Line_Point + C.Center);
-        return new Finite_Static_Seqence<Point>(list);
+        return new FiniteStaticSequence<Point>(list);
       }
       if (Greater_Than_Approx(d, C.Radius))
-        return new Finite_Static_Seqence<Point>();
+        return new FiniteStaticSequence<Point>();
 
 
       var Point_To_Intersection_D = Math.Sqrt(C.Radius * C.Radius - d * d);
@@ -281,7 +281,7 @@ static class Functions
       list.Add(Line_Point + scaled_Direction + C.Center);
       list.Add(Line_Point - scaled_Direction + C.Center);
 
-      return new Finite_Static_Seqence<Point>(list);
+      return new FiniteStaticSequence<Point>(list);
     }
 
 
@@ -289,11 +289,11 @@ static class Functions
 
     list.Add(origin + radius_Vector + C.Center);
     list.Add(origin - radius_Vector + C.Center);
-    return new Finite_Static_Seqence<Point>(list);
+    return new FiniteStaticSequence<Point>(list);
   }
 
 
-  public static Finite_Static_Seqence<Point> Intersect(Line L, Arc A)
+  public static FiniteStaticSequence<Point> Intersect(Line L, Arc A)
   {
     var circle = new Circle(A.Center, A.Radius);
 
@@ -309,21 +309,21 @@ static class Functions
       if (Less_Equal_Approx(A.Start_Ray.Director_Vector.AngleTo(CP_Vector), A.Angle)) list.Add(P);
     }
 
-    return new Finite_Static_Seqence<Point>(list);
+    return new FiniteStaticSequence<Point>(list);
   }
 
   #endregion
 
   #region Ray
 
-  public static Finite_Static_Seqence<Point> Intersect(Ray R, Point Point)
+  public static FiniteStaticSequence<Point> Intersect(Ray R, Point Point)
   {
     var AP_vector = Point - R.First_Point;
 
-    if (!AP_vector.IsColinear(R.Director_Vector)) return new Finite_Static_Seqence<Point>();
+    if (!AP_vector.IsColinear(R.Director_Vector)) return new FiniteStaticSequence<Point>();
 
-    if (Less_Than_Approx(AP_vector.Dot_Product(R.Director_Vector), 0)) return new Finite_Static_Seqence<Point>();
-    else return new Finite_Static_Seqence<Point>(new Point[] { Point });
+    if (Less_Than_Approx(AP_vector.Dot_Product(R.Director_Vector), 0)) return new FiniteStaticSequence<Point>();
+    else return new FiniteStaticSequence<Point>(new Point[] { Point });
   }
 
 
@@ -337,10 +337,10 @@ static class Functions
     var Line_intersect = Functions.Intersect(Line_A, Line_B);
 
 
-    if (Line_intersect is Finite_Static_Seqence<Point>)
+    if (Line_intersect is FiniteStaticSequence<Point>)
     {
       var list = new List<Point>();
-      var intersection = (Finite_Static_Seqence<Point>)Line_intersect;
+      var intersection = (FiniteStaticSequence<Point>)Line_intersect;
 
       if (intersection.Count == 0) return intersection;
 
@@ -358,7 +358,7 @@ static class Functions
   {
     var line_intersect = Intersect(new Line(R.First_Point, R.First_Point + R.Director_Vector), S);
 
-    if (line_intersect is Finite_Static_Seqence<Point> intersect)
+    if (line_intersect is FiniteStaticSequence<Point> intersect)
     {
       // parallel
       if (intersect.Count == 0) return line_intersect;
@@ -369,7 +369,7 @@ static class Functions
     return line_intersect;
   }
 
-  public static Finite_Static_Seqence<Point> Intersect(Ray R, Circle C)
+  public static FiniteStaticSequence<Point> Intersect(Ray R, Circle C)
   {
     var Line_R = Line.Point_DirectorVec(R.First_Point, R.Director_Vector);
 
@@ -384,11 +384,11 @@ static class Functions
 
     }
 
-    return new Finite_Static_Seqence<Point>(list);
+    return new FiniteStaticSequence<Point>(list);
   }
 
 
-  public static Finite_Static_Seqence<Point> Intersect(Ray R, Arc A)
+  public static FiniteStaticSequence<Point> Intersect(Ray R, Arc A)
   {
     var C = new Circle(A.Center, A.Radius);
     var intersection = Intersect(R, C);
@@ -400,14 +400,14 @@ static class Functions
       if (Intersect(P, A).Count > 0) list.Add(P);
     }
 
-    return new Finite_Static_Seqence<Point>(list);
+    return new FiniteStaticSequence<Point>(list);
   }
 
   #endregion
 
   #region Segment
 
-  public static Finite_Static_Seqence<Point> Intersect(Segment S, Point Point)
+  public static FiniteStaticSequence<Point> Intersect(Segment S, Point Point)
       => Intersect(Point, S);
 
   public static Sequence<Point> Intersect(Segment S, Line L)
@@ -422,7 +422,7 @@ static class Functions
     Ray R2 = new(S1.B_Point, S1.A_Point);
 
     var ray_intersect = Intersect(R1, S2);
-    if (ray_intersect is Finite_Static_Seqence<Point> intersect)
+    if (ray_intersect is FiniteStaticSequence<Point> intersect)
     {
       if (intersect.Count == 0) return ray_intersect;
       return Intersect(intersect[0], R2);
@@ -431,7 +431,7 @@ static class Functions
     return ray_intersect;
   }
 
-  public static Finite_Static_Seqence<Point> Intersect(Segment S, Circle C)
+  public static FiniteStaticSequence<Point> Intersect(Segment S, Circle C)
   {
     List<Point> list = new(2);
 
@@ -443,7 +443,7 @@ static class Functions
     return new(list);
   }
 
-  public static Finite_Static_Seqence<Point> Intersect(Segment S, Arc A)
+  public static FiniteStaticSequence<Point> Intersect(Segment S, Arc A)
   {
     Circle C = new(A.Center, A.Radius);
 
@@ -462,15 +462,15 @@ static class Functions
 
   #region Circle
 
-  public static Finite_Static_Seqence<Point> Intersect(Circle C, Point Point)
+  public static FiniteStaticSequence<Point> Intersect(Circle C, Point Point)
       => Intersect(Point, C);
 
 
-  public static Finite_Static_Seqence<Point> Intersect(Circle C, Line L) => Intersect(L, C);
+  public static FiniteStaticSequence<Point> Intersect(Circle C, Line L) => Intersect(L, C);
 
-  public static Finite_Static_Seqence<Point> Intersect(Circle C, Ray R) => Intersect(R, C);
+  public static FiniteStaticSequence<Point> Intersect(Circle C, Ray R) => Intersect(R, C);
 
-  public static Finite_Static_Seqence<Point> Intersect(Circle C, Segment S)
+  public static FiniteStaticSequence<Point> Intersect(Circle C, Segment S)
       => Intersect(S, C);
 
   public static Sequence<Point> Intersect(Circle C1, Circle C2)
@@ -478,9 +478,9 @@ static class Functions
     if (Equal_Vectors_Approx(C1.Center, C2.Center))
     {
       if (Equal_Approx(C1.Radius, C2.Radius))
-        return new Infinite_Static_Sequence<Point>();
+        return new InfiniteStaticSequence<Point>();
 
-      return new Finite_Static_Seqence<Point>();
+      return new FiniteStaticSequence<Point>();
     }
 
     var k1 = C1.Center.X_Coord;
@@ -505,15 +505,15 @@ static class Functions
   {
     var intersections = Intersect(C, new Circle(A.Center, A.Radius));
 
-    if (intersections is Finite_Static_Seqence<Point>)
+    if (intersections is FiniteStaticSequence<Point>)
     {
       var list = new List<Point>();
-      foreach (var P in (Finite_Static_Seqence<Point>)intersections)
+      foreach (var P in (FiniteStaticSequence<Point>)intersections)
       {
         if (Intersect(P, A).Count > 0) list.Add(P);
       }
 
-      return new Finite_Static_Seqence<Point>(list);
+      return new FiniteStaticSequence<Point>(list);
     }
 
     return intersections;
@@ -523,13 +523,13 @@ static class Functions
 
   #region Arc
 
-  public static Finite_Static_Seqence<Point> Intersect(Arc A, Point Point) => Intersect(Point, A);
+  public static FiniteStaticSequence<Point> Intersect(Arc A, Point Point) => Intersect(Point, A);
 
-  public static Finite_Static_Seqence<Point> Intersect(Arc A, Line L) => Intersect(L, A);
+  public static FiniteStaticSequence<Point> Intersect(Arc A, Line L) => Intersect(L, A);
 
-  public static Finite_Static_Seqence<Point> Intersect(Arc A, Ray R) => Intersect(R, A);
+  public static FiniteStaticSequence<Point> Intersect(Arc A, Ray R) => Intersect(R, A);
 
-  public static Finite_Static_Seqence<Point> Intersect(Arc A, Segment S)
+  public static FiniteStaticSequence<Point> Intersect(Arc A, Segment S)
       => Intersect(S, A);
 
   public static Sequence<Point> Intersect(Arc A, Circle C)
@@ -539,15 +539,15 @@ static class Functions
   {
     var intersections = Intersect(new Circle(A1.Center, A1.Radius), A2);
 
-    if (intersections is Finite_Static_Seqence<Point>)
+    if (intersections is FiniteStaticSequence<Point>)
     {
       var list = new List<Point>();
-      foreach (var P in (Finite_Static_Seqence<Point>)intersections)
+      foreach (var P in (FiniteStaticSequence<Point>)intersections)
       {
         if (Intersect(P, A1).Count > 0) list.Add(P);
       }
 
-      return new Finite_Static_Seqence<Point>(list);
+      return new FiniteStaticSequence<Point>(list);
     }
 
 
