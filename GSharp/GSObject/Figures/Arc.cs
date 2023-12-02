@@ -1,19 +1,18 @@
-namespace GSharp.GSObject.Figures;
+namespace GSharp.Objects.Figures;
 
 using System;
-using GSharp.GSObject.Collections;
-using GSharp.Statement;
+using GSharp.Objects.Collections;
+using GSharp.Types;
 
-// using Godot;
 
-public class Arc : Figure
+public class Arc : GeometricLocation
 {
-    public Ray Start_Ray { get; }
+    public readonly Ray Start_Ray;
 
-    public Point Center { get; }
+    public readonly Point Center;
 
-    public double Radius { get; }
-    public double Angle { get; }
+    public readonly double Radius;
+    public readonly double Angle;
 
     public Arc()
     {
@@ -58,17 +57,7 @@ public class Arc : Figure
         return false;
         }
 
-    public override string GetTypeName() => GSTypes.Arc.ToString();
+    public override string GetTypeName() => TypeName.Arc.ToString();
     public override string ToString() => $"Arc{{C={Center}, R={this.Start_Ray}, Alpha={this.Angle}, Rad={this.Radius}}}";
-
-    public override GSObject OperatePoint(Point other, Add op) => UnsupportedOperation(other, op);
-    public override GSObject OperatePoint(Point other, Subst op) => UnsupportedOperation(other, op);
-
-    
-    public override GSObject OperateScalar(Scalar other, Mult op)  => UnsupportedOperation(other, op);
-    public override GSObject OperateScalar(Scalar other, Div op)  => UnsupportedOperation(other, op);
-
-
-
 
 }

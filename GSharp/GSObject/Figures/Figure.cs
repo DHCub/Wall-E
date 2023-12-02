@@ -1,8 +1,8 @@
 
 
-namespace GSharp.GSObject.Figures;
+namespace GSharp.Objects.Figures;
 using System;
-using GSharp.GSObject.Collections;
+using GSharp.Objects.Collections;
 
 public class RandomNumberGenerator
 {
@@ -40,22 +40,27 @@ public abstract class Figure : GSObject
     }
     public abstract Point Sample();
 
-    public override GSObject OperateScalar(Scalar other, Add op) => UnsupportedOperation(other, op);
-    public override GSObject OperateScalar(Scalar other, LessTh op) => UnsupportedOperation(other, op);
+    public override GSObject OperateScalar(Scalar other, Add op) => UnsupportedOperError(other, op);
+    public override GSObject OperateScalar(Scalar other, LessTh op) => UnsupportedOperError(other, op);
 
-    public override GSObject OperateScalar(Scalar other, Mod op) => UnsupportedOperation(other, op);
+    public override GSObject OperateScalar(Scalar other, Mod op) => UnsupportedOperError(other, op);
 
-    public override GSObject OperateScalar(Scalar other, Subst op) => UnsupportedOperation(other, op);
+    public override GSObject OperateScalar(Scalar other, Subst op) => UnsupportedOperError(other, op);
 
-    public override GSObject OperateFiniteStaticSequence(FiniteStaticSequence other, Add op) => UnsupportedOperation(other, op);
-    public override GSObject OperateInfiniteStaticSequence(InfiniteStaticSequence other, Add op) => UnsupportedOperation(other, op);
-    public override GSObject OperateGeneratorSequence(GeneratorSequence other, Add op) => UnsupportedOperation(other, op);
+    public override GSObject OperateFiniteStaticSequence(FiniteStaticSequence other, Add op) => UnsupportedOperError(other, op);
+    public override GSObject OperateInfiniteStaticSequence(InfiniteStaticSequence other, Add op) => UnsupportedOperError(other, op);
+    public override GSObject OperateGeneratorSequence(GeneratorSequence other, Add op) => UnsupportedOperError(other, op);
 
-    public override GSObject OperateUndefined(Undefined other, Add op)  => UnsupportedOperation(other, op);
+    public override GSObject OperateUndefined(Undefined other, Add op)  => UnsupportedOperError(other, op);
 
-    public override GSObject OperatePoint(Point other, Mult op) => UnsupportedOperation(other, op);
+    public override GSObject OperatePoint(Point other, Mult op) => UnsupportedOperError(other, op);
 
-    public override GSObject OperateString(GSharp.GSObject.String other, Add op) => UnsupportedOperation(other, op);
+    public override GSObject OperateMeasure(Measure other, Add op) => UnsupportedOperError(other, op);
+    public override GSObject OperateMeasure(Measure other, Subst op) => UnsupportedOperError(other, op);
+    public override GSObject OperateMeasure(Measure other, Mod op) => UnsupportedOperError(other, op);
+    public override GSObject OperateMeasure(Measure other, LessTh op) => UnsupportedOperError(other, op);
+
+    public override GSObject OperateString(GSharp.Objects.String other, Add op) => UnsupportedOperError(other, op);
 
     public override bool GetTruthValue() => true;
 

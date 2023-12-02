@@ -1,12 +1,12 @@
-namespace GSharp.GSObject.Figures;
+namespace GSharp.Objects.Figures;
 using System;
 using Godot;
 
-public partial class Circle : Figure
+public partial class Circle : GeometricLocation
 {
-    public double Radius { get; }
+    public readonly double Radius;
 
-    public Point Center { get; }
+    public readonly Point Center;
 
     public Circle()
     {
@@ -48,14 +48,7 @@ public partial class Circle : Figure
 
 
 
-    public override string GetTypeName() => GSTypes.Circle.ToString();
+    public override string GetTypeName() => TypeName.Circle.ToString();
     public override string ToString() => $"C({Center})";
 
-
-    public override GSObject OperatePoint(Point other, Add op) => UnsupportedOperation(other, op);
-    public override GSObject OperatePoint(Point other, Subst op) => UnsupportedOperation(other, op);
-
-    public override GSObject OperateScalar(Scalar other, Mult op) => UnsupportedOperation(other, op);
-
-    public override GSObject OperateScalar(Scalar other, Div op)  => UnsupportedOperation(other, op);
 }

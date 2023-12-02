@@ -2,7 +2,7 @@ using System.Diagnostics.Metrics;
 
 namespace GSharp;
 
-public enum GSTypes
+public enum TypeName
 {
     Point,
     Line,
@@ -11,7 +11,7 @@ public enum GSTypes
     Circle,
     Arc,
     Scalar,
-    Boolean,
+    Measure,
     String,
 }
 
@@ -33,9 +33,9 @@ public abstract class GSharpType
 
 public class Constant_SimpleType : GSharpType
 {
-    public readonly GSTypes Type;
+    public readonly TypeName Type;
 
-    public Constant_SimpleType(GSTypes Type)
+    public Constant_SimpleType(TypeName Type)
     {
         this.Type = Type;
     }
@@ -56,7 +56,7 @@ public class Constant_SimpleType : GSharpType
     {
         return this.Type switch
         {
-            GSTypes.Point or GSTypes.Scalar or GSTypes.Measure or GSTypes.String => true,
+            TypeName.Point or TypeName.Scalar or TypeName.Measure or TypeName.String => true,
             _ => false,
         };
     }
@@ -65,7 +65,7 @@ public class Constant_SimpleType : GSharpType
     {
         return this.Type switch
         {
-            GSTypes.Point or GSTypes.Measure or GSTypes.Scalar => true,
+            TypeName.Point or TypeName.Measure or TypeName.Scalar => true,
             _ => false,
         };
     }
@@ -74,7 +74,7 @@ public class Constant_SimpleType : GSharpType
     {
         return this.Type switch
         {
-            GSTypes.Scalar or GSTypes.Measure => true,
+            TypeName.Scalar or TypeName.Measure => true,
             _ => false
         };
     }
@@ -83,22 +83,22 @@ public class Constant_SimpleType : GSharpType
     {
         if (other is Constant_SimpleType CST)
         {
-            if (this.Type == GSTypes.Scalar)
+            if (this.Type == TypeName.Scalar)
             {
                 return CST.Type switch{
-                    GSTypes.Point or GSTypes.Measure or GSTypes.Scalar => true,
+                    TypeName.Point or TypeName.Measure or TypeName.Scalar => true,
                     _ => false
                 };
             }
 
-            if (this.Type == GSTypes.Measure)
+            if (this.Type == TypeName.Measure)
             {
-                return CST.Type == GSTypes.Scalar;
+                return CST.Type == TypeName.Scalar;
             }
 
-            if (this.Type == GSTypes.Point)
+            if (this.Type == TypeName.Point)
             {
-                return CST.Type == GSTypes.Scalar;
+                return CST.Type == TypeName.Scalar;
             }
 
             return false;
@@ -111,10 +111,10 @@ public class Constant_SimpleType : GSharpType
     {
         if (other is Constant_SimpleType CST)
         {
-            if (CST.Type != GSTypes.Scalar) return false;
+            if (CST.Type != TypeName.Scalar) return false;
             
             return this.Type switch{
-                GSTypes.Scalar or GSTypes.Point or GSTypes.Measure => true,
+                TypeName.Scalar or TypeName.Point or TypeName.Measure => true,
                 _ => false
             };
         }
@@ -142,7 +142,7 @@ public class Sequence_Type : GSharpType
         => other is Sequence_Type ST && this.Type.Matches(ST.Type) ||
            other is Undefined_Type || 
            other is Drawable_Type d && this.Type.Matches(d) ||
-           other is Constant_SimpleType CST && CST.Type == GSTypes.Boolean;
+           other is Constant_SimpleType CST && CST.Type == TypeName.Boolean;
 
     public override string ToString() => $"Seq<{this.Type.ToString()}>";
 
@@ -171,7 +171,7 @@ public class Drawable_Type : GSharpType
         {
             return cT.Type switch
             {
-                GSTypes.Point or GSTypes.Line or GSTypes.Ray or GSTypes.Segment or GSTypes.Circle or GSTypes.Arc => true,
+                TypeName.Point or TypeName.Line or TypeName.Ray or TypeName.Segment or TypeName.Circle or TypeName.Arc => true,
                 _ => false,
             };
         }
@@ -190,13 +190,13 @@ public class Drawable_Type : GSharpType
     public override bool IsComparable() => false;
 
     public override bool Is_Multiplyable_By(GSharpType other) 
-        => other is Constant_SimpleType CST && CST.Type == GSTypes.Scalar;
+        => other is Constant_SimpleType CST && CST.Type == TypeName.Scalar;
 
     public override bool Is_Dividable_By(GSharpType other)
     {
         if (other is not Constant_SimpleType CST) return false;
 
-        return CST.Type == GSTypes.Scalar;
+        return CST.Type == TypeName.Scalar;
     }
 }
 

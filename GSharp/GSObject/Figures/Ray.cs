@@ -1,11 +1,12 @@
-namespace GSharp.GSObject.Figures;
+namespace GSharp.Objects.Figures;
 using System;
+using GSharp.Types;
 
-public partial class Ray : Figure
+public partial class Ray : GeometricLocation
 {
-    public Point First_Point { get; }
+    public readonly Point First_Point;
 
-    public Point Director_Vector { get; }
+    public readonly Point Director_Vector;
 
     public Ray()
     {
@@ -18,7 +19,7 @@ public partial class Ray : Figure
     public Ray(Point First_Point, Point Second_Point)
     {
         if (Functions.Equal_Vectors_Approx(First_Point, Second_Point))
-            throw new ArgumentException("Equal Points Cannot determine a Ray");
+            throw new RuntimeError("Equal Points Cannot determine a Ray");
 
         this.First_Point = First_Point;
         this.Director_Vector = Second_Point - First_Point;
@@ -31,4 +32,12 @@ public partial class Ray : Figure
     {
         throw new NotImplementedException();
     }
+    public override string ToString() => $"Ray: [from: {this.First_Point} directorV: {this.Director_Vector}]";
+
+    public override bool Equals(GSObject obj)
+        => obj is Ray R &&
+            Functions.Equal_Vectors_Approx(R.First_Point, this.First_Point) &&
+            Functions.Equal_Approx(0, this.Director_Vector.AngleTo(R.Director_Vector));
+
+    public override string GetTypeName() => TypeName.Ray.ToString();
 }

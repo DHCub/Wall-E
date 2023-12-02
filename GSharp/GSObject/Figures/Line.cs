@@ -1,19 +1,19 @@
-namespace GSharp.GSObject.Figures;
+namespace GSharp.Objects.Figures;
 using System;
+using GSharp.Types;
 
-
-public partial class Line : Figure
+public partial class Line : GeometricLocation
 {
 
-    public Point A_Point {get;}
+    public readonly Point A_Point;
 
-    public Point Normal_Vector {get;}
-    public Point Director_Vector {get;}
-    public double Algebraic_Trace {get;}
+    public readonly Point Normal_Vector;
+    public readonly Point Director_Vector;
+    public readonly double Algebraic_Trace;
 
     public override string ToString()
     {
-        return $"({Normal_Vector.X_Coord})x + ({Normal_Vector.Y_Coord})y + ({Algebraic_Trace}) = 0";
+        return $"L:({Normal_Vector.X_Coord})x + ({Normal_Vector.Y_Coord})y + ({Algebraic_Trace}) = 0";
     }
 
     public Line()
@@ -29,7 +29,7 @@ public partial class Line : Figure
     public Line(Point A_Point, Point B_Point)
     {
         if (Functions.Equal_Vectors_Approx(A_Point, B_Point))
-            throw new ArgumentException("Equal Points Cannot determine a Line");
+            throw new RuntimeError("Equal Points Cannot determine a Line");
         
         this.A_Point = A_Point;
         Director_Vector = B_Point - A_Point;
@@ -72,5 +72,10 @@ public partial class Line : Figure
         return new Point(x, -C/B - A/B*x);
     }
 
-    public override bool Equals(GSObject obj) => obj is Line L && L.Director_Vector.IsColinear(this.Director_Vector) && 
+    public override bool Equals(GSObject obj) => 
+        obj is Line L && 
+            L.Director_Vector.IsColinear(this.Director_Vector) && 
+            Functions.Intersect(this.A_Point, L).Count > 0;
+
+    public override string GetTypeName() => TypeName.Line.ToString();
 }

@@ -1,10 +1,11 @@
-namespace GSharp.GSObject.Figures;
+namespace GSharp.Objects.Figures;
 using System;
+using GSharp.Types;
 
-public partial class Segment : Figure
+public partial class Segment : GeometricLocation
 {
-    public Point A_Point { get; }
-    public Point B_Point { get; }
+    public readonly Point A_Point;
+    public readonly Point B_Point;
 
     public Segment()
     {
@@ -17,7 +18,7 @@ public partial class Segment : Figure
     public Segment(Point A_Point, Point B_Point)
     {
         if (Functions.Equal_Vectors_Approx(A_Point, B_Point))
-            throw new ArgumentException("Equal Points do not Determine a Segment");
+            throw new RuntimeError("Equal Points do not Determine a Segment");
         this.A_Point = A_Point;
         this.B_Point = B_Point;
     }
@@ -33,4 +34,14 @@ public partial class Segment : Figure
 
         return A_Point + Vector;
     }
+
+    public override string GetTypeName() => TypeName.Segment.ToString();
+
+    public override bool Equals(GSObject obj)
+        => obj is Segment S &&(
+            Functions.Equal_Vectors_Approx(S.A_Point, this.A_Point) && Functions.Equal_Vectors_Approx(S.B_Point, this.B_Point) ||
+            Functions.Equal_Vectors_Approx(S.A_Point, this.B_Point) && Functions.Equal_Vectors_Approx(S.B_Point, this.A_Point));
+
+    public override string ToString() => $"Segment: [from: {this.A_Point} to: {this.B_Point}]";
+
 }

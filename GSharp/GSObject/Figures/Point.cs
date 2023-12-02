@@ -1,11 +1,11 @@
-namespace GSharp.GSObject.Figures;
+namespace GSharp.Objects.Figures;
 using System;
 using Godot;
-
+using GSharp.Types;
 public partial class Point : Figure
 {
-    public double X_Coord { get; }
-    public double Y_Coord { get; }
+    public readonly double X_Coord;
+    public readonly double Y_Coord;
     public double Norm
     {
         get
@@ -39,6 +39,12 @@ public partial class Point : Figure
 
     public static Point operator *(double alpha, Point A)
         => new(A.X_Coord * alpha, A.Y_Coord * alpha);
+
+    public static Point operator *(Point A, double alpha)
+        => new(A.X_Coord * alpha, A.Y_Coord * alpha);
+    
+    public static Point operator / (Point P, double alpha)
+        => new(P.X_Coord/alpha, P.Y_Coord/alpha);
 
     public double Dot_Product(Point other) => this.X_Coord * other.X_Coord + this.Y_Coord * other.Y_Coord;
 
@@ -106,4 +112,28 @@ public partial class Point : Figure
 
         return (p1, p2);
     }
+
+    public override string GetTypeName() => TypeName.Point.ToString();
+
+    public override bool Equals(GSObject obj) => obj is Point P && Functions.Equal_Vectors_Approx(this, P);
+
+    public override GSObject OperateScalar(Scalar other, Mult op)
+        => this*other.value;
+    public override GSObject OperateScalar(Scalar other, Div op)
+        => this/other.value;
+   
+
+
+    public override GSObject OperateMeasure(Measure other, Div op)
+        => this/other.value;
+    public override GSObject OperateMeasure(Measure other, Mult op)
+        => this*other.value;
+
+    public override GSObject OperatePoint(Point other, Add op)
+        => this + other;
+
+    public override GSObject OperatePoint(Point other, Subst op)
+        => this - other;
+
+
 }
