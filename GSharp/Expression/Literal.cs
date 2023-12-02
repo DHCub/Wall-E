@@ -3,6 +3,7 @@ namespace GSharp.Expression;
 public class Literal : Expr
 {
   public readonly object value;
+
   public Literal(object value)
   {
     this.value = value;

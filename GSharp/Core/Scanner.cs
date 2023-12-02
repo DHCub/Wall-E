@@ -1,13 +1,17 @@
-namespace GSharp;
+using System.Collections.Generic;
+using System.Linq;
+using GSharp.Exceptions;
 
+namespace GSharp;
 using static TokenType;
 
-using System.Linq;
-using System.Collections.Generic;
+// <summary>
+// Scans a GSharp program, converting it to a list of Tokens.
+// </summary>
 
 public class Scanner
 {
-  private static readonly Dictionary<string, TokenType> keywords = new Dictionary<string, TokenType>
+  private static readonly Dictionary<string, TokenType> ReservedKeywords = new Dictionary<string, TokenType>
   {
     {"point", POINT},
     {"line", LINE},
@@ -48,27 +52,29 @@ public class Scanner
     {"undefined", UNDEFINED}
   };
 
-  public string source { get; }
-  private readonly List<Token> tokens = new List<Token>();
-  private int start = 0;
-  private int current = 0;
+  public readonly string source;
+  private readonly ScanErrorHandler scanErrorHandler;
+
+  private readonly List<Token> tokens = new();
+  private int start;
+  private int current;
   private int line = 1;
 
-  private readonly ILogger logger;
-
-  public Scanner(ILogger logger, string source)
+  public Scanner(ScanErrorHandler scanErrorHandler, string source)
   {
-    this.logger = logger;
     this.source = source;
+    this.scanErrorHandler = scanErrorHandler;
   }
 
   public List<Token> ScanTokens()
   {
     while (!IsAtEnd())
     {
+      // We are at the beginning of the next lexeme
       start = current;
       ScanToken();
     }
+
     tokens.Add(new Token(EOF, "", null, line, current));
     return tokens;
   }
@@ -78,6 +84,59 @@ public class Scanner
     char c = Advance();
     switch (c)
     {
+      case ' ':
+      case '\r':
+      case '\t':
+        // ignore whitespaces
+        break;
+
+      case '\n':
+        // new lines are tracked to increase the newline count
+        line++;
+        break;
+
+      case '"':
+        ScanString();
+        break;
+
+      case '!':
+        AddToken(Match('=') ? NOT_EQUAL : NOT);
+        break;
+
+      case '+':
+        AddToken(PLUS);
+        break;
+      case '-':
+        AddToken(MINUS);
+        break;
+      case '%':
+        AddToken(MOD);
+        break;
+      case '/':
+        if (Match('/'))
+        {
+          // a comment goes until the end of the line.
+          while (Peek() != '\n' && !IsAtEnd()) Advance();
+        }
+        else
+        {
+          AddToken(DIV);
+        }
+        break;
+      case '*':
+        AddToken(MUL);
+        break;
+
+      case ',':
+        AddToken(COMMA);
+        break;
+      case ';':
+        AddToken(SEMICOLON);
+        break;
+      case '^':
+        AddToken(POWER);
+        break;
+
       case '(':
         AddToken(LEFT_PARENTESIS);
         break;
@@ -90,53 +149,19 @@ public class Scanner
       case '}':
         AddToken(RIGHT_BRACE);
         break;
-      case ',':
-        AddToken(COMMA);
-        break;
-      case '-':
-        AddToken(MINUS);
-        break;
-      case '+':
-        AddToken(PLUS);
-        break;
-      case ';':
-        AddToken(SEMICOLON);
-        break;
-      case '*':
-        AddToken(MUL);
-        break;
-      case '^':
-        AddToken(POWER);
-        break;
-      case '/':
-        if (Eat('/'))
-        {
-          // a comment goes until the end of the line.
-          while (Peek() != '\n' && !IsAtEnd()) Advance();
-        }
-        else
-        {
-          AddToken(DIV);
-        }
-        break;
-      case '%':
-        AddToken(MOD);
-        break;
-      case '!':
-        AddToken(Eat('=') ? NOT_EQUAL : NOT);
-        break;
+
       case '=':
-        AddToken(Eat('=') ? EQUAL_EQUAL : EQUAL);
+        AddToken(Match('=') ? EQUAL_EQUAL : EQUAL);
         break;
       case '<':
-        AddToken(Eat('=') ? LESS_EQUAL : LESS);
+        AddToken(Match('=') ? LESS_EQUAL : LESS);
         break;
       case '>':
-        AddToken(Eat('=') ? GREATER_EQUAL : GREATER);
+        AddToken(Match('=') ? GREATER_EQUAL : GREATER);
         break;
       case '.':
         bool errorFound = false;
-        if (Eat('.') && Eat('.'))
+        if (Match('.') && Match('.'))
         {
           AddToken(DOTS);
         }
@@ -148,36 +173,24 @@ public class Scanner
         if (errorFound)
         {
           // unexpected character
-          Token invalid = new Token(STRING, c.ToString(), null, line, current);
-          logger.Error("LEXICAL", invalid, "Unexpected character.");
+          scanErrorHandler(new ScanError("Unexpected character.", line));
         }
 
         break;
-      case ' ':
-      case '\r':
-      case '\t':
-        // ignore whitespaces
-        break;
-      case '\n':
-        line++;
-        break;
-      case '"':
-        ScanString();
-        break;
+
       default:
         if (IsDigit(c))
         {
           ScanNumber();
         }
-        else if (IsAlpha(c))
+        else if (IsAlpha(c) || IsUnderscore(c))
         {
           ScanIdentifier();
         }
         else
         {
           // unexpected character
-          Token invalid = new Token(STRING, c.ToString(), null, line, current);
-          logger.Error("LEXICAL", invalid, "Unexpected character.");
+          scanErrorHandler(new ScanError("Unexpected character." + c, line));
         }
         break;
     }
@@ -185,49 +198,46 @@ public class Scanner
 
   private void ScanIdentifier()
   {
-    while (IsAlphaNum(Peek())) Advance();
+    while (IsAlphaNumeric(Peek())) Advance();
 
-    string text = source.Substring(start, current - start);
-    TokenType type;
-    if (keywords.ContainsKey(text))
-    {
-      type = keywords[text];
-    }
-    else
-    {
-      type = IDENTIFIER;
-    }
+    // see if the identifier is a reserved word
+    string text = source[start..current];
+    var type = ReservedKeywords.ContainsKey(text) ? ReservedKeywords[text] : IDENTIFIER;
+
     AddToken(type);
   }
 
   private void ScanNumber()
   {
+    bool isFractional = false;
+
     while (IsDigit(Peek())) Advance();
 
-    if (Peek() == '.' && IsDigit(Next()))
+    // look for a fractional part
+    if (Peek() == '.' && IsDigit(PeekNext()))
     {
+      isFractional = true;
       Advance();
       while (IsDigit(Peek())) Advance();
     }
 
-    if (IsAlpha(Peek()))
+    if (IsAlpha(Peek()) || IsUnderscore(Peek()))
     {
       Advance();
-      while (IsAlphaNum(Peek())) Advance();
-      string text = source.Substring(start, current - start);
-      Token invalid = new Token(IDENTIFIER, text, null, line, current);
-      logger.Error("LEXICAL", invalid, "Is not a valid token");
+      while (IsAlphaNumeric(Peek())) Advance();
+      string text = source[start..current];
+      scanErrorHandler(new ScanError($"{text} is not a valid token", line));
       return;
     }
 
-    AddToken(NUMBER, double.Parse(source.Substring(start, current - start)));
+    AddToken(new NumericToken(source[start..current], double.Parse(source[start..current]), line, current, isFractional));
   }
 
   private void ScanString()
   {
     while (Peek() != '"' && !IsAtEnd())
     {
-      if (Peek() == '\\' && Next() == '"')
+      if (Peek() == '\\' && PeekNext() == '"')
       {
         Advance();
       }
@@ -238,9 +248,7 @@ public class Scanner
     // unterminated string
     if (IsAtEnd())
     {
-      string text = source.Substring(start, current - start - 1);
-      Token invalid = new Token(STRING, text, null, line, current);
-      logger.Error("LEXICAL", invalid, "Unterminated string.");
+      scanErrorHandler(new ScanError("Unterminated string.", line));
       return;
     }
 
@@ -248,14 +256,14 @@ public class Scanner
     Advance();
 
     // trim the surrounding quotes
-    string value = source.Substring(start + 1, current - start - 2);
+    string value = source[(start + 1)..(current - 1)];
 
     value = value.Replace("\\t", "\t").Replace("\\n", "\n").Replace("\\\"", "\"");
 
     AddToken(STRING, value);
   }
 
-  private bool Eat(char expected)
+  private bool Match(char expected)
   {
     if (IsAtEnd()) return false;
     if (source[current] == expected)
@@ -272,7 +280,7 @@ public class Scanner
     return source[current];
   }
 
-  private char Next()
+  private char PeekNext()
   {
     if (current + 1 >= source.Count()) return '\0';
     return source[current + 1];
@@ -280,24 +288,28 @@ public class Scanner
 
   private bool IsAlpha(char c)
   {
-    return ('a' <= c && c <= 'z') ||
-           ('A' <= c && c <= 'Z') ||
-           (c == '_');
+    return (c is >= 'a' and <= 'z') ||
+           (c is >= 'A' and <= 'Z');
+  }
+
+  private bool IsUnderscore(char c)
+  {
+    return c is '_';
+  }
+
+  private bool IsAlphaNumeric(char c)
+  {
+    return IsAlpha(c) || IsUnderscore(c) || IsDigit(c);
   }
 
   private bool IsDigit(char c)
   {
-    return '0' <= c && c <= '9';
-  }
-
-  private bool IsAlphaNum(char c)
-  {
-    return IsAlpha(c) || IsDigit(c);
+    return c is >= '0' and <= '9';
   }
 
   private bool IsAtEnd()
   {
-    return current >= source.Count();
+    return current >= source.Length;
   }
 
   private char Advance()
@@ -305,12 +317,12 @@ public class Scanner
     return source[current++];
   }
 
-  private void AddToken(TokenType type)
+  private void AddToken(Token token)
   {
-    AddToken(type, null);
+    tokens.Add(token);
   }
 
-  private void AddToken(TokenType type, object literal)
+  private void AddToken(TokenType type, object literal = null)
   {
     string text = source.Substring(start, current - start);
     tokens.Add(new Token(type, text, literal, line, current));
