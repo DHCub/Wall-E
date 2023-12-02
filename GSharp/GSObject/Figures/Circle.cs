@@ -1,6 +1,6 @@
 namespace GSharp.Objects.Figures;
 using System;
-using Godot;
+using GSharp.Types;
 
 public partial class Circle : GeometricLocation
 {

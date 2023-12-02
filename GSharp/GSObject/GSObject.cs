@@ -5,12 +5,12 @@ using GSharp.Objects.Collections;
 using GSharp.Objects.Figures;
 using GSharp.Types;
 
-public abstract class GSObject: IOperate<GSObject, Add>, 
-                                IOperate<GSObject, Subst>, 
-                                IOperate<GSObject, Mult>, 
-                                IOperate<GSObject, Div>, 
-                                IOperate<GSObject, Mod>, 
-                                IOperate<GSObject, LessTh>
+public abstract class GSObject: IOperate<Add>, 
+                                IOperate<Subst>, 
+                                IOperate<Mult>, 
+                                IOperate<Div>, 
+                                IOperate<Mod>, 
+                                IOperate<LessTh>
 {
     public abstract override string ToString();
     public abstract bool Equals(GSObject obj);

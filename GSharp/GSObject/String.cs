@@ -1,6 +1,6 @@
 using GSharp.Objects.Collections;
 using GSharp.Objects.Figures;
-
+using GSharp.Types;
 namespace GSharp.Objects;
 
 public class String : GSObject

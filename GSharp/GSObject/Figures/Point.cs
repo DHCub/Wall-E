@@ -1,6 +1,5 @@
 namespace GSharp.Objects.Figures;
 using System;
-using Godot;
 using GSharp.Types;
 public partial class Point : Figure
 {
@@ -73,11 +72,6 @@ public partial class Point : Figure
 
     public Point Orthogonal()
         => new(this.Y_Coord, -this.X_Coord);
-
-    public static explicit operator Vector2(Point point)
-    {
-        return new Vector2((float)point.X_Coord, (float)point.Y_Coord);
-    }
 
     public bool Equal_Approx(Point other)
         => Functions.Equal_Vectors_Approx(this, other);

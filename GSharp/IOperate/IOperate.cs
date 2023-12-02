@@ -3,9 +3,9 @@ using System;
 using Objects;
 using Objects.Figures;
 using Objects.Collections;
-public interface IOperate<Return, OP> where OP: Operator
+public interface IOperate<OP> where OP: Operator
 {
-    public static Return Operate(IOperate<Return, OP> operable1, IOperate<Return, OP> operable2)
+    public static GSObject Operate(IOperate<OP> operable1, IOperate<OP> operable2)
     {
         if (operable2 is Point P) return operable1.OperatePoint(P, null);
         if (operable2 is Line L) return operable1.OperateLine(L, null);
@@ -22,29 +22,29 @@ public interface IOperate<Return, OP> where OP: Operator
         throw new NotImplementedException("GSOBJECT UNSUPPORTED");
     }
 
-    public Return UnsupportedOperError(Objects.GSObject other, OP op);
+    public GSObject UnsupportedOperError(Objects.GSObject other, OP op);
 
-    public Return OperatePoint(Point other, OP op);
-    public Return OperateLine(Line other, OP op);
-    public Return OperateSegment(Segment other, OP op);
-    public Return OperateRay(Ray other, OP op);
-    public Return OperateCircle(Circle other, OP op);
-    public Return OperateArc(Arc other, OP op);
+    public GSObject OperatePoint(Point other, OP op);
+    public GSObject OperateLine(Line other, OP op);
+    public GSObject OperateSegment(Segment other, OP op);
+    public GSObject OperateRay(Ray other, OP op);
+    public GSObject OperateCircle(Circle other, OP op);
+    public GSObject OperateArc(Arc other, OP op);
     
     
-    public Return OperateScalar(Scalar other, OP op);
-    public Return OperateMeasure(Measure other, OP op);
+    public GSObject OperateScalar(Scalar other, OP op);
+    public GSObject OperateMeasure(Measure other, OP op);
     
     
-    public Return OperateString(Objects.String other, OP op);
+    public GSObject OperateString(Objects.String other, OP op);
     
     
-    public Return OperateUndefined(Undefined other, OP op);
+    public GSObject OperateUndefined(Undefined other, OP op);
     
     
-    public Return OperateFiniteStaticSequence(FiniteStaticSequence other, OP op);
-    public Return OperateInfiniteStaticSequence(InfiniteStaticSequence other, OP op);
-    public Return OperateGeneratorSequence(GeneratorSequence other, OP op);
+    public GSObject OperateFiniteStaticSequence(FiniteStaticSequence other, OP op);
+    public GSObject OperateInfiniteStaticSequence(InfiniteStaticSequence other, OP op);
+    public GSObject OperateGeneratorSequence(GeneratorSequence other, OP op);
 }
 
 

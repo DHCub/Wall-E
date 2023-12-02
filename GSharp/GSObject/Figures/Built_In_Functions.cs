@@ -2,7 +2,6 @@ namespace GSharp;
 
 using Objects.Figures;
 
-using Godot;
 using GSharp.Objects.Collections;
 using System;
 using System.Collections.Generic;
