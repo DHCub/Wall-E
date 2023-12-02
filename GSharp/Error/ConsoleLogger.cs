@@ -15,7 +15,7 @@ public class ConsoleLogger : ILogger
 
   public void RuntimeError(RuntimeError error)
   {
-    Console.WriteLine($"! SEMANTIC ERROR: `{error.tokenStr}` {error.Message}");
+    Console.WriteLine($"! RUNTIME ERROR: {error.Message}");
     hadRuntimeError = true;
   }
 

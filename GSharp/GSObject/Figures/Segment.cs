@@ -1,7 +1,7 @@
-namespace Geometry;
+namespace GSharp.GSObject.Figures;
 using System;
 
-public partial class Segment : IDrawable
+public partial class Segment : Figure
 {
     public Point A_Point { get; }
     public Point B_Point { get; }
@@ -22,12 +22,12 @@ public partial class Segment : IDrawable
         this.B_Point = B_Point;
     }
 
-    public Point Sample()
+    public override Point Sample()
     {
         var Vector = this.B_Point - this.A_Point;
 
         var norm = Vector.Norm;
-        var length = IDrawable.rnd.RandfRange(0, (float)norm);
+        var length = Figure.rnd.RandfRange(0, (float)norm);
 
         Vector = (length / norm) * Vector;
 

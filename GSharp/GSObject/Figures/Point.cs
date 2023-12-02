@@ -1,8 +1,8 @@
-namespace Geometry;
+namespace GSharp.GSObject.Figures;
 using System;
 using Godot;
 
-public partial class Point : IDrawable
+public partial class Point : Figure
 {
     public double X_Coord { get; }
     public double Y_Coord { get; }
@@ -21,8 +21,8 @@ public partial class Point : IDrawable
     }
 
     public Point() : this(
-        IDrawable.rnd.RandfRange(IDrawable.Window_StartX, IDrawable.Window_EndX),
-        IDrawable.rnd.RandfRange(IDrawable.Window_StartY, IDrawable.Window_EndY))
+        Figure.rnd.RandfRange(Figure.Window_StartX, Figure.Window_EndX),
+        Figure.rnd.RandfRange(Figure.Window_StartY, Figure.Window_EndY))
     { }
 
     public Point(double X_Coord, double Y_Coord)
@@ -90,7 +90,7 @@ public partial class Point : IDrawable
         return new(x2, y2);
     }
 
-    public Point Sample() => this;
+    public override Point Sample() => this;
 
     public static (Point p1, Point p2) TwoDifferentPoints()
     {
@@ -100,7 +100,7 @@ public partial class Point : IDrawable
         if (!Functions.Equal_Vectors_Approx(p1, p2)) return (p1, p2);
 
         p2 = new Point(1E-7, 0);
-        p2 = p2.GetRotatedAsVector(IDrawable.rnd.RandfRange(0, (float)(2 * Math.PI)));
+        p2 = p2.GetRotatedAsVector(Figure.rnd.RandfRange(0, (float)(2 * Math.PI)));
 
         p2 = p1 + p2;
 

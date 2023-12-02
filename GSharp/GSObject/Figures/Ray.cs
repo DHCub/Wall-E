@@ -1,7 +1,7 @@
-namespace Geometry;
+namespace GSharp.GSObject.Figures;
 using System;
 
-public partial class Ray : IDrawable
+public partial class Ray : Figure
 {
     public Point First_Point { get; }
 
@@ -27,7 +27,7 @@ public partial class Ray : IDrawable
     public static Ray Point_DirectorVec(Point Point, Point Direction_Vector)
         => new(Point, Point + Direction_Vector);
 
-    public Point Sample()
+    public override Point Sample()
     {
         throw new NotImplementedException();
     }

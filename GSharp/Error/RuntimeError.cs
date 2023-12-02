@@ -2,10 +2,5 @@ namespace GSharp;
 using System;
 public class RuntimeError : Exception
 {
-  public readonly string tokenStr;
-
-  public RuntimeError(string tokenStr, string message) : base(message)
-  {
-    this.tokenStr = tokenStr;
-  }
+  public RuntimeError(string message) : base(message) {}
 }

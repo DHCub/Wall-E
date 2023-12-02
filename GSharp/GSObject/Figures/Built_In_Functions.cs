@@ -1,7 +1,9 @@
-namespace Geometry;
+namespace GSharp;
+
+using GSObject.Figures;
 
 using Godot;
-using GSharp.Collections;
+using GSharp.GSObject.Collections;
 using System;
 using System.Collections.Generic;
 
@@ -17,7 +19,7 @@ static class Functions
   public static double Distance(Line L, Point P)
       => Distance(P, L);
 
-  public static Sequence<Point> Intersect(IDrawable A, IDrawable B)
+  public static Sequence<Point> Intersect(Figure A, Figure B)
   {
     if (A is Point P)
     {

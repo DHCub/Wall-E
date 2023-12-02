@@ -1,7 +1,8 @@
-namespace Geometry;
+namespace GSharp.GSObject.Figures;
 using System;
 
-public partial class Line : IDrawable
+
+public partial class Line : Figure
 {
 
     public Point A_Point {get;}
@@ -54,7 +55,7 @@ public partial class Line : IDrawable
     public static Line Point_DirectorVec(Point Point, Point Direction_Vector)
         => new(Point, Point + Direction_Vector);
 
-    public Point Sample()
+    public override Point Sample()
     {
         var A = this.Normal_Vector.X_Coord;
         var B = this.Normal_Vector.Y_Coord;
@@ -62,12 +63,14 @@ public partial class Line : IDrawable
 
         if(Functions.Greater_Than_Approx(Math.Abs(A), Math.Abs(B)))
         {
-            var y = IDrawable.rnd.RandfRange(IDrawable.Window_StartY, IDrawable.Window_EndY);
+            var y = Figure.rnd.RandfRange(Figure.Window_StartY, Figure.Window_EndY);
 
             return new Point(-C/A - B/A*y, y);
         }
 
-        var x = IDrawable.rnd.RandfRange(IDrawable.Window_StartX, IDrawable.Window_EndX); 
+        var x = Figure.rnd.RandfRange(Figure.Window_StartX, Figure.Window_EndX); 
         return new Point(x, -C/B - A/B*x);
     }
+
+    public override bool Equals(GSObject obj) => obj is Line L && L.Director_Vector.IsColinear(this.Director_Vector) && 
 }
