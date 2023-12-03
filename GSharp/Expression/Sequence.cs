@@ -1,20 +1,22 @@
-namespace GSharp.Expression;
-
 using System.Collections.Generic;
 
-public class Sequence : Expr
-{
-  public readonly Token openBraceTk;
-  public readonly List<Expr> items;
+namespace GSharp.Expression;
 
-  public Sequence(Token openBraceTk, List<Expr> items)
+public class Sequence : Expr, IToken
+{
+  public readonly Token Brace;
+  public readonly List<Expr> Items;
+
+  public Sequence(Token Brace, List<Expr> Items)
   {
-    this.items = items;
-    this.openBraceTk = openBraceTk;
+    this.Items = Items;
+    this.Brace = Brace;
   }
 
   public override R Accept<R>(IVisitor<R> visitor)
   {
     return visitor.VisitSequenceExpr(this);
   }
+
+  public Token Token => Brace;
 }

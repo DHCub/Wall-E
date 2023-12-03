@@ -1,8 +1,9 @@
 namespace GSharp.Objects.Figures;
 using System;
 using GSharp.Types;
+using GSharp.Exceptions;
 
-public partial class Ray : GeometricLocation
+public class Ray : GeometricLocation
 {
     public readonly Point First_Point;
 

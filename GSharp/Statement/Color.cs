@@ -1,16 +1,20 @@
 namespace GSharp.Statement;
 
-public class Color : Stmt
+public class ColorStmt : Stmt, IToken
 {
-  public readonly Token color;
+  public readonly Token Command;
+  public readonly Token Color;
 
-  public Color(Token color)
+  public ColorStmt(Token Command, Token Color)
   {
-    this.color = color;
+    this.Command = Command;
+    this.Color = Color;
   }
 
   public override R Accept<R>(IVisitor<R> visitor)
   {
     return visitor.VisitColorStmt(this);
   }
+
+  public Token Token => Color;
 }

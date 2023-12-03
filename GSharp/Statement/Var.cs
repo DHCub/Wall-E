@@ -2,23 +2,49 @@ namespace GSharp.Statement;
 
 using GSharp.Expression;
 
-public class Var : Stmt
+public class Var : Stmt, IToken
 {
-  public readonly Token type;
-  public readonly Token name;
-  public readonly Expr initializer;
-  public readonly bool isSequence;
+  public readonly Token Name;
+  public readonly Expr Initializer;
+  public readonly ITypeReference TypeReference;
 
-  public Var(Token type, Token name, Expr initializer, bool isSequence = false)
+  public Var(Token Name, Expr Initializer, TypeReference TypeReference)
   {
-    this.type = type;
-    this.name = name;
-    this.initializer = initializer;
-    this.isSequence = isSequence;
+    this.Name = Name;
+    this.Initializer = Initializer;
+    this.TypeReference = TypeReference;
   }
 
   public override R Accept<R>(IVisitor<R> visitor)
   {
     return visitor.VisitVarStmt(this);
   }
+
+  public override string ToString()
+  {
+    if (Initializer != null)
+    {
+      if (TypeReference?.TypeSpecifier.lexeme is not null)
+      {
+        return $"var {Name.lexeme}: {TypeReference.TypeSpecifier.lexeme} = {Initializer};";
+      }
+      else
+      {
+        return $"var {Name.lexeme} = {Initializer};";
+      }
+    }
+    else
+    {
+      if (TypeReference?.TypeSpecifier.lexeme is not null)
+      {
+        return $"var {Name.lexeme}: {TypeReference.TypeSpecifier.lexeme};";
+      }
+      else
+      {
+        return $"var {Name.lexeme};";
+      }
+    }
+  }
+
+  public Token Token => Name;
 }

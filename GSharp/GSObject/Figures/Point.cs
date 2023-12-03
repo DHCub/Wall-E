@@ -1,7 +1,8 @@
 namespace GSharp.Objects.Figures;
 using System;
 using GSharp.Types;
-public partial class Point : Figure
+using GSharp.Exceptions;
+public class Point : Figure
 {
     public readonly double X_Coord;
     public readonly double Y_Coord;

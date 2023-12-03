@@ -4,6 +4,7 @@ using System;
 using GSharp.Objects.Collections;
 using GSharp.Objects.Figures;
 using GSharp.Types;
+using GSharp.Exceptions
 
 public abstract class GSObject: IOperate<Add>, 
                                 IOperate<Subst>, 

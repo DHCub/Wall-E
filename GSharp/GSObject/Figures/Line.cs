@@ -1,6 +1,7 @@
 namespace GSharp.Objects.Figures;
 using System;
 using GSharp.Types;
+using GSharp.Exceptions;
 
 public partial class Line : GeometricLocation
 {
