@@ -1,11 +1,18 @@
-namespace GSharp;
 using System;
+
+namespace GSharp.Exceptions;
+
 public class RuntimeError : Exception
 {
-  public readonly string tokenStr;
+  public Token? token { get; }
 
-  public RuntimeError(string tokenStr, string message) : base(message)
+  public RuntimeError(Token? token, string message) : base(message)
   {
-    this.tokenStr = tokenStr;
+    this.token = token;
+  }
+
+  public RuntimeError(Token? token, string message, Exception innerException) : base(message, innerException)
+  {
+    this.token = token;
   }
 }

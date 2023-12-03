@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using GSharp.Exceptions;
 
@@ -8,10 +9,9 @@ using static TokenType;
 // <summary>
 // Scans a GSharp program, converting it to a list of Tokens.
 // </summary>
-
 public class Scanner
 {
-  private static readonly Dictionary<string, TokenType> ReservedKeywords = new Dictionary<string, TokenType>
+  public static readonly Dictionary<string, TokenType> ReservedKeywords = new Dictionary<string, TokenType>
   {
     {"point", POINT},
     {"line", LINE},
@@ -52,6 +52,32 @@ public class Scanner
     {"undefined", UNDEFINED}
   };
 
+  public static IEnumerable<string> ReservedTypeKeywordStrings =>
+    new List<string>
+    {
+      "measure",
+      "intersect",
+      "count",
+      "randoms",
+      "points",
+      "samples"
+    }.ToImmutableHashSet();
+
+  private static ISet<string> reservedKeywordOnlyStrings;
+
+  public static ISet<string> ReservedKeywordOnlyStrings
+  {
+    get
+    {
+      reservedKeywordOnlyStrings ??= ReservedKeywords.Select(kvp => kvp.Key).ToImmutableHashSet();
+
+      return reservedKeywordOnlyStrings;
+    }
+  }
+
+  public static IEnumerable<string> ReservedKeywordStrings =>
+    ReservedKeywordOnlyStrings.Concat(ReservedTypeKeywordStrings).ToImmutableHashSet();
+
   public readonly string source;
   private readonly ScanErrorHandler scanErrorHandler;
 
@@ -60,7 +86,7 @@ public class Scanner
   private int current;
   private int line = 1;
 
-  public Scanner(ScanErrorHandler scanErrorHandler, string source)
+  public Scanner(string source, ScanErrorHandler scanErrorHandler)
   {
     this.source = source;
     this.scanErrorHandler = scanErrorHandler;
@@ -126,6 +152,9 @@ public class Scanner
       case '*':
         AddToken(MUL);
         break;
+      case '^':
+        AddToken(POWER);
+        break;
 
       case ',':
         AddToken(COMMA);
@@ -133,8 +162,8 @@ public class Scanner
       case ';':
         AddToken(SEMICOLON);
         break;
-      case '^':
-        AddToken(POWER);
+      case ':':
+        AddToken(TWO_DOTS);
         break;
 
       case '(':
@@ -230,7 +259,7 @@ public class Scanner
       return;
     }
 
-    AddToken(new NumericToken(source[start..current], double.Parse(source[start..current]), line, current, isFractional));
+    AddToken(new NumericToken(source[start..current], source[start..current], line, current, isFractional));
   }
 
   private void ScanString()
