@@ -1,14 +1,14 @@
-namespace GSharp.Statement;
-
 using GSharp.Expression;
 
-public class Expression : Stmt
-{
-  public readonly Expr expression;
+namespace GSharp.Statement;
 
-  public Expression(Expr expression)
+public class ExpressionStmt : Stmt
+{
+  public readonly Expr Expression;
+
+  public ExpressionStmt(Expr Expression)
   {
-    this.expression = expression;
+    this.Expression = Expression;
   }
 
   public override R Accept<R>(IVisitor<R> visitor)

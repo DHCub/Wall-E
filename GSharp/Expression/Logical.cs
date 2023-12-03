@@ -1,20 +1,22 @@
 namespace GSharp.Expression;
 
-public class Logical : Expr
+public class Logical : Expr, IToken
 {
-  public readonly Expr left;
-  public readonly Token oper;
-  public readonly Expr right;
+  public readonly Expr Left;
+  public readonly Token Oper;
+  public readonly Expr Right;
 
-  public Logical(Expr left, Token oper, Expr right)
+  public Logical(Expr Left, Token Oper, Expr Right)
   {
-    this.left = left;
-    this.oper = oper;
-    this.right = right;
+    this.Left = Left;
+    this.Oper = Oper;
+    this.Right = Right;
   }
 
   public override R Accept<R>(IVisitor<R> visitor)
   {
     return visitor.VisitLogicalExpr(this);
   }
+
+  public Token Token => Oper;
 }

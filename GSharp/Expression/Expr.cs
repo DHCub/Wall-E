@@ -2,11 +2,19 @@ namespace GSharp.Expression;
 
 public abstract class Expr
 {
+  public ITypeReference TypeReference { get; }
+
+  public Expr()
+  {
+    TypeReference = new TypeReference(TypeSpecifier: null);
+  }
+
   public interface IVisitor<R>
   {
     R VisitBinaryExpr(Binary expr);
     R VisitCallExpr(Call expr);
     R VisitConditionalExpr(Conditional expr);
+    R VisitEmptyExpr(Empty expr);
     R VisitGroupingExpr(Grouping expr);
     R VisitIntRangeExpr(IntRange expr);
     R VisitLetInExpr(LetIn expr);

@@ -1,3 +1,5 @@
+using System;
+
 namespace GSharp;
 
 public class Token
@@ -11,7 +13,7 @@ public class Token
   public Token(TokenType type, string lexeme, object literal, int line, int column)
   {
     this.type = type;
-    this.lexeme = lexeme;
+    this.lexeme = lexeme ?? throw new ArgumentException("lexeme cannot be null");
     this.literal = literal;
     this.line = line;
     this.column = column;
@@ -19,6 +21,13 @@ public class Token
 
   public override string ToString()
   {
-    return $"Token({type}, {lexeme}, {literal})";
+    if (literal != null)
+    {
+      return $"Token({type}, {lexeme}, {literal})";
+    }
+    else
+    {
+      return $"Token({type}, {lexeme})";
+    }
   }
 }

@@ -4,10 +4,10 @@ public abstract class Stmt
 {
   public interface IVisitor<R>
   {
-    R VisitColorStmt(Color stmt);
-    R VisitConstantStmt(Constant stmt);
+    R VisitColorStmt(ColorStmt stmt);
+    R VisitConstantStmt(ConstantStmt stmt);
     R VisitDrawStmt(Draw stmt);
-    R VisitExpressionStmt(Expression stmt);
+    R VisitExpressionStmt(ExpressionStmt stmt);
     R VisitFunctionStmt(Function stmt);
     R VisitImportStmt(Import stmt);
     R VisitPrintStmt(Print stmt);

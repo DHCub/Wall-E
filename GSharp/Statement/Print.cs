@@ -1,19 +1,24 @@
+using GSharp.Expression;
+
 namespace GSharp.Statement;
 
-using GSharp.Expression;
-using System.Collections.Generic;
-
-public class Print : Stmt
+public class Print : Stmt, IToken
 {
-  public readonly List<Expr> printe;
+  public readonly Token Command;
+  public readonly Expr Expression;
+  public readonly Token? Label;
 
-  public Print(List<Expr> printe)
+  public Print(Token Command, Expr Expression, Token? Label = null)
   {
-    this.printe = printe;
+    this.Command = Command;
+    this.Expression = Expression;
+    this.Label = Label;
   }
 
   public override R Accept<R>(IVisitor<R> visitor)
   {
     return visitor.VisitPrintStmt(this);
   }
+
+  public Token Token => Command;
 }

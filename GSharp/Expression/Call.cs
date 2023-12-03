@@ -1,24 +1,58 @@
-namespace GSharp.Expression;
-
+using System;
 using System.Collections.Generic;
 
-public class Call : Expr
-{
-  public readonly Expr calle;
-  public readonly Token paren;
-  public readonly List<Expr> arguments;
+namespace GSharp.Expression;
 
-  public Call(Expr calle, Token paren, List<Expr> arguments)
+public class Call : Expr, IToken
+{
+  public readonly Expr Calle;
+  public IToken TokenAwareCalle => (IToken)Calle;
+  public readonly Token Paren;
+  public readonly List<Expr> Arguments;
+
+  public string? CalleToString
   {
-    this.calle = calle;
-    this.paren = paren;
-    this.arguments = arguments;
+    get
+    {
+      if (Calle is Variable variable)
+      {
+        return variable.Name.lexeme;
+      }
+      else
+      {
+        return ToString();
+      }
+    }
   }
 
-  public int Arity => arguments.Count;
+  public Call(Expr Calle, Token Paren, List<Expr> Arguments)
+  {
+    if (Calle is not IToken)
+    {
+      throw new ArgumentException("Calle must be IToken");
+    }
+
+    this.Calle = Calle;
+    this.Paren = Paren;
+    this.Arguments = Arguments;
+  }
 
   public override R Accept<R>(IVisitor<R> visitor)
   {
     return visitor.VisitCallExpr(this);
   }
+
+  public override string ToString()
+  {
+    if (Calle is Variable variable)
+    {
+      return $"'call function {variable.Name.lexeme}'";
+    }
+    else
+    {
+      return base.ToString();
+    }
+  }
+
+  public Token Token => Paren;
 }

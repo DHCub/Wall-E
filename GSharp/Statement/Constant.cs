@@ -1,22 +1,24 @@
-namespace GSharp.Statement;
-
 using GSharp.Expression;
-
+using System;
 using System.Collections.Generic;
 
-public class Constant : Stmt
-{
-  public readonly List<Token> constNames;
-  public readonly Expr initializer;
+namespace GSharp.Statement;
 
-  public Constant(List<Token> constNames, Expr initializer)
+public class ConstantStmt : Stmt, IToken
+{
+  public readonly List<Token> Names;
+  public readonly Expr Initializer;
+
+  public ConstantStmt(List<Token> Names, Expr Initializer)
   {
-    this.constNames = constNames;
-    this.initializer = initializer;
+    this.Names = Names;
+    this.Initializer = Initializer;
   }
 
   public override R Accept<R>(IVisitor<R> visitor)
   {
     return visitor.VisitConstantStmt(this);
   }
+
+  public Token Token => Names.Count > 0 ? Names[0] : throw new ArgumentException("constant decl should have names");
 }

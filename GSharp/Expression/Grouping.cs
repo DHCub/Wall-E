@@ -1,17 +1,18 @@
-using GSharp.Expression;
-
 namespace GSharp.Expression;
 
-public class Grouping : Expr
+public class Grouping : Expr, IToken
 {
-  public readonly Expr expression;
-  public Grouping(Expr expression)
+  public readonly Expr Expression;
+
+  public Grouping(Expr Expression)
   {
-    this.expression = expression;
+    this.Expression = Expression;
   }
 
   public override R Accept<R>(IVisitor<R> visitor)
   {
     return visitor.VisitGroupingExpr(this);
   }
+
+  public Token? Token => (Expression as IToken)?.Token;
 }
