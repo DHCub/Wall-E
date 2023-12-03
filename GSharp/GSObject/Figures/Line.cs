@@ -30,7 +30,7 @@ public partial class Line : GeometricLocation
     public Line(Point A_Point, Point B_Point)
     {
         if (Functions.Equal_Vectors_Approx(A_Point, B_Point))
-            throw new RuntimeError("Equal Points Cannot determine a Line");
+            throw new RuntimeError(null, "Equal Points Cannot determine a Line");
         
         this.A_Point = A_Point;
         Director_Vector = B_Point - A_Point;

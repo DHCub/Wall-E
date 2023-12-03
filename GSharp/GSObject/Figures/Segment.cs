@@ -19,7 +19,7 @@ public partial class Segment : GeometricLocation
     public Segment(Point A_Point, Point B_Point)
     {
         if (Functions.Equal_Vectors_Approx(A_Point, B_Point))
-            throw new RuntimeError("Equal Points do not Determine a Segment");
+            throw new RuntimeError(null, "Equal Points do not Determine a Segment");
         this.A_Point = A_Point;
         this.B_Point = B_Point;
     }

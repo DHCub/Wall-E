@@ -131,10 +131,10 @@ public class RandomPointInFigureGenerator : GSGenerator
         current = 0;
     }
 
-    private RandomPointInFigureGenerator(int current, InternalPointInFigureGenerator generator)
+    private RandomPointInFigureGenerator(RandomPointInFigureGenerator other)
     {
-        this.current = current;
-        this.@internal = generator;
+        this.current = other.current;
+        this.@internal = other.@internal;
     }
 
     public override bool Equals(GSGenerator other)
@@ -142,7 +142,7 @@ public class RandomPointInFigureGenerator : GSGenerator
            gen.@internal == this.@internal && 
            gen.current == this.current;
 
-    public override GSGenerator GetCopy() => new RandomPointInFigureGenerator(current, @internal);
+    public override GSGenerator GetCopy() => new RandomPointInFigureGenerator(this);
 
     public override GSObject GetNextValue()
         => @internal[current++];
@@ -159,10 +159,10 @@ public class RandomDoubleGenerator : GSGenerator
         current = 0;
     }
 
-    private RandomDoubleGenerator(int current, InternalDoubleGenerator generator)
+    private RandomDoubleGenerator(RandomDoubleGenerator other)
     {
-        this.current = current;
-        this.@internal = generator;
+        this.current = other.current;
+        this.@internal = other.@internal;
     }
 
     public override bool Equals(GSGenerator other)
@@ -174,7 +174,7 @@ public class RandomDoubleGenerator : GSGenerator
         => @internal[current++];
 
     public override GSGenerator GetCopy()
-        => new RandomDoubleGenerator(current, @internal);
+        => new RandomDoubleGenerator(this);
 
 }
 
@@ -189,10 +189,10 @@ public class RandomPointInCanvasGenerator : GSGenerator
         @internal = new();
     }
 
-    private RandomPointInCanvasGenerator(int current, InternalPointInCanvasGenerator generator)
+    private RandomPointInCanvasGenerator(RandomPointInCanvasGenerator other)
     {
-        this.current = current;
-        this.@internal = generator;
+        this.current = other.current;
+        this.@internal = other.@internal;
     }
 
     public override bool Equals(GSGenerator other)
@@ -201,10 +201,48 @@ public class RandomPointInCanvasGenerator : GSGenerator
             RPICG.current == this.current;
 
     public override GSGenerator GetCopy()
-        => new RandomPointInCanvasGenerator(current, @internal);
+        => new RandomPointInCanvasGenerator(this);
 
     public override GSObject GetNextValue() => @internal[current++];
 
+}
+
+public enum FigureOptions
+{
+    Point,
+    Line,
+    Ray,
+    Segment,
+    Circle,
+    Arc
+}
+
+public class RandomFigureGenerator : GSGenerator
+{
+    private int current;
+    private InternalRandomFigureGenerator @internal;
+    public RandomFigureGenerator(FigureOptions figure)
+    {
+        @internal = new(figure);
+        current = 0;
+    }
+    
+    private RandomFigureGenerator(RandomFigureGenerator other)
+    {
+        current = other.current;
+        @internal = other.@internal;
+    }
+
+    public override bool Equals(GSGenerator other)
+        => other is RandomFigureGenerator RFG && 
+        RFG.current == this.current &&
+        RFG.@internal == this.@internal;
+
+    public override GSObject GetNextValue()
+        => @internal[current++];
+
+    public override GSGenerator GetCopy()
+        => new RandomFigureGenerator(this);
 }
 
 abstract class InternalGenerator
@@ -267,6 +305,39 @@ class InternalPointInCanvasGenerator: InternalGenerator
                     generatedPoints.Add(new Point());
 
             return generatedPoints[i];
+        }
+    }
+}
+
+class InternalRandomFigureGenerator : InternalGenerator
+{
+    private List<Figure> generatedFigures;
+    private FigureOptions figure;
+
+    public InternalRandomFigureGenerator(FigureOptions figure)
+    {
+        this.figure = figure;
+    }
+
+    public override GSObject this[int i]
+    {
+        get{
+            if (i > this.generatedFigures.Count)
+                for (int j = generatedFigures.Count; j < i; j++)
+                    generatedFigures.Add(
+                        figure switch
+                        {
+                            FigureOptions.Point => new Point(),
+                            FigureOptions.Line => new Line(),
+                            FigureOptions.Ray => new Ray(),
+                            FigureOptions.Segment => new Segment(),
+                            FigureOptions.Circle => new Circle(),
+                            FigureOptions.Arc => new Arc(),
+                            _ => throw new NotImplementedException("UNSUPPORTED FIGURE TYPE FOR GENERATION"),
+                        }
+                    );
+            
+            return generatedFigures[i];
         }
     }
 }

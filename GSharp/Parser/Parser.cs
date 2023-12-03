@@ -4,6 +4,10 @@ using GSharp.Statement;
 using static GSharp.TokenType;
 using static GSharp.Exceptions.ParseErrorType;
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace GSharp.Parser;
 
 // <summary>

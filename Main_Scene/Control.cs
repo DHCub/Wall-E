@@ -1,7 +1,6 @@
 using Godot;
 using GSharp;
-using GSharp.Collections;
-using GSharp.Core;
+using GSharp.Objects.Collections;
 using GSharp.Objects.Figures;
 using System.Collections.Generic;
 
@@ -25,14 +24,14 @@ public partial class Control : Godot.Control
 		// var console = GetNode<RichTextLabel>("Console_Margin/Console");
 		// console.Text = "";
 
-		void ShowIntersect(params Figure[] arr)
-		{
-			for (int i = 0; i < arr.Length - 1; i++)
-			{
-				for (int j = i + 1; j < arr.Length; j++)
-				{
-					if (i == j) continue;
-					var intersect = Functions.Intersect(arr[i], arr[j]);
+		// void ShowIntersect(params Figure[] arr)
+		// {
+		// 	for (int i = 0; i < arr.Length - 1; i++)
+		// 	{
+		// 		for (int j = i + 1; j < arr.Length; j++)
+		// 		{
+		// 			if (i == j) continue;
+		// 			var intersect = Functions.Intersect(arr[i], arr[j]);
 				
 		// 			if (intersect is FiniteStaticSequence<Point> Seq)
 		// 			{

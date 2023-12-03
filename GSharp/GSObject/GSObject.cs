@@ -4,7 +4,7 @@ using System;
 using GSharp.Objects.Collections;
 using GSharp.Objects.Figures;
 using GSharp.Types;
-using GSharp.Exceptions
+using GSharp.Exceptions;
 
 public abstract class GSObject: IOperate<Add>, 
                                 IOperate<Subst>, 
@@ -57,12 +57,12 @@ public abstract class GSObject: IOperate<Add>,
 
     #region Errors
 
-    public GSObject UnsupportedOperError(GSObject other, Add OP) => throw new RuntimeError(TriedToOperate("Add", this.GetTypeName(), other.GetTypeName()));
-    public GSObject UnsupportedOperError(GSObject other, Subst OP) => throw new RuntimeError(TriedToOperate("Substract", this.GetTypeName(), other.GetTypeName()));
-    public GSObject UnsupportedOperError(GSObject other, Mult OP) => throw new RuntimeError(TriedToOperate("Multiply", this.GetTypeName(), other.GetTypeName()));
-    public GSObject UnsupportedOperError(GSObject other, Div OP) => throw new RuntimeError(TriedToOperate("Divide", this.GetTypeName(), other.GetTypeName()));
-    public GSObject UnsupportedOperError(GSObject other, Mod OP) => throw new RuntimeError(TriedToFindModuloOfT1OverT2(this.GetTypeName(), other.GetTypeName()));
-    public GSObject UnsupportedOperError(GSObject other, LessTh OP) => throw new RuntimeError(NoOrderRelation(this.GetTypeName(), other.GetTypeName()));
+    public GSObject UnsupportedOperError(GSObject other, Add OP) => throw new RuntimeError(null, TriedToOperate("Add", this.GetTypeName(), other.GetTypeName()));
+    public GSObject UnsupportedOperError(GSObject other, Subst OP) => throw new RuntimeError(null, TriedToOperate("Substract", this.GetTypeName(), other.GetTypeName()));
+    public GSObject UnsupportedOperError(GSObject other, Mult OP) => throw new RuntimeError(null, TriedToOperate("Multiply", this.GetTypeName(), other.GetTypeName()));
+    public GSObject UnsupportedOperError(GSObject other, Div OP) => throw new RuntimeError(null, TriedToOperate("Divide", this.GetTypeName(), other.GetTypeName()));
+    public GSObject UnsupportedOperError(GSObject other, Mod OP) => throw new RuntimeError(null, TriedToFindModuloOfT1OverT2(this.GetTypeName(), other.GetTypeName()));
+    public GSObject UnsupportedOperError(GSObject other, LessTh OP) => throw new RuntimeError(null, NoOrderRelation(this.GetTypeName(), other.GetTypeName()));
     
     #endregion
 

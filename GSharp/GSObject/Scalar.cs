@@ -3,7 +3,7 @@ namespace GSharp.Objects;
 using System;
 using GSharp.Objects.Collections;
 using GSharp.Objects.Figures;
-using GSharp.Types
+using GSharp.Types;
 
 public class Scalar : GSObject
 {
