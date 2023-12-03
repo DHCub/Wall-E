@@ -22,29 +22,29 @@ public interface IOperate<OP> where OP: Operator
         throw new NotImplementedException("GSOBJECT UNSUPPORTED");
     }
 
-    public GSObject UnsupportedOperError(Objects.GSObject other, OP op);
+    GSObject UnsupportedOperError(Objects.GSObject other, OP op);
 
-    public GSObject OperatePoint(Point other, OP op);
-    public GSObject OperateLine(Line other, OP op);
-    public GSObject OperateSegment(Segment other, OP op);
-    public GSObject OperateRay(Ray other, OP op);
-    public GSObject OperateCircle(Circle other, OP op);
-    public GSObject OperateArc(Arc other, OP op);
+    GSObject OperatePoint(Point other, OP op);
+    GSObject OperateLine(Line other, OP op);
+    GSObject OperateSegment(Segment other, OP op);
+    GSObject OperateRay(Ray other, OP op);
+    GSObject OperateCircle(Circle other, OP op);
+    GSObject OperateArc(Arc other, OP op);
     
     
-    public GSObject OperateScalar(Scalar other, OP op);
-    public GSObject OperateMeasure(Measure other, OP op);
+    GSObject OperateScalar(Scalar other, OP op);
+    GSObject OperateMeasure(Measure other, OP op);
     
     
-    public GSObject OperateString(Objects.String other, OP op);
+    GSObject OperateString(Objects.String other, OP op);
     
     
-    public GSObject OperateUndefined(Undefined other, OP op);
+    GSObject OperateUndefined(Undefined other, OP op);
     
     
-    public GSObject OperateFiniteStaticSequence(FiniteStaticSequence other, OP op);
-    public GSObject OperateInfiniteStaticSequence(InfiniteStaticSequence other, OP op);
-    public GSObject OperateGeneratorSequence(GeneratorSequence other, OP op);
+    GSObject OperateFiniteStaticSequence(FiniteStaticSequence other, OP op);
+    GSObject OperateInfiniteStaticSequence(InfiniteStaticSequence other, OP op);
+    GSObject OperateGeneratorSequence(GeneratorSequence other, OP op);
 }
 
 

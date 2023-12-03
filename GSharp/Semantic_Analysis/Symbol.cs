@@ -1,5 +1,6 @@
 namespace GSharp;
 using System.Collections.Generic;
+using GSharp.Types;
 
 public abstract class Symbol
 {
@@ -8,29 +9,25 @@ public abstract class Symbol
 
 public class Fun_Symbol : Symbol
 {
-    public readonly List<(GSharpType Type, string Name)> Parameters;
-    public readonly GSharpType ReturnType;
+    public readonly List<(GSType Type, string Name)> Parameters;
+    public readonly GSType ReturnType;
     public readonly string Name;
 
-// #nullable enable
-//     public readonly Equation_System? Parameter_Constraints;
-// #nullable disable
 
-    public Fun_Symbol(string Name, List<(GSharpType, string)> Parameters, GSharpType ReturnType)//, Equation_System Parameter_Constraints = null)
+    public Fun_Symbol(string Name, List<(GSType, string)> Parameters, GSType ReturnType)
     {
         this.Name = Name;
         this.Parameters = Parameters;
         this.ReturnType = ReturnType;
-        // this.Parameter_Constraints = Parameter_Constraints;
     }
 }
 
 public class Variable_Symbol : Symbol
 {
     public readonly string Name;
-    public readonly GSharpType Type;
+    public readonly GSType Type;
 
-    public Variable_Symbol(GSharpType Type,  string Name)
+    public Variable_Symbol(GSType Type,  string Name)
     {
         this.Type = Type;
         this.Name = Name;

@@ -67,7 +67,7 @@ public partial class Control : Godot.Control
 			return;
 		}
 		
-		var analyzer = new Semantic_Analyzer(logger, parser.Parse());
+		var analyzer = new s(logger, parser.Parse());
 		if(logger.hadError)
 		{
 			WriteErrors(logger);

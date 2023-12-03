@@ -4,12 +4,12 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using GSharp.Expression;
+using GSharp.Types;
 
-public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Statement.Stmt.IVisitor<GSharpType?>
+public class Semantic_Analyzer : Expr.IVisitor<GSType?>, Statement.Stmt.IVisitor<GSType?>
 {
-	private readonly Token PlaceholderTok = new(TokenType.UNDEFINED, "PLACEHOLDER", null, -1, -1);
 
-	private const string SEMANTIC = "SEMANTIC";
+	private const string SEMANTIC = "SEMANTIC Semantic_Analyzer";
 	private List<Statement.Stmt> Statements;
 	private ILogger Logger;
 
@@ -35,105 +35,105 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Statement.Stmt.IVis
 
 			BuiltIns.Define(POINT, new Fun_Symbol(
 				POINT,
-				new List<(GSharpType, string)>{
-					(new Constant_SimpleType(GSharpType.Types.Scalar), "x"),
-					(new Constant_SimpleType(GSharpType.Types.Scalar), "y")
+				new List<(GSType, string)>{
+					(new SimpleType(TypeName.Scalar), "x"),
+					(new SimpleType(TypeName.Scalar), "y")
 				},
-				new Constant_SimpleType(GSharpType.Types.Point)
+				new SimpleType(TypeName.Point)
 			), 2);
 
 			BuiltIns.Define(LINE, new Fun_Symbol(
 				LINE,
-				new List<(GSharpType, string)>{
-					(new Constant_SimpleType(GSharpType.Types.Point), "p1"),
-					(new Constant_SimpleType(GSharpType.Types.Point), "p2")
+				new List<(GSType, string)>{
+					(new SimpleType(TypeName.Point), "p1"),
+					(new SimpleType(TypeName.Point), "p2")
 				},
-				new Constant_SimpleType(GSharpType.Types.Line)
+				new SimpleType(TypeName.Line)
 			), 2);
 
 			BuiltIns.Define(RAY, new Fun_Symbol(
 				RAY,
-				new List<(GSharpType, string)>{
-					(new Constant_SimpleType(GSharpType.Types.Point), "p1"),
-					(new Constant_SimpleType(GSharpType.Types.Point), "p2")
+				new List<(GSType, string)>{
+					(new SimpleType(TypeName.Point), "p1"),
+					(new SimpleType(TypeName.Point), "p2")
 				},
-				new Constant_SimpleType(GSharpType.Types.Ray)
+				new SimpleType(TypeName.Ray)
 			), 2);
 
 			BuiltIns.Define(SEGMENT, new Fun_Symbol(
 				SEGMENT,
-				new List<(GSharpType, string)>{
-					(new Constant_SimpleType(GSharpType.Types.Point), "p1"),
-					(new Constant_SimpleType(GSharpType.Types.Point), "p2")
+				new List<(GSType, string)>{
+					(new SimpleType(TypeName.Point), "p1"),
+					(new SimpleType(TypeName.Point), "p2")
 				},
-				new Constant_SimpleType(GSharpType.Types.Segment)
+				new SimpleType(TypeName.Segment)
 			), 2);
 
 			BuiltIns.Define(CIRCLE, new Fun_Symbol(
 				CIRCLE,
-				new List<(GSharpType, string)>{
-					(new Constant_SimpleType(GSharpType.Types.Point), "c"),
-					(new Constant_SimpleType(GSharpType.Types.Measure), "r")
+				new List<(GSType, string)>{
+					(new SimpleType(TypeName.Point), "c"),
+					(new SimpleType(TypeName.Measure), "r")
 				},
-				new Constant_SimpleType(GSharpType.Types.Circle)
+				new SimpleType(TypeName.Circle)
 			), 2);
 
 			BuiltIns.Define(ARC, new Fun_Symbol(
 				ARC,
-				new List<(GSharpType, string)>{
-					(new Constant_SimpleType(GSharpType.Types.Point), "p1"),
-					(new Constant_SimpleType(GSharpType.Types.Point), "p2"),
-					(new Constant_SimpleType(GSharpType.Types.Point), "p3"),
-					(new Constant_SimpleType(GSharpType.Types.Measure), "m")
+				new List<(GSType, string)>{
+					(new SimpleType(TypeName.Point), "p1"),
+					(new SimpleType(TypeName.Point), "p2"),
+					(new SimpleType(TypeName.Point), "p3"),
+					(new SimpleType(TypeName.Measure), "m")
 				},
-				new Constant_SimpleType(GSharpType.Types.Arc)
+				new SimpleType(TypeName.Arc)
 			), 4);
 
 			BuiltIns.Define(MEASURE, new Fun_Symbol(
 				MEASURE,
-				new List<(GSharpType, string)>{
-					(new Constant_SimpleType(GSharpType.Types.Point), "p1"),
-					(new Constant_SimpleType(GSharpType.Types.Point), "p2")
+				new List<(GSType, string)>{
+					(new SimpleType(TypeName.Point), "p1"),
+					(new SimpleType(TypeName.Point), "p2")
 				},
-				new Constant_SimpleType(GSharpType.Types.Measure)
+				new SimpleType(TypeName.Measure)
 			), 2);
 
 			BuiltIns.Define(INTERSECT, new Fun_Symbol(
 				INTERSECT,
-				new List<(GSharpType, string)>{
-					(new Drawable_Type(), "f1"),
-					(new Drawable_Type(), "f2")
+				new List<(GSType, string)>{
+					(new DrawableType(), "f1"),
+					(new DrawableType(), "f2")
 				},
-				new Sequence_Type(new Constant_SimpleType(GSharpType.Types.Point))
+				new SequenceType(new SimpleType(TypeName.Point))
 			), 2);
 
 
 			BuiltIns.Define(COUNT, new Fun_Symbol(
 				COUNT,
-				new List<(GSharpType, string)>{
-					(new Sequence_Type(new Undefined_Type()), "s")
+				new List<(GSType, string)>{
+					(new SequenceType(new UndefinedType()), "s")
 				},
-				new Constant_SimpleType(GSharpType.Types.Scalar)
+				new SimpleType(TypeName.Scalar)
 			), 1);
 
 			BuiltIns.Define(RANDOMS, new Fun_Symbol(
 				RANDOMS,
 				new(),
-				new Sequence_Type(new Constant_SimpleType(GSharpType.Types.Scalar))
+				new SequenceType(new SimpleType(TypeName.Scalar))
 			), 0);
 
 			BuiltIns.Define(POINTS, new Fun_Symbol(
 				POINTS,
-				new List<(GSharpType, string)>{
-					(new Drawable_Type(), "f")
+				new List<(GSType, string)>{
+					(new DrawableType(), "f")
 				},
-				new Sequence_Type(new Constant_SimpleType(GSharpType.Types.Point))
+				new SequenceType(new SimpleType(TypeName.Point))
 			), 1);
 
 			BuiltIns.Define(SAMPLES, new Fun_Symbol(
 				SAMPLES,
 				new(),
-				new Sequence_Type(new Constant_SimpleType(GSharpType.Types.Point))
+				new SequenceType(new SimpleType(TypeName.Point))
 			), 0);
 
 		}
@@ -155,21 +155,21 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Statement.Stmt.IVis
 		}
 	}
 
-	public GSharpType? VisitVarStmt(Statement.Var var_stmt)
+	public GSType? VisitVarStmt(Statement.Var var_stmt)
 	{
-		GSharpType Type = var_stmt.type.type switch
+		GSType Type = var_stmt.type.type switch
 		{
-			TokenType.POINT => new Constant_SimpleType(GSharpType.Types.Point),
-			TokenType.LINE => new Constant_SimpleType(GSharpType.Types.Line),
-			TokenType.RAY => new Constant_SimpleType(GSharpType.Types.Ray),
-			TokenType.SEGMENT => new Constant_SimpleType(GSharpType.Types.Segment),
-			TokenType.CIRCLE => new Constant_SimpleType(GSharpType.Types.Circle),
-			TokenType.ARC => new Constant_SimpleType(GSharpType.Types.Arc),
+			TokenType.POINT => new SimpleType(TypeName.Point),
+			TokenType.LINE => new SimpleType(TypeName.Line),
+			TokenType.RAY => new SimpleType(TypeName.Ray),
+			TokenType.SEGMENT => new SimpleType(TypeName.Segment),
+			TokenType.CIRCLE => new SimpleType(TypeName.Circle),
+			TokenType.ARC => new SimpleType(TypeName.Arc),
 			_ => null
 		} ?? throw new Exception("VARIABLE DECLARATION TYPE UNSUPPORTED");
 
 		if (var_stmt.isSequence)
-			Type = new Sequence_Type(Type);
+			Type = new SequenceType(Type);
 
 		if (!CurrentContext.Define(var_stmt.name.lexeme, new Variable_Symbol(Type, var_stmt.name.lexeme)))
 			Logger.Error(SEMANTIC, var_stmt.name, "Variable " + var_stmt.name.lexeme + " Redefined");
@@ -177,7 +177,7 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Statement.Stmt.IVis
 		return null;
 	}
 
-	public GSharpType? VisitPrintStmt(Statement.Print print)
+	public GSType? VisitPrintStmt(Statement.Print print)
 	{
 		foreach (var expr in print.printe)
 			TypeCheck(expr);
@@ -185,17 +185,17 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Statement.Stmt.IVis
 		return null;
 	}
 
-	private GSharpType? TypeCheck(Statement.Stmt stmt)
+	private GSType? TypeCheck(Statement.Stmt stmt)
 	{
 		return stmt.Accept(this);
 	}
 
-	private GSharpType? TypeCheck(Expr expr)
+	private GSType? TypeCheck(Expr expr)
 	{
 		return expr.Accept(this);
 	}
 
-	public GSharpType? VisitFunctionStmt(Statement.Function function)
+	public GSType? VisitFunctionStmt(Statement.Function function)
 	{
 
 		#region check if function is defined
@@ -218,21 +218,23 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Statement.Stmt.IVis
 		#region define function in inner context, get Function_Symbol
 
 
-		List<(GSharpType type, string name)> Parameters = new();
+		List<(GSType type, string name)> Parameters = new();
 
 		foreach (var param in function.parameters)
 		{
-			(GSharpType type, string name) parameter_info = (new Undefined_Type(), param.lexeme);
+			(GSType type, string name) parameter_info = (new UndefinedType(), param.lexeme);
 
 			Parameters.Add(parameter_info);
 
-			Function_Context.Define(
+			var paramRedefined = Function_Context.Define(
 				parameter_info.name,
-				new Variable_Symbol(new Undefined_Type(), parameter_info.name)
+				new Variable_Symbol(new UndefinedType(), parameter_info.name)
 			);
+
+			if (paramRedefined) Logger.Error(SEMANTIC, param, $"Parameter {param.lexeme} redefined in Function declaration");
 		}
 
-		Undefined_Type return_type = new();
+		UndefinedType return_type = new();
 
 		Fun_Symbol Function_Symbol = new(
 			function.name.lexeme,
@@ -267,11 +269,11 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Statement.Stmt.IVis
 		return null;
 	}
 
-	public GSharpType? VisitColorStmt(Statement.Color color) => null;
+	public GSType? VisitColorStmt(Statement.Color color) => null;
 
-	public GSharpType? VisitConstantStmt(Statement.Constant constant)
+	public GSType? VisitConstantStmt(Statement.Constant constant)
 	{
-		GSharpType ValueType = TypeCheck(constant.initializer);
+		GSType ValueType = TypeCheck(constant.initializer);
 
 		void RedefinedError(Token VarNanme)
 		{
@@ -281,7 +283,7 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Statement.Stmt.IVis
 		bool IsUnderscore(Token name)
 			=> name.lexeme == "_";
 
-		if (ValueType is Sequence_Type seq)
+		if (ValueType is SequenceType seq)
 		{
 			for (int i = 0; i < constant.constNames.Count - 1; i++)
 			{
@@ -301,7 +303,7 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Statement.Stmt.IVis
 				RedefinedError(constant.constNames.Last());
 		}
 
-		else if (ValueType is Constant_SimpleType simpleType)
+		else if (ValueType is SimpleType simpleType)
 		{
 			if (constant.constNames.Count > 1)
 				Logger.Error(SEMANTIC, constant.constNames[0], "Cannot destructure a non-sequence object");
@@ -317,13 +319,13 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Statement.Stmt.IVis
 				if (IsUnderscore(constant.constNames[i])) continue;
 				if (!CurrentContext.Define(
 						constant.constNames[i].lexeme,
-						new Variable_Symbol(new Undefined_Type(), constant.constNames[i].lexeme)
+						new Variable_Symbol(new UndefinedType(), constant.constNames[i].lexeme)
 					))
 					RedefinedError(constant.constNames[i]);
 			}
 		}
 
-		else if (ValueType is Undefined_Type u)
+		else if (ValueType is UndefinedType u)
 		{
 			foreach (var VarName in constant.constNames)
 			{
@@ -336,7 +338,7 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Statement.Stmt.IVis
 			}
 		}
 
-		else if (ValueType is Drawable_Type d)
+		else if (ValueType is DrawableType d)
 		{
 			foreach (var VarName in constant.constNames)
 			{
@@ -352,9 +354,9 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Statement.Stmt.IVis
 		return null;
 	}
 
-	public GSharpType? VisitDrawStmt(Statement.Draw draw)
+	public GSType? VisitDrawStmt(Statement.Draw draw)
 	{
-		Drawable_Type drawable = new();
+		DrawableType drawable = new();
 
 		var expType = TypeCheck(draw.elements);
 		if (!expType.Matches(drawable))
@@ -363,13 +365,13 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Statement.Stmt.IVis
 		return null;
 	}
 
-	public GSharpType? VisitExpressionStmt(Statement.Expression expression) => TypeCheck(expression);
+	public GSType? VisitExpressionStmt(Statement.Expression expression) => TypeCheck(expression);
 
-	public GSharpType? VisitImportStmt(Statement.Import import) => null;
+	public GSType? VisitImportStmt(Statement.Import import) => null;
 
-	public GSharpType? VisitRestoreStmt(Statement.Restore restore) => null;
+	public GSType? VisitRestoreStmt(Statement.Restore restore) => null;
 
-	public GSharpType? VisitLetInExpr(LetIn letIn)
+	public GSType? VisitLetInExpr(LetIn letIn)
 	{
 		var ogContext = CurrentContext;
 		CurrentContext = new(CurrentContext);
@@ -384,11 +386,11 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Statement.Stmt.IVis
 		return return_type;
 	}
 
-	public GSharpType? VisitConditionalExpr(Conditional conditional)
+	public GSType? VisitConditionalExpr(Conditional conditional)
 	{
 		var condition_Expr_T = TypeCheck(conditional.condition);
 
-		if (!condition_Expr_T.Matches(new Constant_SimpleType(GSharpType.Types.Boolean)))
+		if (!condition_Expr_T.Matches(new SimpleType(TypeName.Boolean)))
 			Logger.Error(SEMANTIC, conditional.ifTk, $"Conditional Expression must be boolean, {condition_Expr_T} Passed instead");
 
 		var then_branch_T = TypeCheck(conditional.thenBranch);
@@ -397,33 +399,33 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Statement.Stmt.IVis
 		if (!then_branch_T.Matches(else_branch_T))
 		{
 			Logger.Error(SEMANTIC, conditional.ifTk, $"Conditional Expression must have matching return types, {then_branch_T} and {else_branch_T} returned instead");
-			return new Undefined_Type();
+			return new UndefinedType();
 		}
 
 		return then_branch_T;
 	}
 
-	public GSharpType? VisitLiteralExpr(Literal literal)
+	public GSType? VisitLiteralExpr(Literal literal)
 	{
-		if (literal.value is bool) return new Constant_SimpleType(GSharpType.Types.Boolean);
-		else if (literal.value is double) return new Constant_SimpleType(GSharpType.Types.Scalar);
-		else if (literal.value is string) return new Constant_SimpleType(GSharpType.Types.String);
+		if (literal.value is bool) return new SimpleType(TypeName.Boolean);
+		else if (literal.value is double) return new SimpleType(TypeName.Scalar);
+		else if (literal.value is string) return new SimpleType(TypeName.String);
 
 		else throw new Exception("LITERAL NOT SUPPORTED");
 	}
 
-	public GSharpType? VisitBinaryExpr(Binary binary)
+	public GSType? VisitBinaryExpr(Binary binary)
 	{
-		GSharpType TLeft = TypeCheck(binary.left);
-		GSharpType TRight = TypeCheck(binary.right);
+		GSType TLeft = TypeCheck(binary.left);
+		GSType TRight = TypeCheck(binary.right);
 
 		void Operator_Doesnt_Support_Operands_Error()
 		{
 			Logger.Error(SEMANTIC, binary.oper, $"Operator {binary.oper.lexeme} does not support operands of type {TLeft} and {TRight} ");
 		}
 
-		Constant_SimpleType numeric = new(GSharpType.Types.Scalar);
-		Constant_SimpleType measure = new(GSharpType.Types.Measure);
+		SimpleType numeric = new(TypeName.Scalar);
+		SimpleType measure = new(TypeName.Measure);
 		bool error = false;
 
 
@@ -441,17 +443,17 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Statement.Stmt.IVis
 					if (!TLeft.Matches(TRight))
 					{
 						Operator_Doesnt_Support_Operands_Error();
-						return new Undefined_Type();
+						return new UndefinedType();
 					}
 
-					if (TLeft is Undefined_Type)
+					if (TLeft is UndefinedType)
 						return TRight;
 
 					return TLeft;
 				}
 
 				Operator_Doesnt_Support_Operands_Error();
-				return new Undefined_Type();
+				return new UndefinedType();
 
 			case TokenType.MINUS:
 				if (!TLeft.IsSubstractable())
@@ -465,22 +467,22 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Statement.Stmt.IVis
 					if (!TLeft.Matches(TRight))
 					{
 						Operator_Doesnt_Support_Operands_Error();
-						return new Undefined_Type();
+						return new UndefinedType();
 					}
 
-					if (TLeft is Undefined_Type)
+					if (TLeft is UndefinedType)
 						return TRight;
 
 					return TLeft;
 				}
 
 				Operator_Doesnt_Support_Operands_Error();
-				return new Undefined_Type();
+				return new UndefinedType();
 
 
 			case TokenType.EQUAL_EQUAL:
 			case TokenType.NOT_EQUAL:
-				return new Constant_SimpleType(GSharpType.Types.Boolean);
+				return new SimpleType(TypeName.Boolean);
 
 			case TokenType.LESS_EQUAL:
 			case TokenType.LESS:
@@ -497,14 +499,14 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Statement.Stmt.IVis
 					error = true;
 
 				if (error) Operator_Doesnt_Support_Operands_Error();
-				return new Constant_SimpleType(GSharpType.Types.Boolean);
+				return new SimpleType(TypeName.Boolean);
 
 			case TokenType.DIV:
 
 				if (!TLeft.Is_Dividable_By(TRight))
 				{
 					Operator_Doesnt_Support_Operands_Error();
-					return new Undefined_Type();
+					return new UndefinedType();
 				}
 
 				return TLeft;
@@ -514,10 +516,10 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Statement.Stmt.IVis
 				if (!TLeft.Is_Multiplyable_By(TRight))
 				{
 					Operator_Doesnt_Support_Operands_Error();
-					return new Undefined_Type();
+					return new UndefinedType();
 				}
 
-				return (TLeft is Constant_SimpleType CST && CST.Type == GSharpType.Types.Scalar) ? TRight : TLeft;
+				return (TLeft is SimpleType CST && CST.Type == TypeName.Scalar) ? TRight : TLeft;
 
 
 			case TokenType.POWER:
@@ -533,7 +535,7 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Statement.Stmt.IVis
 
 	}
 
-	public GSharpType? VisitCallExpr(Call call)
+	public GSType? VisitCallExpr(Call call)
 	{
 		var nameTok = ((Variable)call.calle).name;
 
@@ -542,7 +544,7 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Statement.Stmt.IVis
 		if (Fun_Symbol == null)
 		{
 			Logger.Error(SEMANTIC, nameTok, $"Function {nameTok.lexeme} with {call.Arity} parameter{((call.Arity > 1) ? "s" : "")} is Undefined in this Context");
-			return new Undefined_Type();
+			return new UndefinedType();
 		}
 
 		for (int i = 0; i < Fun_Symbol.Parameters.Count; i++)
@@ -563,13 +565,13 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Statement.Stmt.IVis
 		return Fun_Symbol.ReturnType;
 	}
 
-	public GSharpType? VisitLogicalExpr(Logical logical)
+	public GSType? VisitLogicalExpr(Logical logical)
 	{
 
-		GSharpType TLeft = TypeCheck(logical.left);
-		GSharpType TRight = TypeCheck(logical.right);
+		GSType TLeft = TypeCheck(logical.left);
+		GSType TRight = TypeCheck(logical.right);
 
-		Constant_SimpleType boolean = new(GSharpType.Types.Boolean);
+		SimpleType boolean = new(TypeName.Boolean);
 
 		if (!TLeft.Matches(boolean))
 		{
@@ -588,7 +590,7 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Statement.Stmt.IVis
 		return boolean;
 	}
 
-	public GSharpType? VisitIntRangeExpr(IntRange range)
+	public GSType? VisitIntRangeExpr(IntRange range)
 	{
 		if (range.left.literal is not double)
 		{
@@ -603,18 +605,18 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Statement.Stmt.IVis
 		if (!double.IsInteger((double)range.right.literal))
 			Logger.Error(SEMANTIC, range.right, ERROR_MESSAGE);
 
-		return new Constant_SimpleType(GSharpType.Types.Scalar);
+		return new SimpleType(TypeName.Scalar);
 	}
 
-	public GSharpType? VisitGroupingExpr(Grouping expr)
+	public GSType? VisitGroupingExpr(Grouping expr)
 	{
 		return TypeCheck(expr.expression);
 	}
 
-	public GSharpType? VisitSequenceExpr(Sequence sequence)
+	public GSType? VisitSequenceExpr(Sequence sequence)
 	{
-		List<GSharpType> element_Types = new(sequence.items.Count);
-		GSharpType MostRestrainedType = new Undefined_Type();
+		List<GSType> element_Types = new(sequence.items.Count);
+		GSType MostRestrainedType = new UndefinedType();
 		bool error = false;
 		bool type_restrained = false;
 
@@ -622,9 +624,9 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Statement.Stmt.IVis
 		{
 			var currType = TypeCheck(sequence.items[i]);
 			element_Types.Add(currType);
-			if (MostRestrainedType is not Constant_SimpleType && !currType.IsUndefined())
+			if (MostRestrainedType is not SimpleType && !currType.IsUndefined())
 			{
-				if (currType is Constant_SimpleType CST)
+				if (currType is SimpleType CST)
 					MostRestrainedType = CST;
 				if (MostRestrainedType.IsUndefined()) MostRestrainedType = currType;
 
@@ -644,44 +646,44 @@ public class Semantic_Analyzer : Expr.IVisitor<GSharpType?>, Statement.Stmt.IVis
 			}
 		}
 
-		if (!error) return new Sequence_Type(MostRestrainedType);
-		return new Sequence_Type(new Undefined_Type());
+		if (!error) return new SequenceType(MostRestrainedType);
+		return new SequenceType(new UndefinedType());
 	}
 
-	public GSharpType? VisitUnaryExpr(Unary unary)
+	public GSType? VisitUnaryExpr(Unary unary)
 	{
-		GSharpType TRight = TypeCheck(unary.right);
+		GSType TRight = TypeCheck(unary.right);
 		switch (unary.oper.type)
 		{
 			case TokenType.NOT:
-				Constant_SimpleType boolean = new(GSharpType.Types.Boolean);
+				SimpleType boolean = new(TypeName.Boolean);
 				if (!TRight.Matches(boolean))
 					Logger.Error(SEMANTIC, unary.oper, $"Logical NOT must have boolean value as right operand {TRight} not supported");
 
 				return boolean;
 			case TokenType.MINUS:
-				Constant_SimpleType scalar = new(GSharpType.Types.Scalar);
-				Constant_SimpleType measure = new(GSharpType.Types.Measure);
+				SimpleType scalar = new(TypeName.Scalar);
+				SimpleType measure = new(TypeName.Measure);
 
 				if (TRight.Matches(scalar)) return scalar;
 				if (TRight.Matches(measure)) return measure;
 
 				Logger.Error(SEMANTIC, unary.oper, $"Minus Unary Operator does not suppot {TRight} as Right Operand");
-				return new Undefined_Type();
+				return new UndefinedType();
 
 			default: throw new Exception("UNARY OPERATOR NOT SUPPORTED");
 		}
 	}
 
-	public GSharpType? VisitUndefinedExpr(Undefined undefined) => new Undefined_Type();
+	public GSType? VisitUndefinedExpr(Undefined undefined) => new UndefinedType();
 
-	public GSharpType? VisitVariableExpr(Variable variable)
+	public GSType? VisitVariableExpr(Variable variable)
 	{
 		var symbol = CurrentContext.Get_Symbol(variable.name.lexeme);
 		if (symbol == null)
 		{
 			Logger.Error(SEMANTIC, variable.name, $"Variable {variable.name.lexeme} is Undefined in this Context");
-			return new Undefined_Type();
+			return new UndefinedType();
 		}
 
 		return symbol.Type;

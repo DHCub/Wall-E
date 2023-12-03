@@ -35,15 +35,6 @@ public abstract class GSObject: IOperate<Add>,
     protected static string TriedToFindModuloOfT1OverT2(string T1, TypeName T2)
         => $"Tried to find Modulo of {T1} over {T2}";   
 
-    #region Operation Names
-
-    protected const string ADD = "Add";
-    protected const string SUBSTRACT = "Substract";
-    protected const string MULTIPLY = "Multiply";
-    protected const string DIVIDE = "Divide";
-
-    #endregion
-
     #region Type Names
     
     // protected const string POINT = "Point";
@@ -65,10 +56,10 @@ public abstract class GSObject: IOperate<Add>,
 
     #region Errors
 
-    public GSObject UnsupportedOperError(GSObject other, Add OP) => throw new RuntimeError(TriedToOperate(ADD, this.GetTypeName(), other.GetTypeName()));
-    public GSObject UnsupportedOperError(GSObject other, Subst OP) => throw new RuntimeError(TriedToOperate(SUBSTRACT, this.GetTypeName(), other.GetTypeName()));
-    public GSObject UnsupportedOperError(GSObject other, Mult OP) => throw new RuntimeError(TriedToOperate(MULTIPLY, this.GetTypeName(), other.GetTypeName()));
-    public GSObject UnsupportedOperError(GSObject other, Div OP) => throw new RuntimeError(TriedToOperate(DIVIDE, this.GetTypeName(), other.GetTypeName()));
+    public GSObject UnsupportedOperError(GSObject other, Add OP) => throw new RuntimeError(TriedToOperate("Add", this.GetTypeName(), other.GetTypeName()));
+    public GSObject UnsupportedOperError(GSObject other, Subst OP) => throw new RuntimeError(TriedToOperate("Substract", this.GetTypeName(), other.GetTypeName()));
+    public GSObject UnsupportedOperError(GSObject other, Mult OP) => throw new RuntimeError(TriedToOperate("Multiply", this.GetTypeName(), other.GetTypeName()));
+    public GSObject UnsupportedOperError(GSObject other, Div OP) => throw new RuntimeError(TriedToOperate("Divide", this.GetTypeName(), other.GetTypeName()));
     public GSObject UnsupportedOperError(GSObject other, Mod OP) => throw new RuntimeError(TriedToFindModuloOfT1OverT2(this.GetTypeName(), other.GetTypeName()));
     public GSObject UnsupportedOperError(GSObject other, LessTh OP) => throw new RuntimeError(NoOrderRelation(this.GetTypeName(), other.GetTypeName()));
     
