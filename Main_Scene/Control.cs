@@ -1,9 +1,8 @@
 using Godot;
-using Geometry;
-using System;
 using GSharp;
 using GSharp.Collections;
 using GSharp.Core;
+using GSharp.Objects.Figures;
 using System.Collections.Generic;
 
 public partial class Control : Godot.Control
@@ -21,75 +20,75 @@ public partial class Control : Godot.Control
 
 	public void _on_Button_pressed() 
 	{
-		var code = GetNode<CodeEdit>("Code_Edit_Marg/CodeEdit");
-		var draw_area = GetNode<Node2D>("Draw_Area_Marg/Viewport_Container/SubViewport/Background/Node2D");
-		var console = GetNode<RichTextLabel>("Console_Margin/Console");
-		console.Text = "";
+		// var code = GetNode<CodeEdit>("Code_Edit_Marg/CodeEdit");
+		// var draw_area = GetNode<Node2D>("Draw_Area_Marg/Viewport_Container/SubViewport/Background/Node2D");
+		// var console = GetNode<RichTextLabel>("Console_Margin/Console");
+		// console.Text = "";
 
-		void ShowIntersect(params IDrawable[] arr)
-		{
-			for (int i = 0; i < arr.Length - 1; i++)
-			{
-				for (int j = i + 1; j < arr.Length; j++)
-				{
-					if (i == j) continue;
-					var intersect = Functions.Intersect(arr[i], arr[j]);
+		// void ShowIntersect(params Figure[] arr)
+		// {
+		// 	for (int i = 0; i < arr.Length - 1; i++)
+		// 	{
+		// 		for (int j = i + 1; j < arr.Length; j++)
+		// 		{
+		// 			if (i == j) continue;
+		// 			var intersect = Functions.Intersect(arr[i], arr[j]);
 				
-					if (intersect is FiniteStaticSequence<Point> Seq)
-					{
-						foreach(var P in Seq)
-							draw_area.AddDrawable(Colors.Black, P);
-					}
-				}
-			}
-		}
+		// 			if (intersect is FiniteStaticSequence<Point> Seq)
+		// 			{
+		// 				foreach(var P in Seq)
+		// 					draw_area.AddDrawable(Colors.Black, P);
+		// 			}
+		// 		}
+		// 	}
+		// }
 
-		void WriteErrors(CollectorLogger logger)
-		{
-			List<char> ErrorMsg = new();
+		// void WriteErrors(CollectorLogger logger)
+		// {
+		// 	List<char> ErrorMsg = new();
 
-			foreach(var error in logger.Errors)
-				ErrorMsg.AddRange(error + '\n');
+		// 	foreach(var error in logger.Errors)
+		// 		ErrorMsg.AddRange(error + '\n');
 
-			console.Text = new string(ErrorMsg.ToArray());
-		}
+		// 	console.Text = new string(ErrorMsg.ToArray());
+		// }
 
-		var txt = code.Text;
+		// var txt = code.Text;
 
-		var logger = new CollectorLogger();
-		var scanner = new Scanner(logger, txt);
+		// var logger = new CollectorLogger();
+		// var scanner = new Scanner(logger, txt);
 		
-		var parser = new Parser(logger, scanner.ScanTokens());
+		// var parser = new Parser(logger, scanner.ScanTokens());
 		
-		if(logger.hadError)
-		{
-			WriteErrors(logger);
-			return;
-		}
+		// if(logger.hadError)
+		// {
+		// 	WriteErrors(logger);
+		// 	return;
+		// }
 		
-		var analyzer = new Semantic_Analyzer(logger, parser.Parse());
-		if(logger.hadError)
-		{
-			WriteErrors(logger);
-			return;
-		}
+		// var analyzer = new Semantic_Analyzer(logger, parser.Parse());
+		// if(logger.hadError)
+		// {
+		// 	WriteErrors(logger);
+		// 	return;
+		// }
 
 
-		analyzer.Analyze();
-		if (logger.hadError)
-		{
-			WriteErrors(logger);
-			return;
-		}
+		// analyzer.Analyze();
+		// if (logger.hadError)
+		// {
+		// 	WriteErrors(logger);
+		// 	return;
+		// }
 
-		var interpreter = new Interpreter(logger);
+		// var interpreter = new Interpreter(logger);
 
-		interpreter.Interpret(parser.Parse());
+		// interpreter.Interpret(parser.Parse());
 		
-		if (logger.hadError) {
-			WriteErrors(logger);
-			return;
-		}
+		// if (logger.hadError) {
+		// 	WriteErrors(logger);
+		// 	return;
+		// }
 
 		// Line l1 = new();
 		// Line l2 = new();		
@@ -123,4 +122,3 @@ public partial class Control : Godot.Control
 	// }
 
 }
-

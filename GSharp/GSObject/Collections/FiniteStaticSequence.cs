@@ -1,7 +1,4 @@
-// when this returns null upon indexing, it must be interpreted as surpassing the end
-using System.Collections.Generic;
 using System.Collections;
-using System.Linq;
 
 namespace GSharp.Objects.Collections;
 

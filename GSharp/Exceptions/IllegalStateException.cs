@@ -1,6 +1,6 @@
 namespace GSharp.Exceptions;
 
-public class IllegalStateException : CollectionException
+public class IllegalStateException : ObjectException
 {
   public IllegalStateException(string message) : base(message) { }
 }

@@ -1,6 +1,6 @@
 namespace GSharp.Exceptions;
 
-public class IOExceptions : StdLibException
+public class IOExceptions : ObjectException
 {
   public int errorNumber { get; }
 

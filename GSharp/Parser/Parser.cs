@@ -1,14 +1,8 @@
-using System;
-using System.Collections.Generic;
-
 using GSharp.Exceptions;
 using GSharp.Expression;
 using GSharp.Statement;
 using static GSharp.TokenType;
 using static GSharp.Exceptions.ParseErrorType;
-
-using System.Linq;
-using System.Reflection.Metadata;
 
 namespace GSharp.Parser;
 
@@ -366,7 +360,6 @@ public class Parser
   private Expr LetInExpression(Token Let)
   {
     var instructions = Block();
-    Consume(IN, "Expected 'in' at end of 'let-in' ");
     Expr body = Expression();
     return new LetIn(Let, instructions, body);
   }
