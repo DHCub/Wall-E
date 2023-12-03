@@ -1,22 +1,24 @@
 namespace GSharp.Expression;
 
-public class Conditional : Expr
+public class Conditional : Expr, IToken
 {
-  public readonly Token ifTk;
-  public readonly Expr condition;
-  public readonly Expr thenBranch;
-  public readonly Expr elseBranch;
+  public readonly Token If;
+  public readonly Expr Condition;
+  public readonly Expr ThenBranch;
+  public readonly Expr ElseBranch;
 
-  public Conditional(Token ifTk, Expr condition, Expr thenBranch, Expr elseBranch)
+  public Conditional(Token If, Expr Condition, Expr ThenBranch, Expr ElseBranch)
   {
-    this.condition = condition;
-    this.thenBranch = thenBranch;
-    this.elseBranch = elseBranch;
-    this.ifTk = ifTk;
+    this.Condition = Condition;
+    this.ThenBranch = ThenBranch;
+    this.ElseBranch = ElseBranch;
+    this.If = If;
   }
 
   public override R Accept<R>(IVisitor<R> visitor)
   {
     return visitor.VisitConditionalExpr(this);
   }
+
+  public Token Token => If;
 }

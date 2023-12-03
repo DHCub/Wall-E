@@ -1,23 +1,25 @@
+using System.Collections.Generic;
+using GSharp.Statement;
+
 namespace GSharp.Expression;
 
-using GSharp.Statement;
-using System.Collections.Generic;
-
-public class LetIn : Expr
+public class LetIn : Expr, IToken
 {
-  public readonly Token letTk;
-  public readonly List<Stmt> instructions;
-  public readonly Expr body;
+  public readonly Token Let;
+  public readonly List<Stmt> Stmts;
+  public readonly Expr Body;
 
-  public LetIn(Token letTk, List<Stmt> instructions, Expr body)
+  public LetIn(Token Let, List<Stmt> Stmts, Expr Body)
   {
-    this.instructions = instructions;
-    this.body = body;
-    this.letTk = letTk;
+    this.Stmts = Stmts;
+    this.Body = Body;
+    this.Let = Let;
   }
 
   public override R Accept<R>(IVisitor<R> visitor)
   {
     return visitor.VisitLetInExpr(this);
   }
+
+  public Token Token => Let;
 }

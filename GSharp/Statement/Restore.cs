@@ -1,11 +1,18 @@
 namespace GSharp.Statement;
 
-public class Restore : Stmt
+public class Restore : Stmt, IToken
 {
-  public Restore() { }
+  public readonly Token Command;
+
+  public Restore(Token Command)
+  {
+    this.Command = Command;
+  }
 
   public override R Accept<R>(IVisitor<R> visitor)
   {
     return visitor.VisitRestoreStmt(this);
   }
+
+  public Token Token => Command;
 }

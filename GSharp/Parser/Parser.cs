@@ -10,7 +10,7 @@ using static GSharp.Exceptions.ParseErrorType;
 using System.Linq;
 using System.Reflection.Metadata;
 
-namespace GSharp.Core;
+namespace GSharp.Parser;
 
 // <summary>
 // Parses GSharp code to either a list of statements.
@@ -132,6 +132,11 @@ public class Parser
         return VarDeclaration(Previous());
       }
 
+      if (Match(POINT_SEQUENCE, LINE_SEQUENCE, SEGMENT_SEQUENCE, RAY_SEQUENCE, CIRCLE_SEQUENCE, ARC_SEQUENCE))
+      {
+        return VarDeclaration(Previous());
+      }
+
       if (IsConstant() && Match(IDENTIFIER))
       {
         return ConstDeclaration();
@@ -149,10 +154,10 @@ public class Parser
   private Stmt Statement()
   {
     if (Match(DRAW)) return DrawStatement(Previous());
-    if (Match(COLOR)) return ColorStatement();
-    if (Match(RESTORE)) return RestoreStatement();
-    if (Match(IMPORT)) return ImportStatement();
-    if (Match(PRINT)) return PrintStatement();
+    if (Match(COLOR)) return ColorStatement(Previous());
+    if (Match(RESTORE)) return RestoreStatement(Previous());
+    if (Match(IMPORT)) return ImportStatement(Previous());
+    if (Match(PRINT)) return PrintStatement(Previous());
 
     return ExpressionStatement();
   }
@@ -161,7 +166,7 @@ public class Parser
   {
     Expr expr = Expression();
     Consume(SEMICOLON, "Expected ';' after expression.", MISSING_SEMICOLON);
-    return new Statement.Expression(expr);
+    return new ExpressionStmt(expr);
   }
 
   private Expr IfExpression(Token ifTk)
@@ -227,7 +232,7 @@ public class Parser
     return new Function(name, parameters, body, new TypeReference(returnTypeSpecifier));
   }
 
-  private Stmt DrawStatement(Token DrawCommand)
+  private Stmt DrawStatement(Token command)
   {
     Expr elements = Expression();
 
@@ -237,17 +242,17 @@ public class Parser
       nameId = Consume(STRING, "Expected string.");
     }
 
-    Consume(SEMICOLON, "Expected 'l' after draw command.");
-    return new Draw(elements, DrawCommand, nameId);
+    Consume(SEMICOLON, "Expected 'label' after draw command.");
+    return new Draw(command, elements, nameId);
   }
 
-  private Stmt ColorStatement()
+  private Stmt ColorStatement(Token command)
   {
     if (Match(BLUE, RED, YELLOW, GREEN, CYAN, MAGENTA, WHITE, GRAY, BLACK))
     {
       Token color = Previous();
       Consume(SEMICOLON, "Expected ';' after color command.");
-      return new Color(color);
+      return new ColorStmt(command, color);
     }
     else
     {
@@ -256,20 +261,20 @@ public class Parser
     }
   }
 
-  private Stmt RestoreStatement()
+  private Stmt RestoreStatement(Token command)
   {
     Consume(SEMICOLON, "Expected ';' after restore command.");
-    return null;
+    return new Restore(command);
   }
 
-  private Stmt ImportStatement()
+  private Stmt ImportStatement(Token command)
   {
     Token dirName = Consume(STRING, "Expected directory name.");
     Consume(SEMICOLON, "Expected ';' after import ");
-    return new Import(dirName);
+    return new Import(command, dirName);
   }
 
-  private Stmt PrintStatement()
+  private Stmt PrintStatement(Token command)
   {
     Expr value = Expression();
 
@@ -280,18 +285,11 @@ public class Parser
     }
 
     Consume(SEMICOLON, "Expected ';' after print expressions.");
-    return new Print(value, label);
+    return new Print(command, value, label);
   }
 
   private Stmt VarDeclaration(Token type)
   {
-    bool isSequence = false;
-
-    if (Match(SEQUENCE))
-    {
-      isSequence = true;
-    }
-
     Token name = Consume(IDENTIFIER, "Expected variable name.");
 
     BlockReservedIdentifiers(name);
@@ -299,7 +297,7 @@ public class Parser
     Expr initializer = null;
 
     Consume(SEMICOLON, "Expected ';' after variable declaration.");
-    return new Var(name, initializer, new TypeReference(type, isSequence));
+    return new Var(name, initializer, new TypeReference(type));
   }
 
   private List<Token> GetNames()
@@ -327,17 +325,7 @@ public class Parser
     Consume(EQUAL, "Expected '=' after constant name.");
     Expr initializer = Expression();
     Consume(SEMICOLON, "Expected ';' after constant declaration.");
-    return new Constant(constNames, initializer);
-  }
-
-  private List<Stmt> Instructions()
-  {
-    List<Stmt> instructions = new List<Stmt>();
-    while (!Check(IN) && !IsAtEnd())
-    {
-      instructions.Add(Declaration());
-    }
-    return instructions;
+    return new ConstantStmt(constNames, initializer);
   }
 
   private Expr SequenceDeclaration(Token openBraceTk)
@@ -375,12 +363,12 @@ public class Parser
     return new Sequence(openBraceTk, items);
   }
 
-  private Expr LetInExpression(Token letTk)
+  private Expr LetInExpression(Token Let)
   {
-    var instructions = Instructions();
+    var instructions = Block();
     Consume(IN, "Expected 'in' at end of 'let-in' ");
     Expr body = Expression();
-    return new LetIn(letTk, instructions, body);
+    return new LetIn(Let, instructions, body);
   }
 
   private List<Stmt> Block()
@@ -488,18 +476,18 @@ public class Parser
       // instead of retaining it as a unary prefix expression
       if (oper.type == MINUS && right is Literal rightLiteral)
       {
-        if (rightLiteral.value is INumericLiteral numericLiteral)
+        if (rightLiteral.Value is INumericLiteral numericLiteral)
         {
           return new Literal(NumberParser.MakeNegative(numericLiteral));
         }
-        else if (rightLiteral.value is null)
+        else if (rightLiteral.Value is null)
         {
           Error(Peek(), "Unary minus operator does not suppor null operand.");
           return new Literal(null);
         }
         else
         {
-          throw new ArgumentException($"Type {rightLiteral.value.GetType().Name} not supported.");
+          throw new ArgumentException($"Type {rightLiteral.Value.GetType().Name} not supported.");
         }
       }
       else

@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using GSharp.Exceptions;
 
-namespace GSharp;
+namespace GSharp.Parser;
 using static TokenType;
 
 // <summary>
@@ -348,6 +348,49 @@ public class Scanner
 
   private void AddToken(Token token)
   {
+    if (token.type == SEQUENCE)
+    {
+      if (tokens.Count > 0)
+      {
+        Token newToken;
+        switch (tokens.Last().type)
+        {
+          case POINT:
+            tokens.RemoveAt(tokens.Count - 1);
+            newToken = new Token(POINT_SEQUENCE, "point sequence", null, line, current);
+            tokens.Add(newToken);
+            return;
+          case LINE:
+            tokens.RemoveAt(tokens.Count - 1);
+            newToken = new Token(LINE_SEQUENCE, "line sequence", null, line, current);
+            tokens.Add(newToken);
+            return;
+          case SEGMENT:
+            tokens.RemoveAt(tokens.Count - 1);
+            newToken = new Token(SEGMENT_SEQUENCE, "segment sequence", null, line, current);
+            tokens.Add(newToken);
+            return;
+          case RAY:
+            tokens.RemoveAt(tokens.Count - 1);
+            newToken = new Token(RAY_SEQUENCE, "ray sequence", null, line, current);
+            tokens.Add(newToken);
+            return;
+          case ARC:
+            tokens.RemoveAt(tokens.Count - 1);
+            newToken = new Token(ARC_SEQUENCE, "arc sequence", null, line, current);
+            tokens.Add(newToken);
+            return;
+          case CIRCLE:
+            tokens.RemoveAt(tokens.Count - 1);
+            newToken = new Token(CIRCLE_SEQUENCE, "circle sequence", null, line, current);
+            tokens.Add(newToken);
+            return;
+          default:
+            break;
+        }
+      }
+    }
+
     tokens.Add(token);
   }
 
