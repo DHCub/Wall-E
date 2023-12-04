@@ -1,7 +1,7 @@
 using Godot;
 
-using Figures;
 using GSharp;
+using GSharp.Objects.Figures;
 
 using System;
 using System.Collections.Generic;
@@ -28,6 +28,9 @@ public partial class Node2D : Godot.Node2D
         var lineWidth = 2/Transform.X.X;
 
         // DrawCircle(container.Size/2, PointRadius, Colors.Green);
+        Godot.Vector2 GetVect2(Point P) {
+            return new Godot.Vector2((float)P.X_Coord, (float)P.Y_Coord);
+        }
 
         void draw_segment(Line L, Point P1, Point P2, Godot.Color color, bool P1_inf = false, bool P2_inf = false)
         {
@@ -117,7 +120,7 @@ public partial class Node2D : Godot.Node2D
         {
             if (drawable is Point P)
             {
-                DrawCircle((Vector2)P, Figure.Point_Representation_Radius/Transform.X.X, color);
+                DrawCircle(GetVect2(P), Figure.Point_Representation_Radius/Transform.X.X, color);
             }
             else if (drawable is Line L)
             {
@@ -149,7 +152,7 @@ public partial class Node2D : Godot.Node2D
             {
                 // DrawCircle(Circle.Center, (float)Circle.Radius, Circle.Color);
                 DrawArc(
-                    (Vector2)Circle.Center,
+                    GetVect2(Circle.Center),
                     (float)Circle.Radius,
                     0,
                     (float)(2 * Math.PI),
@@ -164,7 +167,7 @@ public partial class Node2D : Godot.Node2D
 
 
                 DrawArc(
-                    (Vector2)Arc.Center,
+                    GetVect2(Arc.Center),
                     (float)Arc.Radius,
                     (float)start_angle,
                     (float)(start_angle + Arc.Angle),

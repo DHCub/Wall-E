@@ -1,9 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
-
 using GSharp.Exceptions;
 using GSharp.Expression;
 using GSharp.Statement;
@@ -114,7 +112,6 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
   {
     // loop over all the scopes, from the innermost and outhards, trying to find a registered
     // "binding factory" that matches this name.
-
     for (int i = scopes.Count - 1; i >= 0; i--)
     {
       if (scopes[i].ContainsKey(name.lexeme))
@@ -123,7 +120,7 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
 
         if (bindingFactory == VariableBindingFactory.None)
         {
-          nameResolutionErrorHandler(new NameResolutionError("Cannot read local variable in it own initializer.", name));
+          nameResolutionErrorHandler(new NameResolutionError("Cannot read local variable in its own initializer.", name));
           return;
         }
 
@@ -208,7 +205,7 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
   {
     if (!IsEmpty(scopes) && scopes.Last().ContainsKey(expr.Name.lexeme))
     {
-      nameResolutionErrorHandler(new NameResolutionError("Cannot read local variable in it own initializer.", expr.Name));
+      nameResolutionErrorHandler(new NameResolutionError("Cannot read local variable in its own initializer.", expr.Name));
     }
 
     ResolveLocalOrGlobal(expr, expr.Name);
@@ -309,7 +306,6 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
     DefineFunction(stmt.Name, stmt.ReturnTypeReference, stmt);
 
     ResolveFunction(stmt, FunctionType.FUNCTION);
-
     return VoidObject.Void;
   }
 
@@ -326,7 +322,12 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
       Define(param.Name, new TypeReference(param.TypeSpecifier));
     }
 
-    Resolve(function.Body);
+    {
+      BeginScope();
+      Resolve(function.Body);
+      EndScope();
+    }
+
     EndScope();
 
     currentFunction = enclosingFunction;
@@ -347,6 +348,21 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
 
   public VoidObject VisitRestoreStmt(Restore stmt)
   {
+    return VoidObject.Void;
+  }
+
+  public VoidObject VisitReturnStmt(Statement.Return stmt)
+  {
+    if (currentFunction == FunctionType.NONE)
+    {
+      nameResolutionErrorHandler(new NameResolutionError("Cannot return from top-level code.", stmt.Keyword));
+    }
+
+    if (stmt.Value != null)
+    {
+      Resolve(stmt.Value);
+    }
+
     return VoidObject.Void;
   }
 

@@ -3,6 +3,9 @@ using GSharp.Expression;
 using GSharp.Statement;
 using static GSharp.TokenType;
 using static GSharp.Exceptions.ParseErrorType;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 using System;
 using System.Collections.Generic;
@@ -242,8 +245,12 @@ public class Parser
 
     Consume(EQUAL, "Expected '=' before function's body.");
 
-    Expr body = Expression();
-
+    List<Stmt> body = new List<Stmt>();
+    
+    Stmt returnValue = ReturnStatement();
+    
+    body.Add(returnValue);
+    
     Consume(SEMICOLON, "Expected ';' after function declaration.");
     return new Function(name, parameters, body, new TypeReference(returnTypeSpecifier));
   }
@@ -314,6 +321,12 @@ public class Parser
 
     Consume(SEMICOLON, "Expected ';' after variable declaration.");
     return new Var(name, initializer, new TypeReference(type));
+  }
+
+  private Stmt ReturnStatement()
+  {
+    Expr value = Expression();
+    return new Statement.Return(null, value);
   }
 
   private List<Token> GetNames()

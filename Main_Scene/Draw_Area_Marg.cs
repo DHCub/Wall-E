@@ -1,6 +1,5 @@
 using Godot;
-using System;
-using Figures;
+using GSharp.Objects.Figures;
 
 public partial class Draw_Area_Marg : MarginContainer
 {

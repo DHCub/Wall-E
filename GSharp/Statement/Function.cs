@@ -8,14 +8,14 @@ public class Function : Stmt, IToken
 {
   public readonly Token Name;
   public readonly ImmutableList<Parameter> Parameters;
-  public readonly Expr Body;
+  public readonly ImmutableList<Stmt> Body;
   public readonly ITypeReference ReturnTypeReference;
 
-  public Function(Token Name, IEnumerable<Parameter> Parameters, Expr Body, TypeReference ReturnTypeReference)
+  public Function(Token Name, IEnumerable<Parameter> Parameters, IEnumerable<Stmt> Body, TypeReference ReturnTypeReference)
   {
     this.Name = Name;
     this.Parameters = Parameters.ToImmutableList();
-    this.Body = Body;
+    this.Body = Body.ToImmutableList();
     this.ReturnTypeReference = ReturnTypeReference;
   }
 

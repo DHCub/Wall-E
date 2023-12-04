@@ -1,10 +1,13 @@
+using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Data;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using GSharp.Exceptions;
 using GSharp.Expression;
 using GSharp.Objects;
+using GSharp.Objects.Collections;
 using GSharp.Objects.Figures;
 using GSharp.Parser;
 using GSharp.Statement;
@@ -16,27 +19,30 @@ namespace GSharp.Interpreter;
 // Interpreter for GSharp code
 // </summary>
 
-public class Interpreter : IInterpreter<GSObject>, Expr.IVisitor<GSObject>, Stmt.IVisitor<VoidObject>
+public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<VoidObject>
 {
   private readonly Action<RuntimeError> runtimeErrorHandler;
   private readonly GSharpEnvironment globals = new();
 
   internal IBindingHandler bindingHandler { get; }
 
-  private ImmutableList<Stmt> previousStmts = ImmutableList.Create<Stmt>();
-  private IEnvironment<GSObject> currentEnvironment;
+  private readonly Action<string> standardOutputHandler;
 
-  public Interpreter(Action<RuntimeError> runtimeErrorHandler, IBindingHandler? bindingHandler = null)
+  private ImmutableList<Stmt> previousStmts = ImmutableList.Create<Stmt>();
+  private IEnvironment currentEnvironment;
+
+  public Interpreter(Action<RuntimeError> runtimeErrorHandler, Action<string> standardOutputHandler, IBindingHandler? bindingHandler = null)
   {
     this.runtimeErrorHandler = runtimeErrorHandler;
     this.bindingHandler = bindingHandler ?? new BindingHandler();
+    this.standardOutputHandler = standardOutputHandler;
 
     this.currentEnvironment = globals;
   }
 
   public object? Eval(string source, ScanErrorHandler scanErrorHandler, ParseErrorHandler parseErrorHandler, NameResolutionErrorHandler nameResolutionErrorHandler)
   {
-    if (System.String.IsNullOrWhiteSpace(source))
+    if (string.IsNullOrWhiteSpace(source))
     {
       return null;
     }
@@ -127,7 +133,7 @@ public class Interpreter : IInterpreter<GSObject>, Expr.IVisitor<GSObject>, Stmt
     // ...
 
     bool hasParseErrors = false;
-    var parser = new Parser.Parser(tokens, parseError =>
+    var parser = new GSharp.Parser.Parser(tokens, parseError =>
     {
       hasParseErrors = true;
       parseErrorHandler(parseError);
@@ -259,7 +265,7 @@ public class Interpreter : IInterpreter<GSObject>, Expr.IVisitor<GSObject>, Stmt
     {
       if (localBinding is IDistanceBinding distanceBinding)
       {
-        return currentEnvironment.GetAt(distanceBinding.Distance, name.lexeme);
+        return currentEnvironment.GetAt(distanceBinding.Distance - 1, name.lexeme);
       }
       else
       {
@@ -304,9 +310,9 @@ public class Interpreter : IInterpreter<GSObject>, Expr.IVisitor<GSObject>, Stmt
     stmt.Accept(this);
   }
 
-  public void ExecuteBlock(IEnumerable<Stmt> statements, IEnvironment<GSObject> blockEnvironment)
+  public void ExecuteBlock(IEnumerable<Stmt>? statements, IEnvironment blockEnvironment)
   {
-    IEnvironment<GSObject> previousEnvironment = currentEnvironment;
+    IEnvironment previousEnvironment = currentEnvironment;
 
     try
     {
@@ -321,6 +327,33 @@ public class Interpreter : IInterpreter<GSObject>, Expr.IVisitor<GSObject>, Stmt
     {
       currentEnvironment = previousEnvironment;
     }
+  }
+
+  private GSObject ExecuteInternalBlock(IEnumerable<Stmt>? statements, Expr body, IEnvironment blockEnvironment)
+  {
+    IEnvironment previousEnvironment = currentEnvironment;
+
+    GSObject result;
+    try
+    {
+      currentEnvironment = blockEnvironment;
+
+      if (statements is not null)
+      {
+        foreach (var statement in statements)
+        {
+          Execute(statement);
+        }
+      }
+
+      result = Evaluate(body);
+    }
+    finally
+    {
+      currentEnvironment = previousEnvironment;
+    }
+
+    return result;
   }
 
   public GSObject VisitBinaryExpr(Binary expr)
@@ -363,4 +396,231 @@ public class Interpreter : IInterpreter<GSObject>, Expr.IVisitor<GSObject>, Stmt
     }
   }
 
+  public GSObject VisitCallExpr(Call expr)
+  {
+    GSObject calle = Evaluate(expr.Calle);
+
+    var arguments = new List<GSObject>();
+    foreach (var argument in expr.Arguments)
+    {
+      arguments.Add(Evaluate(argument));
+    }
+
+    switch (calle)
+    {
+      case ICallable callable:
+        if (arguments.Count != callable.Arity())
+        {
+          throw new RuntimeError(expr.Paren, "Expected" + callable.Arity() + " argument(s) but got " + arguments.Count + ".");
+        }
+
+        try
+        {
+          return callable.Call(this, arguments);
+        }
+        catch (RuntimeError)
+        {
+          throw;
+        }
+        catch (Exception e)
+        {
+          if (expr.Calle is Variable variable)
+          {
+            throw new RuntimeError(variable.Name, $"{variable.Name.lexeme}: {e.Message}");
+          }
+          else
+          {
+            throw new RuntimeError(expr.Paren, e.Message);
+          }
+        }
+      default:
+        throw new RuntimeError(expr.Paren, $"Can only call functions and native methods, not {calle}");
+    }
+  }
+
+  public GSObject VisitConditionalExpr(Conditional expr)
+  {
+    bool condition = Evaluate(expr.Condition)!.GetTruthValue();
+
+    if (condition)
+    {
+      return Evaluate(expr.ThenBranch);
+    }
+    else
+    {
+      return Evaluate(expr.ElseBranch);
+    }
+  }
+
+  public GSObject VisitEmptyExpr(Empty expr)
+  {
+    return new Objects.Undefined();
+  }
+
+  public GSObject VisitIntRangeExpr(IntRange expr)
+  {
+    if (expr.Right is null)
+    {
+      return new GeneratorSequence(new IntRangeGenerator((int)expr.Left.literal));
+    }
+    else
+    {
+      List<GSObject> rangeInt = new();
+      for (int i = (int)expr.Left.literal; i <= (int)expr.Right.literal; i++)
+      {
+        rangeInt.Add(new Scalar(i));
+      }
+
+      return new FiniteStaticSequence(rangeInt);
+    }
+  }
+
+  public GSObject VisitLetInExpr(LetIn expr)
+  {
+    return ExecuteInternalBlock(expr.Stmts, expr.Body, currentEnvironment);
+  }
+
+  public GSObject VisitSequenceExpr(Expression.Sequence expr)
+  {
+    throw new NotImplementedException();
+  }
+
+  public GSObject VisitUndefinedExpr(Expression.Undefined expr)
+  {
+    return new Objects.Undefined();
+  }
+
+  public VoidObject VisitColorStmt(ColorStmt stmt)
+  {
+    throw new NotImplementedException();
+  }
+
+  public VoidObject VisitConstantStmt(ConstantStmt stmt)
+  {
+    GSObject value = Evaluate(stmt.Initializer);
+
+    if (value is Objects.Collections.Sequence valueSeq)
+    {
+      int cntConsts = stmt.Names.Count;
+      for (int i = 0; i < cntConsts - 1; i++)
+      {
+        currentEnvironment.Define(stmt.Names[i], valueSeq[i]);
+      }
+
+      currentEnvironment.Define(stmt.Names.Last(), valueSeq.GetRemainder(cntConsts - 1));
+    }
+    else
+    {
+      if (stmt.Names.Count != 1)
+      {
+        throw new RuntimeError(stmt.Token, "Cannot assign some constants to unique value.");
+      }
+
+      currentEnvironment.Define(stmt.Names[0], value);
+    }
+
+    return VoidObject.Void;
+  }
+
+  public VoidObject VisitDrawStmt(Draw stmt)
+  {
+    throw new NotImplementedException();
+  }
+
+  public VoidObject VisitExpressionStmt(ExpressionStmt stmt)
+  {
+    Evaluate(stmt.Expression);
+    return VoidObject.Void;
+  }
+
+  public VoidObject VisitFunctionStmt(Function stmt)
+  {
+    var function = new GSFunction(stmt, currentEnvironment);
+    currentEnvironment.Define(stmt.Name, function);
+    return VoidObject.Void;
+  }
+
+  public VoidObject VisitImportStmt(Import stmt)
+  {
+    throw new NotImplementedException();
+  }
+
+  public VoidObject VisitPrintStmt(Print stmt)
+  {
+    GSObject? value = Evaluate(stmt.Expression);
+    if (stmt.Label is not null)
+    {
+      standardOutputHandler(stmt.Label.lexeme + ": " + value.ToString());
+    }
+    else
+    {
+      standardOutputHandler(value.ToString());
+    }
+
+    return VoidObject.Void;
+  }
+
+  public VoidObject VisitRestoreStmt(Restore stmt)
+  {
+    throw new NotImplementedException();
+  }
+
+  public VoidObject VisitReturnStmt(Statement.Return stmt)
+  {
+    GSObject value = null;
+    if (stmt.Value != null)
+    {
+      value = Evaluate(stmt.Value);
+    }
+
+    throw new Exceptions.Return(value);
+  }
+
+  public VoidObject VisitVarStmt(Var stmt)
+  {
+    GSObject value;
+
+    if (stmt.Initializer is not null)
+    {
+      value = Evaluate(stmt.Initializer);
+    }
+    else
+    {
+      switch (stmt.TypeReference.TypeSpecifier.type)
+      {
+        case POINT:
+          value = new Point();
+          break;
+        case LINE:
+          value = new Line();
+          break;
+        case SEGMENT:
+          value = new Segment();
+          break;
+        case RAY:
+          value = new Ray();
+          break;
+        case CIRCLE:
+          value = new Circle();
+          break;
+        case ARC:
+          value = new Arc();
+          break;
+        case POINT_SEQUENCE:
+          value = new GeneratorSequence(new RandomFigureGenerator(FigureOptions.Point));
+          break;
+        case LINE_SEQUENCE:
+        case CIRCLE_SEQUENCE:
+        case RAY_SEQUENCE:
+        case SEGMENT_SEQUENCE:
+        case ARC_SEQUENCE:
+          throw new NotImplementedException();
+        default:
+          throw new ArgumentException("Unsupported variable type used.");
+      }
+    }
+
+    currentEnvironment.Define(stmt.Name, value);
+    return VoidObject.Void;
+  }
 }

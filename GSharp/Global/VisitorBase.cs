@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using GSharp.Expression;
 using GSharp.Statement;
 
@@ -171,6 +172,16 @@ public abstract class VisitorBase : Expr.IVisitor<VoidObject>, Stmt.IVisitor<Voi
 
   public virtual VoidObject VisitVariableExpr(Variable expr)
   {
+    return VoidObject.Void;
+  }
+
+  public virtual VoidObject VisitReturnStmt(Statement.Return stmt)
+  {
+    if (stmt.Value != null)
+    {
+      Visit(stmt.Value);
+    }
+
     return VoidObject.Void;
   }
 
