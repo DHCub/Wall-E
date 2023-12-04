@@ -1,7 +1,9 @@
+using GSharp.Objects;
+
 namespace GSharp;
 
-public interface ICallable 
+public interface ICallable
 {
-  object Call(IInterpreter interpreter, List<object> arguments);
+  GSObject Call(IInterpreter interpreter, List<GSObject> arguments);
   int Arity();
 }

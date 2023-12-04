@@ -7,12 +7,12 @@ namespace GSharp.Interpreter;
 // <summary>
 // Holds information about the context for a static scope (functions and variable name binding).
 // </summary>
-internal class GSharpEnvironment : IEnvironment<GSObject>
+internal class GSharpEnvironment : IEnvironment
 {
   private readonly GSharpEnvironment enclosing;
   private readonly Dictionary<string, GSObject> values = new Dictionary<string, GSObject>();
 
-  public GSharpEnvironment(IEnvironment<GSObject> enclosing = null)
+  public GSharpEnvironment(IEnvironment enclosing = null)
   {
     this.enclosing = (GSharpEnvironment)enclosing;
   }

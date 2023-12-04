@@ -12,6 +12,7 @@ public abstract class Stmt
     R VisitImportStmt(Import stmt);
     R VisitPrintStmt(Print stmt);
     R VisitRestoreStmt(Restore stmt);
+    R VisitReturnStmt(Return stmt);
     R VisitVarStmt(Var stmt);
   }
 

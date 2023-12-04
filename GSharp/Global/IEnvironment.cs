@@ -1,8 +1,10 @@
+using GSharp.Objects;
+
 namespace GSharp;
 
-public interface IEnvironment<T>
+public interface IEnvironment
 {
-  void Define(Token name, T value);
-  T GetAt(int distance, string name);
-  void AssignAt(int distance, Token name, T value);
+  void Define(Token name, GSObject value);
+  GSObject GetAt(int distance, string name);
+  void AssignAt(int distance, Token name, GSObject value);
 }

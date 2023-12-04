@@ -24,6 +24,8 @@ public class Scanner
     {"if", IF},
     {"then", THEN},
     {"else", ELSE},
+    {"false", FALSE},
+    {"true", TRUE},
 
     {"and", AND},
     {"or", OR},
@@ -154,6 +156,13 @@ public class Scanner
         break;
       case '^':
         AddToken(POWER);
+        break;
+
+      case '|':
+        AddToken(OR);
+        break;
+      case '&':
+        AddToken(AND);
         break;
 
       case ',':

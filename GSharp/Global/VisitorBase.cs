@@ -174,6 +174,16 @@ public abstract class VisitorBase : Expr.IVisitor<VoidObject>, Stmt.IVisitor<Voi
     return VoidObject.Void;
   }
 
+  public virtual VoidObject VisitReturnStmt(Statement.Return stmt)
+  {
+    if (stmt.Value != null)
+    {
+      Visit(stmt.Value);
+    }
+
+    return VoidObject.Void;
+  }
+
   public virtual VoidObject VisitVarStmt(Var stmt)
   {
     if (stmt.Initializer is not null)
