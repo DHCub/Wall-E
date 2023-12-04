@@ -607,6 +607,8 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
           value = new Arc();
           break;
         case POINT_SEQUENCE:
+          value = new GeneratorSequence(new RandomFigureGenerator(FigureOptions.Point));
+          break;
         case LINE_SEQUENCE:
         case CIRCLE_SEQUENCE:
         case RAY_SEQUENCE:
