@@ -184,6 +184,24 @@ public class Parser
 
   private Stmt FunDeclaration(string kind)
   {
+    TypeName? getTypeNameOrError(Token typeSpecifier)
+    {
+      return typeSpecifier.lexeme switch{
+          "point" => TypeName.Point,
+          "line" => TypeName.Line,
+          "ray" => TypeName.Ray,
+          "segment" => TypeName.Segment,
+          "circle" => TypeName.Circle,
+          "arc" => TypeName.Arc,
+          
+          "scalar" => TypeName.Scalar,
+          "measure" => TypeName.Measure,
+          "string" => TypeName.String,
+          
+          _ => throw Error(typeSpecifier, "Invalid type specifier")
+        };
+    }
+
     Token name = Consume(IDENTIFIER, "Expected " + kind + " name.");
     Consume(LEFT_PARENTESIS, "Expected '(' after " + kind + " name.");
     var parameters = new List<Parameter>();
@@ -214,20 +232,7 @@ public class Parser
         {
           parameterTypeSpecifier = Consume(IDENTIFIER, "Expecting type name.");
           
-          typeName = (parameterTypeSpecifier.lexeme) switch{
-            "point" => TypeName.Point,
-            "line" => TypeName.Line,
-            "ray" => TypeName.Ray,
-            "segment" => TypeName.Segment,
-            "circle" => TypeName.Circle,
-            "arc" => TypeName.Arc,
-            
-            "scalar" => TypeName.Scalar,
-            "measure" => TypeName.Measure,
-            "string" => TypeName.String,
-            
-            _ => throw Error(parameterTypeSpecifier, "Invalid parameter type specifier")
-          };
+          typeName = getTypeNameOrError(parameterTypeSpecifier);
         }
 
         parameters.Add(new Parameter(name, new TypeReference(parameterTypeSpecifier), typeName));
@@ -237,10 +242,13 @@ public class Parser
     Consume(RIGHT_PARENTESIS, "Expected ')' after parameters.");
 
     Token returnTypeSpecifier = null;
+    TypeName? returnTypeName = null;
 
     if (Match(TWO_DOTS))
     {
       returnTypeSpecifier = Consume(IDENTIFIER, "Expecting type name.");
+
+      returnTypeName = getTypeNameOrError(returnTypeSpecifier);
     }
 
     Consume(EQUAL, "Expected '=' before function's body.");
@@ -252,7 +260,7 @@ public class Parser
     body.Add(returnValue);
     
     Consume(SEMICOLON, "Expected ';' after function declaration.");
-    return new Function(name, parameters, body, new TypeReference(returnTypeSpecifier));
+    return new Function(name, parameters, body, new TypeReference(returnTypeSpecifier), returnTypeName);
   }
 
   private Stmt DrawStatement(Token command)

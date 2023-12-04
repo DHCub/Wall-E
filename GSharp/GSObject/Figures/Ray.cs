@@ -41,4 +41,6 @@ public class Ray : GeometricLocation
             Functions.Equal_Approx(0, this.Director_Vector.AngleTo(R.Director_Vector));
 
     public override string GetTypeName() => TypeName.Ray.ToString();
+
+    public override bool SameTypeAs(GSObject gso) => gso is Ray;
 }

@@ -33,6 +33,9 @@ public class Measure : GSObject
 
     public override bool GetTruthValue() => this.value != 0;
 
+    public override bool SameTypeAs(GSObject gso)
+        => gso is Measure;
+
     public override GSObject OperateScalar(Scalar other, Add op) => UnsupportedOperError(other, op);
     public override GSObject OperateScalar(Scalar other, Subst op) => UnsupportedOperError(other, op);
     public override GSObject OperateScalar(Scalar other, Mult op) => new Measure(this.value * Math.Floor(other.value));

@@ -7,6 +7,7 @@ using Figures;
 public partial class InfiniteStaticSequence : Sequence
 {
   private readonly List<GSObject> prefix;
+  public override int PrefixLength() => prefix.Count;
   public InfiniteStaticSequence(ICollection<GSObject> items = null)
   {
     if (items == null) prefix = new();
@@ -17,6 +18,29 @@ public partial class InfiniteStaticSequence : Sequence
   public override string ToString() => INFINITE_SEQUENCE;
   public override bool Equals(GSObject obj) => false;
   public override bool GetTruthValue() => true;
+
+  public override bool SameTypeAs(GSObject gso)
+  {
+    if (this.PrefixLength() == 0) return true;
+    if (gso is FiniteStaticSequence finSeq)
+    {
+      if (finSeq.Count == 0) return true;
+      return this[0].SameTypeAs(finSeq[0]);
+    }
+
+    if (gso is InfiniteStaticSequence infSeq)
+    {
+      if (infSeq.PrefixLength() == 0) return true;
+      return this[0].SameTypeAs(infSeq[0]);
+    }
+
+    if (gso is GeneratorSequence genSeq)
+    {
+      return this[0].SameTypeAs(genSeq[0]);
+    }
+
+    return false;
+  }
 
   public override GSObject GSCount() => new Undefined();
 

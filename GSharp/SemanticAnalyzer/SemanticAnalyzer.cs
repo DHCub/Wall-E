@@ -6,7 +6,6 @@ using GSharp.Statement;
 using GSharp.Types;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 
 public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
@@ -300,7 +299,15 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
       var FunSymbol = new FunSymbol(name, Parameters, retType);
       functionsContext.Define(name, FunSymbol);
 
-      retType = TypeCheck(function.Body);
+      foreach(var stmt in function.Body)
+      {
+        if (stmt is Statement.Return ret)
+        {
+          retType = TypeCheck(ret);
+          break;
+        }
+        else TypeCheck(stmt);
+      }
 
       FunSymbol = new(name, Parameters, retType);
 
@@ -363,6 +370,13 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
     if (redefined)
       errorHandler(new SemanticError(nameTok, $"Variable {name} is already defined in this Context"));
 
+    return new UndefinedType();
+  }
+
+  public GSType VisitReturnStmt(GSharp.Statement.Return @return)
+  {
+    if (@return.Value != null) TypeCheck(@return.Value);
+    
     return new UndefinedType();
   }
 

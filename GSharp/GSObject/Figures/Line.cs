@@ -79,4 +79,6 @@ public partial class Line : GeometricLocation
             Functions.Intersect(this.A_Point, L).Count > 0;
 
     public override string GetTypeName() => TypeName.Line.ToString();
+
+    public override bool SameTypeAs(GSObject gso) => gso is Line;
 }

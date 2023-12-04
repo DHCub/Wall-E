@@ -10,6 +10,7 @@ public class GeneratorSequence : Sequence
 {
     public readonly GSGenerator generator;
     private readonly List<GSObject> prefix;
+    public override int PrefixLength() => prefix.Count;
 
     public GeneratorSequence(GSGenerator generator, ICollection<GSObject> items = null)
     {
@@ -49,6 +50,28 @@ public class GeneratorSequence : Sequence
     public override string ToString() => INFINITE_SEQUENCE;
 
     public override bool GetTruthValue() => true;
+
+    public override bool SameTypeAs(GSObject gso)
+    {
+        if (gso is FiniteStaticSequence seq)
+        {
+            if (seq.Count == 0) return true;
+            return this[0].SameTypeAs(seq[0]);
+        }
+
+        if (gso is GeneratorSequence genSeq)
+        {
+            return this[0].SameTypeAs(genSeq[0]);
+        }
+
+        if (gso is InfiniteStaticSequence infSeq)
+        {
+            if (infSeq.PrefixLength() == 0) return true;
+            return this[0].SameTypeAs(infSeq[0]);
+        }
+
+        return false;
+    }
 
     public override Sequence GetRemainder(int start)
     {

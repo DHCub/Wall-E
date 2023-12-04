@@ -15,6 +15,7 @@ public abstract class Sequence : GSObject
     public abstract Sequence GetRemainder(int start);
     public abstract GSObject this[int i] {get;}
     public abstract GSObject GSCount();
+    public abstract int PrefixLength();
     public abstract IEnumerable<GSObject> GetPrefixValues();
     public override string GetTypeName() => SEQUENCE;
 

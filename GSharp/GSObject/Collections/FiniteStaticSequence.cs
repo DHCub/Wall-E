@@ -12,6 +12,7 @@ using Figures;
 public partial class FiniteStaticSequence : Sequence, IEnumerable<GSObject>
 {
     private List<GSObject> items;
+    public override int PrefixLength() => items.Count;
     public FiniteStaticSequence(ICollection<GSObject> items = null)
     {
         if (items == null) this.items = new();
@@ -36,6 +37,32 @@ public partial class FiniteStaticSequence : Sequence, IEnumerable<GSObject>
             }
 
             return true;
+        }
+
+        return false;
+    }
+
+    public override bool SameTypeAs(GSObject gso)
+    {
+        if (gso is Sequence && this.Count == 0) return true;
+
+        // Count != 0 if any of these ifs are entered
+
+        if (gso is FiniteStaticSequence finSeq)
+        {
+            if (finSeq.Count == 0) return true;
+            return this[0].SameTypeAs(finSeq[0]);
+        }
+
+        if (gso is InfiniteStaticSequence infseq)
+        {
+            if (infseq.PrefixLength() == 0) return true;
+            return this[0].SameTypeAs(infseq[0]);
+        }
+
+        if (gso is GeneratorSequence genSeq)
+        {
+            return this[0].SameTypeAs(genSeq[0]);
         }
 
         return false;

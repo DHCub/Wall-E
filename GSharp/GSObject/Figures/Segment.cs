@@ -43,6 +43,7 @@ public partial class Segment : GeometricLocation
             Functions.Equal_Vectors_Approx(S.A_Point, this.A_Point) && Functions.Equal_Vectors_Approx(S.B_Point, this.B_Point) ||
             Functions.Equal_Vectors_Approx(S.A_Point, this.B_Point) && Functions.Equal_Vectors_Approx(S.B_Point, this.A_Point));
 
+    public override bool SameTypeAs(GSObject gso) => gso is Segment;
     public override string ToString() => $"Segment: [from: {this.A_Point} to: {this.B_Point}]";
 
 }

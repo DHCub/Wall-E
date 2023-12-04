@@ -29,6 +29,8 @@ public class Scalar : GSObject
     public override bool GetTruthValue() => !Functions.Equal_Approx(value, 0);
     public override string GetTypeName() => TypeName.Scalar.ToString();
 
+    public override bool SameTypeAs(GSObject gso) => gso is Scalar;
+
     public override GSObject OperatePoint(Point P, Add op) => UnsupportedOperError(P, op);
 
     public override GSObject OperatePoint(Point other, Mult op)
