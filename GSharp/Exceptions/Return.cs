@@ -1,3 +1,4 @@
+using System;
 using GSharp.Objects;
 
 namespace GSharp.Exceptions;

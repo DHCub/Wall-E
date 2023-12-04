@@ -1,9 +1,11 @@
 using Godot;
 using GSharp;
-using GSharp.Collections;
-using GSharp.Core;
+using GSharp.Exceptions;
+using GSharp.Objects.Collections;
+using GSharp.Interpreter;
 using GSharp.Objects.Figures;
 using System.Collections.Generic;
+using System;
 
 public partial class Control : Godot.Control
 {
@@ -15,80 +17,91 @@ public partial class Control : Godot.Control
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		
+
 	}
 
-	public void _on_Button_pressed() 
+	public void _on_Button_pressed()
 	{
-		// var code = GetNode<CodeEdit>("Code_Edit_Marg/CodeEdit");
-		// var draw_area = GetNode<Node2D>("Draw_Area_Marg/Viewport_Container/SubViewport/Background/Node2D");
-		// var console = GetNode<RichTextLabel>("Console_Margin/Console");
-		// console.Text = "";
+		var code = GetNode<CodeEdit>("Code_Edit_Marg/CodeEdit");
+		var draw_area = GetNode<Node2D>("Draw_Area_Marg/Viewport_Container/SubViewport/Background/Node2D");
+		var console = GetNode<RichTextLabel>("Console_Margin/Console");
+		console.Text = "";
 
-		// void ShowIntersect(params Figure[] arr)
-		// {
-		// 	for (int i = 0; i < arr.Length - 1; i++)
-		// 	{
-		// 		for (int j = i + 1; j < arr.Length; j++)
-		// 		{
-		// 			if (i == j) continue;
-		// 			var intersect = Functions.Intersect(arr[i], arr[j]);
-				
-		// 			if (intersect is FiniteStaticSequence<Point> Seq)
-		// 			{
-		// 				foreach(var P in Seq)
-		// 					draw_area.AddDrawable(Colors.Black, P);
-		// 			}
-		// 		}
-		// 	}
-		// }
+		void ShowIntersect(params Figure[] arr)
+		{
+			for (int i = 0; i < arr.Length - 1; i++)
+			{
+				for (int j = i + 1; j < arr.Length; j++)
+				{
+					if (i == j) continue;
+					var intersect = Functions.Intersect(arr[i], arr[j]);
 
-		// void WriteErrors(CollectorLogger logger)
-		// {
-		// 	List<char> ErrorMsg = new();
+					if (intersect is FiniteStaticSequence Seq)
+					{
+						foreach (var P in Seq.GetPrefixValues())
+							draw_area.AddDrawable(Colors.Black, (Point)P);
+					}
+				}
+			}
+		}
 
-		// 	foreach(var error in logger.Errors)
-		// 		ErrorMsg.AddRange(error + '\n');
+		var txt = code.Text;
 
-		// 	console.Text = new string(ErrorMsg.ToArray());
-		// }
+		bool hadError = false, hadRuntimeError = false;
 
-		// var txt = code.Text;
+		void ScanError(ScanError scanError)
+		{
+			ReportError(scanError.line, string.Empty, scanError.Message);
+		}
 
-		// var logger = new CollectorLogger();
-		// var scanner = new Scanner(logger, txt);
-		
-		// var parser = new Parser(logger, scanner.ScanTokens());
-		
-		// if(logger.hadError)
-		// {
-		// 	WriteErrors(logger);
-		// 	return;
-		// }
-		
-		// var analyzer = new Semantic_Analyzer(logger, parser.Parse());
-		// if(logger.hadError)
-		// {
-		// 	WriteErrors(logger);
-		// 	return;
-		// }
+		void RuntimeError(RuntimeError error)
+		{
+			string line = error.token?.line.ToString() ?? "unknown";
 
+			console.Text += $"[line {line}] {error.Message}\n";
+			hadRuntimeError = true;
+		}
 
-		// analyzer.Analyze();
-		// if (logger.hadError)
-		// {
-		// 	WriteErrors(logger);
-		// 	return;
-		// }
+		void Error(Token token, string message)
+		{
+			if (token.type == TokenType.EOF)
+			{
+				ReportError(token.line, " at end", message);
+			}
+			else
+			{
+				ReportError(token.line, " at '" + token.lexeme + "'", message);
+			}
+		}
 
-		// var interpreter = new Interpreter(logger);
+		void ReportError(int line, string where, string message)
+		{
+			Console.WriteLine($"[line {line}] Error{where}: {message}");
+			hadError = true;
+		}
 
-		// interpreter.Interpret(parser.Parse());
-		
-		// if (logger.hadError) {
-		// 	WriteErrors(logger);
-		// 	return;
-		// }
+		void ParseError(ParseError parseError)
+		{
+			Error(parseError.token, parseError.Message);
+		}
+
+		void NameResolutionError(NameResolutionError nameResolutionError)
+		{
+			Error(nameResolutionError.Token, nameResolutionError.Message);
+		}
+
+		void fun(string x) {
+			console.Text += x + "\n";
+		}
+
+		Interpreter interpreter = new Interpreter(RuntimeError, fun);
+
+		object? result = interpreter.Eval(txt, ScanError, ParseError, NameResolutionError);
+
+		if (result != null && result != VoidObject.Void)
+		{
+			fun(result.ToString());
+		}
 
 		// Line l1 = new();
 		// Line l2 = new();		
@@ -115,10 +128,10 @@ public partial class Control : Godot.Control
 		// GD.Print(txt);
 	}
 
- 	// Called every frame. 'delta' is the elapsed time since the previous frame.
+	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	// public override void _Process(double delta)
 	// {
-		
+
 	// }
 
 }

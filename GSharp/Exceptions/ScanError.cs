@@ -1,3 +1,5 @@
+using System;
+
 namespace GSharp.Exceptions;
 
 public class ScanError : Exception

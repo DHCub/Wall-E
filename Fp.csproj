@@ -3,6 +3,6 @@
     <TargetFramework>net7.0</TargetFramework>
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
-    <NoWarn>CS8632, CS8321</NoWarn>
+    <NoWarn>CS8632, CS8321, CS0649</NoWarn>
   </PropertyGroup>
 </Project>

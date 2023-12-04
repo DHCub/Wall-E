@@ -1,3 +1,4 @@
+using System;
 using static GSharp.TokenType;
 
 namespace GSharp.Exceptions;

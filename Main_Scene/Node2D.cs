@@ -1,14 +1,14 @@
 using Godot;
 
-using Geometry;
 using GSharp;
+using GSharp.Objects.Figures;
 
 using System;
 using System.Collections.Generic;
 
 public partial class Node2D : Godot.Node2D
 {
-    private List<(IDrawable drawable, Godot.Color color)> shapes = new();
+    private List<(Figure drawable, Godot.Color color)> shapes = new();
 
     private bool ShowAxes;
 
@@ -28,6 +28,9 @@ public partial class Node2D : Godot.Node2D
         var lineWidth = 2/Transform.X.X;
 
         // DrawCircle(container.Size/2, PointRadius, Colors.Green);
+        Godot.Vector2 GetVect2(Point P) {
+            return new Godot.Vector2((float)P.X_Coord, (float)P.Y_Coord);
+        }
 
         void draw_segment(Line L, Point P1, Point P2, Godot.Color color, bool P1_inf = false, bool P2_inf = false)
         {
@@ -61,19 +64,19 @@ public partial class Node2D : Godot.Node2D
             double B = L.Normal_Vector.Y_Coord;
             double C = L.Algebraic_Trace;
 
-            double Window_X_Size = IDrawable.Window_EndX - IDrawable.Window_StartX;
-            double Window_Y_Size = IDrawable.Window_EndY - IDrawable.Window_StartY;
+            double Window_X_Size = Figure.Window_EndX - Figure.Window_StartX;
+            double Window_Y_Size = Figure.Window_EndY - Figure.Window_StartY;
 
             if (Functions.Greater_Than_Approx(Math.Abs(A), Math.Abs(B)))
             {
                 if (P1_inf)
                 {
-                    y1 = IDrawable.Window_StartY - Window_Y_Size/2;
+                    y1 = Figure.Window_StartY - Window_Y_Size/2;
                     x1 = -C/A - B/A*y1;
                 }
                 if (P2_inf)
                 {
-                    y2 = IDrawable.Window_EndY + Window_Y_Size/2;
+                    y2 = Figure.Window_EndY + Window_Y_Size/2;
                     x2 = -C/A - B/A*y2;
                 }
             }
@@ -81,13 +84,13 @@ public partial class Node2D : Godot.Node2D
             {
                 if (P1_inf)
                 {
-                    x1 = IDrawable.Window_StartX - Window_X_Size/2;
+                    x1 = Figure.Window_StartX - Window_X_Size/2;
                     if (!Functions.Equal_Approx(B, 0)) y1 = -C/B - A/B*x1;
                 }
 
                 if (P2_inf)
                 {
-                    x2 = IDrawable.Window_EndX + Window_Y_Size/2;
+                    x2 = Figure.Window_EndX + Window_Y_Size/2;
                     if (!Functions.Equal_Approx(B, 0)) y2 = -C/B - A/B*x2;
                 }
             }
@@ -117,7 +120,7 @@ public partial class Node2D : Godot.Node2D
         {
             if (drawable is Point P)
             {
-                DrawCircle((Vector2)P, IDrawable.Point_Representation_Radius/Transform.X.X, color);
+                DrawCircle(GetVect2(P), Figure.Point_Representation_Radius/Transform.X.X, color);
             }
             else if (drawable is Line L)
             {
@@ -149,7 +152,7 @@ public partial class Node2D : Godot.Node2D
             {
                 // DrawCircle(Circle.Center, (float)Circle.Radius, Circle.Color);
                 DrawArc(
-                    (Vector2)Circle.Center,
+                    GetVect2(Circle.Center),
                     (float)Circle.Radius,
                     0,
                     (float)(2 * Math.PI),
@@ -164,7 +167,7 @@ public partial class Node2D : Godot.Node2D
 
 
                 DrawArc(
-                    (Vector2)Arc.Center,
+                    GetVect2(Arc.Center),
                     (float)Arc.Radius,
                     (float)start_angle,
                     (float)(start_angle + Arc.Angle),
@@ -181,7 +184,7 @@ public partial class Node2D : Godot.Node2D
 
     }
 
-    public void AddDrawable(Godot.Color color, params IDrawable[] drawable_array)
+    public void AddDrawable(Godot.Color color, params Figure[] drawable_array)
     {
         foreach(var drawable in drawable_array)
         {

@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using GSharp.Exceptions;
@@ -130,7 +133,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
     // ...
 
     bool hasParseErrors = false;
-    var parser = new Parser.Parser(tokens, parseError =>
+    var parser = new GSharp.Parser.Parser(tokens, parseError =>
     {
       hasParseErrors = true;
       parseErrorHandler(parseError);
@@ -462,7 +465,13 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
     }
     else
     {
-      throw new NotImplementedException();
+      List<GSObject> rangeInt = new();
+      for (int i = (int)expr.Left.literal; i <= (int)expr.Right.literal; i++)
+      {
+        rangeInt.Add(new Scalar(i));
+      }
+
+      return new FiniteStaticSequence(rangeInt);
     }
   }
 
@@ -488,7 +497,29 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
   public VoidObject VisitConstantStmt(ConstantStmt stmt)
   {
-    throw new NotImplementedException();
+    GSObject value = Evaluate(stmt.Initializer);
+
+    if (value is Objects.Collections.Sequence valueSeq)
+    {
+      int cntConsts = stmt.Names.Count;
+      for (int i = 0; i < cntConsts - 1; i++)
+      {
+        currentEnvironment.Define(stmt.Names[i], valueSeq[i]);
+      }
+
+      currentEnvironment.Define(stmt.Names.Last(), valueSeq.GetRemainder(cntConsts - 1));
+    }
+    else
+    {
+      if (stmt.Names.Count != 1)
+      {
+        throw new RuntimeError(stmt.Token, "Cannot assign some constants to unique value.");
+      }
+
+      currentEnvironment.Define(stmt.Names[0], value);
+    }
+
+    return VoidObject.Void;
   }
 
   public VoidObject VisitDrawStmt(Draw stmt)

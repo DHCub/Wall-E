@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using GSharp.Objects.Figures;
 
 namespace GSharp.Objects.Collections;

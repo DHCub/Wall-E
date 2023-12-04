@@ -3,6 +3,9 @@ using GSharp.Objects;
 using GSharp.Objects.Collections;
 using GSharp.Objects.Figures;
 using GSharp.Statement;
+using GSharp;
+using System;
+using System.Collections.Generic;
 
 namespace GSharp.Interpreter;
 

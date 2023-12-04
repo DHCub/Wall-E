@@ -1,6 +1,5 @@
 using Godot;
-using System;
-using Geometry;
+using GSharp.Objects.Figures;
 
 public partial class Draw_Area_Marg : MarginContainer
 {
@@ -39,7 +38,7 @@ public partial class Draw_Area_Marg : MarginContainer
 		// 	-this.Size.Y/2/axesVectorMultiplier, this.Size.Y/2/axesVectorMultiplier
 		// );
 
-		IDrawable.UpdateWindow(
+		Figure.UpdateWindow(
 			x1, x2,
 			y1, y2,
 			axesVectorMultiplier
