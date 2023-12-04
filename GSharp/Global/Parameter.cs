@@ -1,3 +1,6 @@
+using System;
+using GSharp.Types;
+
 namespace GSharp;
 
 public class Parameter
@@ -7,14 +10,18 @@ public class Parameter
 
   public Token TypeSpecifier => TypeReference.TypeSpecifier;
 
-  public Parameter(ITypeReference TypeReference)
-  {
-    this.TypeReference = TypeReference;
-  }
+  public readonly TypeName? typeName;
 
-  public Parameter(Token Name, ITypeReference TypeReference)
+  // public Parameter(ITypeReference TypeReference, TypeName? typeName = null)
+  // {
+  //   this.typeName = typeName;
+  //   this.TypeReference = TypeReference;
+  // }
+
+  public Parameter(Token Name, ITypeReference TypeReference, TypeName? typeName)
   {
     this.Name = Name;
     this.TypeReference = TypeReference;
+    this.typeName = typeName;
   }
 }

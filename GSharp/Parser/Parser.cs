@@ -7,6 +7,7 @@ using static GSharp.Exceptions.ParseErrorType;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GSharp.Types;
 
 namespace GSharp.Parser;
 
@@ -202,14 +203,31 @@ public class Parser
 
         Token parameterTypeSpecifier = null;
 
+        TypeName? typeName = null;
+
         // parameters can optionally use a specific type
         // if the type is not provided, the compiler will try to infer the type based on the usage
         if (Match(TWO_DOTS))
         {
           parameterTypeSpecifier = Consume(IDENTIFIER, "Expecting type name.");
+          
+          typeName = (parameterTypeSpecifier.lexeme) switch{
+            "point" => TypeName.Point,
+            "line" => TypeName.Line,
+            "ray" => TypeName.Ray,
+            "segment" => TypeName.Segment,
+            "circle" => TypeName.Circle,
+            "arc" => TypeName.Arc,
+            
+            "scalar" => TypeName.Scalar,
+            "measure" => TypeName.Measure,
+            "string" => TypeName.String,
+            
+            _ => throw Error(parameterTypeSpecifier, "Invalid parameter type specifier")
+          };
         }
 
-        parameters.Add(new Parameter(parameterName, new TypeReference(parameterTypeSpecifier)));
+        parameters.Add(new Parameter(name, new TypeReference(parameterTypeSpecifier), typeName));
       } while (Match(COMMA));
     }
 

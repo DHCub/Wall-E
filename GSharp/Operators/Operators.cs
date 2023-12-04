@@ -12,6 +12,8 @@ public abstract class Div : Operator {}
 
 public abstract class Mod : Operator {}
 
+public abstract class Power : Operator {}
+
 public abstract class LessTh : Operator {}
 
 

@@ -1,6 +1,7 @@
 namespace GSharp.Objects;
 
 using System;
+using GSharp.Exceptions;
 using GSharp.Objects.Collections;
 using GSharp.Objects.Figures;
 using GSharp.Types;
@@ -38,19 +39,16 @@ public class Scalar : GSObject
     public override GSObject OperateScalar(Scalar other, Add op) => new Scalar(this.value + other.value);
     public override GSObject OperateScalar(Scalar other, Subst op) => new Scalar(this.value - other.value);
     public override GSObject OperateScalar(Scalar other, Mult op) => new Scalar(this.value * other.value);
-    public override GSObject OperateScalar(Scalar other, Div op) => new Scalar(this.value / other.value);
+    public override GSObject OperateScalar(Scalar other, Div op) 
+        => Functions.Equal_Approx(other.value, 0) ? 
+           throw new RuntimeError(null, "Zero Division Error") :
+           new Scalar(this.value / other.value);
 
-    public override GSObject OperateScalar(Scalar other, Mod op) => new Scalar(this.value % other.value);
-    // {
-    //     int ConvertToIntegerOrError(double x)
-    //     {
-    //         if (Functions.Equal_Approx(x - Math.Floor(x), 0)) return (int)Math.Floor(x);
-    //         if (Functions.Equal_Approx(x - Math.Ceiling(x), 0)) return (int)Math.Ceiling(x);
-    //             throw new RuntimeError("Tried to find modulo of non-integer values");
-    //     }
-
-    //     return new Scalar(ConvertToIntegerOrError(this.value)%ConvertToIntegerOrError(other.value));   
-    // }
+    public override GSObject OperateScalar(Scalar other, Mod op) 
+        => Functions.Equal_Approx(other.value, 0) ? 
+           throw new RuntimeError(null, "Zero Division Error") :
+           new Scalar(this.value / other.value);
+    
 
     public override GSObject OperateScalar(Scalar other, LessTh op)
         => new Scalar(Functions.Less_Than_Approx(this.value, other.value)? 1 : 0);

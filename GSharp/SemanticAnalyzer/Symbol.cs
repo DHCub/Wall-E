@@ -7,14 +7,14 @@ public abstract class Symbol
 
 }
 
-public class Fun_Symbol : Symbol
+public class FunSymbol : Symbol
 {
     public readonly List<(GSType Type, string Name)> Parameters;
     public readonly GSType ReturnType;
     public readonly string Name;
 
 
-    public Fun_Symbol(string Name, List<(GSType, string)> Parameters, GSType ReturnType)
+    public FunSymbol(string Name, List<(GSType, string)> Parameters, GSType ReturnType)
     {
         this.Name = Name;
         this.Parameters = Parameters;
@@ -22,12 +22,12 @@ public class Fun_Symbol : Symbol
     }
 }
 
-public class Variable_Symbol : Symbol
+public class VariableSymbol : Symbol
 {
     public readonly string Name;
     public readonly GSType Type;
 
-    public Variable_Symbol(GSType Type,  string Name)
+    public VariableSymbol(GSType Type,  string Name)
     {
         this.Type = Type;
         this.Name = Name;
