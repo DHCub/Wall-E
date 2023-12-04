@@ -1,4 +1,4 @@
-namespace GSharp;
+namespace GSharp.SemanticAnalyzer;
 using System.Collections.Generic;
 
 public class Context
@@ -6,19 +6,13 @@ public class Context
     
     private Dictionary<(string name, int? parameter_Number), Symbol> Assignments;
 
-    #nullable enable
-
     private readonly Context? Enclosing;
-
-    #nullable disable
 
     public Context(Context Enclosing = null)
     {
         this.Enclosing = Enclosing;
         this.Assignments = new();
     }
-
-    #nullable enable
 
     public Fun_Symbol? Get_Symbol(string name, int parameter_Number)
     {
