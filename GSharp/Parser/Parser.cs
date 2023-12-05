@@ -234,8 +234,8 @@ public class Parser
           
           typeName = getTypeNameOrError(parameterTypeSpecifier);
         }
-
-        parameters.Add(new Parameter(name, new TypeReference(parameterTypeSpecifier), typeName));
+        
+        parameters.Add(new Parameter(parameterName, new TypeReference(parameterTypeSpecifier), typeName));
       } while (Match(COMMA));
     }
 
@@ -272,7 +272,7 @@ public class Parser
     {
       nameId = Consume(STRING, "Expected string.");
     }
-
+    
     Consume(SEMICOLON, "Expected 'label' after draw command.");
     return new Draw(command, elements, nameId);
   }
@@ -362,6 +362,7 @@ public class Parser
     Consume(EQUAL, "Expected '=' after constant name.");
     Expr initializer = Expression();
     Consume(SEMICOLON, "Expected ';' after constant declaration.");
+    
     return new ConstantStmt(constNames, initializer);
   }
 

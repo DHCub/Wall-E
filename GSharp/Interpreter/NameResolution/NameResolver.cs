@@ -1,3 +1,5 @@
+#nullable enable
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,6 +10,9 @@ using GSharp.Statement;
 
 namespace GSharp.Interpreter;
 
+// <summary>
+// The NameResolver is responsible for resolving names of local and global variable/function names.
+// </summary>
 internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObject>
 {
   private readonly IBindingHandler bindingHandler;
@@ -52,7 +57,9 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
     scopes.RemoveAt(scopes.Count - 1);
   }
 
-  // declares a variable or function as existing (but not yet initialized)
+  // declares a variable or function as existing (but not yet initialized) in the
+  // innermost scope. This allows the variable to shadow variables in outer scopes
+  // with the same name.
   private void Declare(Token name)
   {
     if (IsEmpty(scopes))
@@ -60,6 +67,8 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
       return;
     }
 
+    // this adds the variable to the innermost scope so that it shadows any outer one
+    // and so that we know the variable exists.
     var scope = scopes.Last();
 
     if (scope.ContainsKey(name.lexeme))
@@ -67,6 +76,9 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
       nameResolutionErrorHandler(new NameResolutionError("Variable with this name already declared in this scope.", name));
     }
 
+    // we mark it as "not ready yet" by binding a know None-value in the scope map. Each
+    // value in the scope map means "is finished being initialized", at this stage of
+    // traversing the tree.
     scope[name.lexeme] = VariableBindingFactory.None;
   }
 
@@ -75,9 +87,9 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
     return stack.Count == 0;
   }
 
+  // defines a previously declared variable as initialized, available for use.
   private void Define(Token name, ITypeReference typeReference)
   {
-    // defines a previously declared variable as initialized, available for use
     if (typeReference == null)
     {
       throw new ArgumentException("typeReference cannot be null");
@@ -89,6 +101,8 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
       return;
     }
 
+    // we set the variable's value in the scope map to mark it as fully initialized
+    // and available for use. It's alive!
     scopes.Last()[name.lexeme] = new VariableBindingFactory(typeReference);
   }
 
@@ -205,7 +219,8 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
   {
     if (!IsEmpty(scopes) && scopes.Last().ContainsKey(expr.Name.lexeme))
     {
-      nameResolutionErrorHandler(new NameResolutionError("Cannot read local variable in its own initializer.", expr.Name));
+      if (scopes.Last()[expr.Name.lexeme] == VariableBindingFactory.None)
+        nameResolutionErrorHandler(new NameResolutionError("Cannot read local variable in its own initializer.", expr.Name));
     }
 
     ResolveLocalOrGlobal(expr, expr.Name);
@@ -216,7 +231,12 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
   public VoidObject ExecuteBlock(List<Stmt> stmts)
   {
     BeginScope();
-    Resolve(stmts);
+
+    foreach (var stmt in stmts)
+    {
+      Resolve(stmt);
+    }
+
     EndScope();
 
     return VoidObject.Void;
@@ -273,6 +293,7 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
   {
     foreach (var consts in stmt.Names)
     {
+      Console.WriteLine("declare " + consts);
       Declare(consts);
     }
 
@@ -280,6 +301,7 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
 
     foreach (var consts in stmt.Names)
     {
+      System.Console.WriteLine("define " + consts);
       Define(consts, new TypeReference(consts));
     }
 
@@ -288,6 +310,7 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
 
   public VoidObject VisitDrawStmt(Draw stmt)
   {
+    Console.WriteLine(stmt.Elements);
     Resolve(stmt.Elements);
 
     return VoidObject.Void;
