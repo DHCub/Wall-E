@@ -90,7 +90,7 @@ public class GeneratorSequence : Sequence
     public override GSObject this[int i]
     {
         get{
-            if (i > this.prefix.Count)
+            if (i >= this.prefix.Count)
                 for (int j = this.prefix.Count; j <= i; j++)
                     this.prefix.Add(generator.GetNextValue());
             
@@ -323,7 +323,7 @@ class InternalPointInCanvasGenerator: InternalGenerator
     public override GSObject this[int i]
     {
         get{
-            if (i > generatedPoints.Count)
+            if (i >= generatedPoints.Count)
                 for (int j = generatedPoints.Count; j <= i; j++)
                     generatedPoints.Add(new Point());
 
@@ -340,13 +340,15 @@ class InternalRandomFigureGenerator : InternalGenerator
     public InternalRandomFigureGenerator(FigureOptions figure)
     {
         this.figure = figure;
+        generatedFigures = new();
     }
 
     public override GSObject this[int i]
     {
         get{
-            if (i > this.generatedFigures.Count)
-                for (int j = generatedFigures.Count; j < i; j++)
+            if (i >= this.generatedFigures.Count)
+            {
+                for (int j = generatedFigures.Count; j <= i; j++)
                     generatedFigures.Add(
                         figure switch
                         {
@@ -359,7 +361,7 @@ class InternalRandomFigureGenerator : InternalGenerator
                             _ => throw new NotImplementedException("UNSUPPORTED FIGURE TYPE FOR GENERATION"),
                         }
                     );
-            
+            }
             return generatedFigures[i];
         }
     }

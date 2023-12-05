@@ -600,7 +600,6 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
   public VoidObject VisitConstantStmt(ConstantStmt stmt)
   {
     GSObject value = Evaluate(stmt.Initializer);
-
     if (value is Objects.Collections.Sequence valueSeq)
     {
       int cntConsts = stmt.Names.Count;
@@ -609,7 +608,9 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
         currentEnvironment.Define(stmt.Names[i], valueSeq[i]);
       }
 
+
       currentEnvironment.Define(stmt.Names.Last(), valueSeq.GetRemainder(cntConsts - 1));
+
     }
     else
     {
