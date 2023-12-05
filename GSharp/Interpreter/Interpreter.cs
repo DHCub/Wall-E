@@ -13,6 +13,7 @@ using GSharp.Parser;
 using GSharp.Statement;
 using static GSharp.TokenType;
 using GSharp.GUIInterface;
+using GSharp;
 
 namespace GSharp.Interpreter;
 
@@ -25,7 +26,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
   private readonly Action<RuntimeError> runtimeErrorHandler;
   private readonly GSharpEnvironment globals = new();
 
-  internal IBindingHandler bindingHandler { get; }
+  internal IBindingHandler BindingHandler { get; }
 
   private readonly Action<string> standardOutputHandler;
 
@@ -34,20 +35,21 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
   private Action<Colors, Figure> drawFigure;
   private Action<Colors, Figure, string> drawLabeledFigure;
-  private Func<string, List<Stmt>> importHandler;
+  private readonly Func<string, List<Stmt>> importHandler;
 
-  private Stack<Colors> colors;
+  private readonly Stack<Colors> colors;
 
   public Interpreter(Action<RuntimeError> runtimeErrorHandler, Action<string> standardOutputHandler, Func<string, List<Stmt>> importHandler, Action<Colors, Figure> drawFigure, Action<Colors, Figure, string> drawLabeledFigure, IBindingHandler? bindingHandler = null)
   {
     this.runtimeErrorHandler = runtimeErrorHandler;
-    this.bindingHandler = bindingHandler ?? new BindingHandler();
+    this.BindingHandler = bindingHandler ?? new BindingHandler();
     this.standardOutputHandler = standardOutputHandler;
     this.drawFigure = drawFigure;
     this.drawLabeledFigure = drawLabeledFigure;
     this.importHandler = importHandler;
 
     colors = new();
+    
     colors.Push(Colors.Black);
 
     this.currentEnvironment = globals;
@@ -76,7 +78,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
       //
 
       bool hasNameResolutionErrors = false;
-      var nameResolver = new NameResolver(bindingHandler, nameResolutionError =>
+      var nameResolver = new NameResolver(BindingHandler, nameResolutionError =>
       {
         hasNameResolutionErrors = true;
         nameResolutionErrorHandler(nameResolutionError);
@@ -279,7 +281,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
   private GSObject LookUpVariable(Token name, Variable identifier)
   {
-    if (bindingHandler.GetLocalBinding(identifier, out Binding? localBinding))
+    if (BindingHandler.GetLocalBinding(identifier, out Binding? localBinding))
     {
       if (localBinding is IDistanceBinding distanceBinding)
       {
