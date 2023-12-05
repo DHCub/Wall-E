@@ -15,4 +15,14 @@ public class RuntimeError : Exception
   {
     this.token = token;
   }
+
+  public override string ToString()
+  {
+    const string RUNTIME_ERROR = "! RUNTIME ERROR: ";
+    
+    if (token == null)
+      return RUNTIME_ERROR + this.Message;
+    
+    return RUNTIME_ERROR + $"at {token.line}:{token.column}, " + this.Message;
+  }
 }

@@ -12,7 +12,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
 {
   private readonly List<Stmt> statements;
   private SemanticErrorHandler errorHandler;
-  private VariableContext variables;
+  private VariableContext variablesContext;
   private FunctionContext builtInFunctions;
   private FunctionContext functionsContext;
 
@@ -141,7 +141,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
     builtInFunctions = new();
     DefineBuiltIns();
 
-    variables = new();
+    variablesContext = new();
     functionsContext = new();
 
     this.errorHandler = errorHandler;
@@ -150,6 +150,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
   public void Analyze()
   {
     functionsContext = new();
+    variablesContext = new();
     foreach (var stmt in statements)
       TypeCheck(stmt);
   }
@@ -169,7 +170,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
 
       if (name.lexeme == "_") return;
 
-      bool redefined = !variables.Define(
+      bool redefined = !variablesContext.Define(
           name.lexeme,
           new VariableSymbol(type, name.lexeme)
       );
@@ -263,7 +264,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
         {
           type ??= new UndefinedType();
 
-          bool redefined = !variables.Define(
+          bool redefined = !variablesContext.Define(
               paramName.lexeme,
               new VariableSymbol(new UndefinedType(), paramName.lexeme)
           );
@@ -285,10 +286,10 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
       }
 
       var ogFunctionContext = functionsContext;
-      var ogVarContext = variables;
+      var ogVarContext = variablesContext;
 
       functionsContext = new(functionsContext);
-      variables = new();
+      variablesContext = new();
 
       var Parameters = new List<(GSType, string)>();
 
@@ -312,7 +313,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
       FunSymbol = new(name, Parameters, retType);
 
       functionsContext = ogFunctionContext;
-      variables = ogVarContext;
+      variablesContext = ogVarContext;
 
       return FunSymbol;
     }
@@ -365,7 +366,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
     var nameTok = varStmt.Name;
     var name = nameTok.lexeme;
 
-    bool redefined = !variables.Define(name, new VariableSymbol(Type, name));
+    bool redefined = !variablesContext.Define(name, new VariableSymbol(Type, name));
 
     if (redefined)
       errorHandler(new SemanticError(nameTok, $"Variable {name} is already defined in this Context"));
@@ -416,14 +417,43 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
 
   public GSType VisitCallExpr(Call call)
   {
-    throw new NotImplementedException();
+    var nameTok = call.TokenAwareCalle.Token;
+    var name = nameTok.lexeme;
+    var argCount = call.Arguments.Count;
 
-    // call.TokenAwareCalle.Token.lexeme = 
+    var FunSymbol = functionsContext.GetSymbol(name, argCount);
+
+    if (FunSymbol == null)
+    {
+      errorHandler(new(nameTok, $"Function {name} is undefined in this Context"));
+      return new UndefinedType();
+    }
+
+    for (int i = 0; i < argCount; i++)
+    {
+      var paramType = FunSymbol.Parameters[i].Type;
+      var argType = TypeCheck(call.Arguments[i]);
+
+      if (!paramType.SameTypeAs(argType))
+        errorHandler(new(nameTok, $"Function {name} takes {paramType} as its #{i+1} parameter, {argType} passed instead"));
+    }
+
+    return FunSymbol.ReturnType;
   }
 
   public GSType VisitConditionalExpr(Conditional conditional)
   {
-    throw new NotImplementedException();
+    TypeCheck(conditional.Condition);
+
+    var thenBranch = TypeCheck(conditional.ThenBranch);
+    var elseBranch = TypeCheck(conditional.ElseBranch);
+
+    if (!thenBranch.SameTypeAs(elseBranch))
+    {
+      errorHandler(new(conditional.If, $"Conditional expression must have equal return types, {thenBranch} and {elseBranch} returned instead"));
+      return new UndefinedType();
+    }
+    return thenBranch.GetMostRestrictedOrError(elseBranch);
   }
 
   public GSType VisitEmptyExpr(Empty empty)
@@ -438,42 +468,109 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
 
   public GSType VisitIntRangeExpr(IntRange intRange)
   {
-    throw new NotImplementedException();
+    const string ERROR = " limit in range expression must be integer literal";
+    var L = (double)intRange.Left.literal;
+    if (!double.IsInteger(L))
+      errorHandler(new(intRange.Left, "Left" + ERROR));
+    if (intRange.Right != null && !double.IsInteger((double)intRange.Right.literal))
+      errorHandler(new(intRange.Left, "Right" + ERROR));
+
+    return new SequenceType(TypeName.Scalar);
   }
 
   public GSType VisitLetInExpr(LetIn letIn)
   {
-    throw new NotImplementedException();
+    var ogVarContext = new VariableContext(variablesContext);
+    var ogFunctionContext = new FunctionContext(functionsContext);
+
+
+    foreach(var stmt in letIn.Stmts)
+      TypeCheck(stmt);
+
+    var retType = TypeCheck(letIn.Body);
+
+
+    variablesContext = ogVarContext;
+    functionsContext = ogFunctionContext;
+
+    return retType;
   }
 
   public GSType VisitLiteralExpr(Literal literal)
   {
-    throw new NotImplementedException();
+    return literal.Value switch{
+      double => new SimpleType(TypeName.Scalar),
+      string => new SimpleType(TypeName.String),
+      bool => new SimpleType(TypeName.Scalar),
+      _ => throw new NotImplementedException("UNSUPPORTED LITERAL TYPE")
+    };
   }
 
   public GSType VisitLogicalExpr(Logical logical)
   {
-    throw new NotImplementedException();
+    TypeCheck(logical.Left);
+    TypeCheck(logical.Right);
+
+    return new SimpleType(TypeName.Scalar);
   }
 
   public GSType VisitSequenceExpr(Sequence sequence)
   {
-    throw new NotImplementedException();
+    SequenceType seqT = new();
+
+    foreach(var item in sequence.Items)
+    {
+      var type = TypeCheck(item);
+      
+      if(item is IntRange)
+        type = new SimpleType(TypeName.Scalar);
+      
+      var (accepted, errorMessage) = seqT.AcceptNewType(type);
+
+      if (!accepted)
+        errorHandler(new(sequence.Brace, errorMessage));
+    }
+
+    return seqT;
   }
 
   public GSType VisitUnaryExpr(Unary unary)
   {
-    throw new NotImplementedException();
+    var left = TypeCheck(unary);
+
+    if (unary.Token.type == TokenType.MINUS)
+    {
+      var (type, error) = IOperable<Mult>.Operable<Mult>(new SimpleType(TypeName.Scalar), left);
+      if (error != null)
+        errorHandler(new(unary.Token, $"Cannot apply minus unary operand to " + left.ToString()));
+      return type;
+    }
+    
+    else if (unary.Token.type == TokenType.NOT)
+      return new SimpleType(TypeName.Scalar);
+
+    throw new NotImplementedException("UNSUPPORTED UNARY OPERATOR");
   }
 
   public GSType VisitUndefinedExpr(Undefined undefined)
   {
-    throw new NotImplementedException();
+    return new UndefinedType();
   }
 
   public GSType VisitVariableExpr(Variable variable)
   {
-    throw new NotImplementedException();
+    var nameTok = variable.Name;
+    var name = nameTok.lexeme;
+
+    var symbol = variablesContext.GetSymbol(name);
+
+    if (symbol == null)
+    {
+      errorHandler(new(nameTok, $"Variable {name} is undefined in this Context"));
+      return new UndefinedType();
+    }
+
+    return symbol.Type;  
   }
 
 }
