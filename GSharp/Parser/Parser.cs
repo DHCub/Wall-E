@@ -321,6 +321,7 @@ public class Parser
 
   private Stmt VarDeclaration(Token type)
   {
+    Console.WriteLine(type.ToString());
     Token name = Consume(IDENTIFIER, "Expected variable name.");
 
     BlockReservedIdentifiers(name);

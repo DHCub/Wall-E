@@ -22,7 +22,6 @@ public partial class Control : Godot.Control
 		var draw_area = GetNode<Node2D>("Draw_Area_Marg/Viewport_Container/SubViewport/Background/Node2D");
 		var console = GetNode<RichTextLabel>("Console_Margin/Console");
 
-
 		void standardOutputHandler(string text)
 		{
 			console.Text += text + '\n';
@@ -31,7 +30,8 @@ public partial class Control : Godot.Control
 		{
 			console.Text += text + '\n';
 		}
-		Godot.Color GetColor(GSharp.GUIInterface.Colors color) => color switch{
+		Godot.Color GetColor(GSharp.GUIInterface.Colors color) => color switch
+		{
 			GSharp.GUIInterface.Colors.Black => Godot.Colors.Black,
 			GSharp.GUIInterface.Colors.Red => Godot.Colors.Red,
 			GSharp.GUIInterface.Colors.Green => Godot.Colors.Green,
@@ -91,62 +91,62 @@ public partial class Control : Godot.Control
 		var txt = code.Text;
 		// old code
 		{
-		// bool hadError = false, hadRuntimeError = false;
+			// bool hadError = false, hadRuntimeError = false;
 
-		// void ScanError(ScanError scanError)
-		// {
-		// 	ReportError(scanError.line, string.Empty, scanError.Message);
-		// }
+			// void ScanError(ScanError scanError)
+			// {
+			// 	ReportError(scanError.line, string.Empty, scanError.Message);
+			// }
 
-		// void RuntimeError(RuntimeError error)
-		// {
-		// 	string line = error.token?.line.ToString() ?? "unknown";
+			// void RuntimeError(RuntimeError error)
+			// {
+			// 	string line = error.token?.line.ToString() ?? "unknown";
 
-		// 	console.Text += $"[line {line}] {error.Message}\n";
-		// 	hadRuntimeError = true;
-		// }
+			// 	console.Text += $"[line {line}] {error.Message}\n";
+			// 	hadRuntimeError = true;
+			// }
 
-		// void Error(Token token, string message)
-		// {
-		// 	if (token.type == TokenType.EOF)
-		// 	{
-		// 		ReportError(token.line, " at end", message);
-		// 	}
-		// 	else
-		// 	{
-		// 		ReportError(token.line, " at '" + token.lexeme + "'", message);
-		// 	}
-		// }
+			// void Error(Token token, string message)
+			// {
+			// 	if (token.type == TokenType.EOF)
+			// 	{
+			// 		ReportError(token.line, " at end", message);
+			// 	}
+			// 	else
+			// 	{
+			// 		ReportError(token.line, " at '" + token.lexeme + "'", message);
+			// 	}
+			// }
 
-		// void ReportError(int line, string where, string message)
-		// {
-		// 	Console.WriteLine($"[line {line}] Error{where}: {message}");
-		// 	hadError = true;
-		// }
+			// void ReportError(int line, string where, string message)
+			// {
+			// 	Console.WriteLine($"[line {line}] Error{where}: {message}");
+			// 	hadError = true;
+			// }
 
-		// void ParseError(ParseError parseError)
-		// {
-		// 	Error(parseError.token, parseError.Message);
-		// }
+			// void ParseError(ParseError parseError)
+			// {
+			// 	Error(parseError.token, parseError.Message);
+			// }
 
-		// void NameResolutionError(NameResolutionError nameResolutionError)
-		// {
-		// 	Error(nameResolutionError.Token, nameResolutionError.Message);
-		// }
+			// void NameResolutionError(NameResolutionError nameResolutionError)
+			// {
+			// 	Error(nameResolutionError.Token, nameResolutionError.Message);
+			// }
 
-		// void fun(string x) {
-		// 	console.Text += x + "\n";
-		// }
+			// void fun(string x) {
+			// 	console.Text += x + "\n";
+			// }
 
-		// Interpreter interpreter = new Interpreter(RuntimeError, fun);
+			// Interpreter interpreter = new Interpreter(RuntimeError, fun);
 
-		// object? result = interpreter.Eval(txt, ScanError, ParseError, NameResolutionError);
+			// object? result = interpreter.Eval(txt, ScanError, ParseError, NameResolutionError);
 
-		// if (result != null && result != VoidObject.Void)
-		// {
-		// 	fun(result.ToString());
-		// }
-	}
+			// if (result != null && result != VoidObject.Void)
+			// {
+			// 	fun(result.ToString());
+			// }
+		}
 
 		gsharp.Interpret(txt);
 		// Line l1 = new();

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -240,8 +241,9 @@ public class Scanner
 
     // see if the identifier is a reserved word
     string text = source[start..current];
-    var type = ReservedKeywords.ContainsKey(text) ? ReservedKeywords[text] : IDENTIFIER;
 
+    var type = ReservedKeywords.ContainsKey(text) ? ReservedKeywords[text] : IDENTIFIER;
+    Console.WriteLine(text + type.ToString());
     AddToken(type);
   }
 
@@ -357,41 +359,49 @@ public class Scanner
 
   private void AddToken(Token token)
   {
-    if (token.type == SEQUENCE)
+    tokens.Add(token);
+  }
+
+  private void AddToken(TokenType type, object literal = null)
+  {
+    string text = source.Substring(start, current - start);
+
+    Token newToken = new Token(type, text, literal, line, current);
+    if (type == SEQUENCE)
     {
+      Console.WriteLine("aquiasdasd");
       if (tokens.Count > 0)
       {
-        Token newToken;
         switch (tokens.Last().type)
         {
           case POINT:
             tokens.RemoveAt(tokens.Count - 1);
-            newToken = new Token(POINT_SEQUENCE, "point sequence", null, line, current);
+            newToken = new Token(POINT_SEQUENCE, "point sequence", literal, line, current);
             tokens.Add(newToken);
             return;
           case LINE:
             tokens.RemoveAt(tokens.Count - 1);
-            newToken = new Token(LINE_SEQUENCE, "line sequence", null, line, current);
+            newToken = new Token(LINE_SEQUENCE, "line sequence", literal, line, current);
             tokens.Add(newToken);
             return;
           case SEGMENT:
             tokens.RemoveAt(tokens.Count - 1);
-            newToken = new Token(SEGMENT_SEQUENCE, "segment sequence", null, line, current);
+            newToken = new Token(SEGMENT_SEQUENCE, "segment sequence", literal, line, current);
             tokens.Add(newToken);
             return;
           case RAY:
             tokens.RemoveAt(tokens.Count - 1);
-            newToken = new Token(RAY_SEQUENCE, "ray sequence", null, line, current);
+            newToken = new Token(RAY_SEQUENCE, "ray sequence", literal, line, current);
             tokens.Add(newToken);
             return;
           case ARC:
             tokens.RemoveAt(tokens.Count - 1);
-            newToken = new Token(ARC_SEQUENCE, "arc sequence", null, line, current);
+            newToken = new Token(ARC_SEQUENCE, "arc sequence", literal, line, current);
             tokens.Add(newToken);
             return;
           case CIRCLE:
             tokens.RemoveAt(tokens.Count - 1);
-            newToken = new Token(CIRCLE_SEQUENCE, "circle sequence", null, line, current);
+            newToken = new Token(CIRCLE_SEQUENCE, "circle sequence", literal, line, current);
             tokens.Add(newToken);
             return;
           default:
@@ -400,12 +410,6 @@ public class Scanner
       }
     }
 
-    tokens.Add(token);
-  }
-
-  private void AddToken(TokenType type, object literal = null)
-  {
-    string text = source.Substring(start, current - start);
-    tokens.Add(new Token(type, text, literal, line, current));
+    tokens.Add(newToken);
   }
 }

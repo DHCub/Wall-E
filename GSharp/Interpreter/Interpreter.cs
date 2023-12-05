@@ -73,6 +73,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
       //
       // resolving names phase
+      //
 
       bool hasNameResolutionErrors = false;
       var nameResolver = new NameResolver(bindingHandler, nameResolutionError =>
@@ -402,7 +403,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
       case MOD:
         return IOperate<Mod>.Operate(left, right);
       case POWER:
-        throw new NotImplementedException();
+        return IOperate<Power>.Operate(left, right);
       default:
         string message = InterpreterMessages.UnsupportedOperandTypes(expr.Oper.type, left, right);
         throw new RuntimeError(expr.Oper, message);
@@ -495,7 +496,90 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
   public GSObject VisitSequenceExpr(Expression.Sequence expr)
   {
-    throw new NotImplementedException();
+    if (expr.Items.Count == 0)
+    {
+      return new FiniteStaticSequence();
+    }
+
+    bool IsFinite = true;
+    GeneratorSequence genSequence = null;
+    GSObject firstSeqValue = null;
+
+    List<GSObject> prefix = new();
+    for (int i = 0; i < expr.Items.Count; i++)
+    {
+      if (IsFinite)
+      {
+        if (expr.Items[i] is IntRange range)
+        {
+          if (i == 0)
+          {
+            firstSeqValue = new Scalar(0);
+          }
+          else
+          {
+            if (!firstSeqValue.SameTypeAs(new Scalar(0)))
+            {
+              throw new RuntimeError(expr.Token, "Sequences values should be of the same type");
+            }
+          }
+
+          if (range.Right is null)
+          {
+            IsFinite = false;
+            genSequence = new GeneratorSequence(new IntRangeGenerator((int)range.Left.literal), prefix);
+          }
+          else
+          {
+            for (int v = (int)range.Left.literal; v <= (int)range.Right.literal; v++)
+            {
+              prefix.Add(new Scalar(v));
+            }
+          }
+        }
+        else
+        {
+          GSObject curVal = Evaluate(expr.Items[i]);
+
+          if (i == 0)
+          {
+            firstSeqValue = curVal;
+          }
+          else
+          {
+            if (!firstSeqValue.SameTypeAs(curVal))
+            {
+              throw new RuntimeError(expr.Token, "Sequences values should be of the same type");
+            }
+          }
+
+          prefix.Add(curVal);
+        }
+      }
+      else
+      {
+        GSObject curVal = Evaluate(expr.Items[i]);
+
+        if (i == 0)
+        {
+          firstSeqValue = curVal;
+        }
+        else
+        {
+          if (!firstSeqValue.SameTypeAs(curVal))
+          {
+            throw new RuntimeError(expr.Token, "Sequences values should be of the same type");
+          }
+        }
+      }
+    }
+
+    if (IsFinite)
+    {
+      return new FiniteStaticSequence(prefix);
+    }
+
+    return genSequence;
   }
 
   public GSObject VisitUndefinedExpr(Expression.Undefined expr)
@@ -543,12 +627,12 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
     {
       if (gso is FiniteStaticSequence finSeq)
       {
-        foreach(var elem in finSeq)
+        foreach (var elem in finSeq)
         {
           draw(elem);
         }
       }
-      else if(gso is Figure figure)
+      else if (gso is Figure figure)
       {
         if (stmt.Label == null)
         {
@@ -654,11 +738,20 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
           value = new GeneratorSequence(new RandomFigureGenerator(FigureOptions.Point));
           break;
         case LINE_SEQUENCE:
+          value = new GeneratorSequence(new RandomFigureGenerator(FigureOptions.Line));
+          break;
         case CIRCLE_SEQUENCE:
+          value = new GeneratorSequence(new RandomFigureGenerator(FigureOptions.Circle));
+          break;
         case RAY_SEQUENCE:
+          value = new GeneratorSequence(new RandomFigureGenerator(FigureOptions.Ray));
+          break;
         case SEGMENT_SEQUENCE:
+          value = new GeneratorSequence(new RandomFigureGenerator(FigureOptions.Segment));
+          break;
         case ARC_SEQUENCE:
-          throw new NotImplementedException();
+          value = new GeneratorSequence(new RandomFigureGenerator(FigureOptions.Arc));
+          break;
         default:
           throw new ArgumentException("Unsupported variable type used.");
       }
