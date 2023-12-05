@@ -31,7 +31,12 @@ internal class GSharpEnvironment : IEnvironment
 
   public GSObject GetAt(int distance, string name)
   {
-    return Ancestor(distance).values[name];
+    if (Ancestor(distance).values.ContainsKey(name))
+    {
+      return Ancestor(distance).values[name];
+    } 
+
+    return new Objects.Undefined();
   }
 
   public void AssignAt(int distance, Token name, GSObject value)

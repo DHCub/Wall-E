@@ -391,7 +391,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
 
       return tup.type;
     }
-    
+
     switch (binary.Oper.type)
     {
       case TokenType.PLUS: return HandleError(IOperable<Add>.Operable<Add>(LeftT, RightT));
@@ -496,7 +496,8 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
 
   public GSType VisitLiteralExpr(Literal literal)
   {
-    return literal.Value switch{
+    return literal.Value switch
+    {
       double => new SimpleType(TypeName.Scalar),
       string => new SimpleType(TypeName.String),
       bool => new SimpleType(TypeName.Scalar),

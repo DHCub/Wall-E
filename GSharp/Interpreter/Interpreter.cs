@@ -49,7 +49,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
     this.importHandler = importHandler;
 
     colors = new();
-    
+
     colors.Push(Colors.Black);
 
     this.currentEnvironment = globals;
@@ -83,7 +83,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
         nameResolutionErrorHandler(nameResolutionError);
       });
 
-      // nameResolver.Resolve(previousAndNewStmts);
+      nameResolver.Resolve(previousAndNewStmts);
 
       if (hasNameResolutionErrors)
       {
@@ -430,7 +430,6 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
     switch (calle)
     {
       case ICallable callable:
-        System.Console.WriteLine(calle.ToString());
         if (arguments.Count != callable.Arity())
         {
           throw new RuntimeError(expr.Paren, "Expected" + callable.Arity() + " argument(s) but got " + arguments.Count + ".");
@@ -609,12 +608,11 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
       int cntConsts = stmt.Names.Count;
       for (int i = 0; i < cntConsts - 1; i++)
       {
-        currentEnvironment.Define(stmt.Names[i], valueSeq[i]);
+        if ((string)stmt.Names[i].literal == "_")
+          currentEnvironment.Define(stmt.Names[i], valueSeq[i]);
       }
 
-
       currentEnvironment.Define(stmt.Names.Last(), valueSeq.GetRemainder(cntConsts - 1));
-
     }
     else
     {
@@ -705,8 +703,8 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
   public VoidObject VisitReturnStmt(Statement.Return stmt)
   {
-    GSObject value = null;
-    if (stmt.Value != null)
+    GSObject value = new Objects.Undefined();
+    if (stmt.Value is not null)
     {
       value = Evaluate(stmt.Value);
     }

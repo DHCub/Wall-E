@@ -293,14 +293,16 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
   {
     foreach (var consts in stmt.Names)
     {
-      Declare(consts);
+      if ((string)consts.literal != "_")
+        Declare(consts);
     }
 
     Resolve(stmt.Initializer);
 
     foreach (var consts in stmt.Names)
     {
-      Define(consts, new TypeReference(consts));
+      if ((string)consts.literal != "_")
+        Define(consts, new TypeReference(consts));
     }
 
     return VoidObject.Void;
