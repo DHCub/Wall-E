@@ -7,6 +7,8 @@ using GSharp.Objects.Figures;
 using System.Collections.Generic;
 using System;
 using GSharp.GUIInterface;
+using Microsoft.VisualBasic;
+using System.IO;
 
 public partial class Control : Godot.Control
 {
@@ -57,7 +59,8 @@ public partial class Control : Godot.Control
 		}
 		string importHandler(string dir)
 		{
-			throw new NotImplementedException();
+			var txt = new StreamReader(dir).ReadToEnd();
+			return txt;
 		}
 
 		gsharp = new GUIInterface(standardOutputHandler, errorHandler, importHandler, drawFigure, drawLabeledFigure);

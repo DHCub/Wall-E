@@ -45,13 +45,13 @@ public class SequenceType : GSType
 
     public (bool accepted, string? errorMessage) AcceptNewType(GSType newItem)
     {
-        string errorMessage() => $"Sequence of {MostRestrictedType.ToString()} cannot contain {newItem.ToString()}";
+        string errorMessage() => $"Seq<{MostRestrictedType.ToString()}> cannot contain {newItem.ToString()}";
 
         var accepted = MostRestrictedType.SameTypeAs(newItem);
 
         if (!accepted) return (false, errorMessage());
         
-        MostRestrictedType = this.GetMostRestrictedOrError(newItem, true);
+        MostRestrictedType = this.MostRestrictedType.GetMostRestrictedOrError(newItem, true);
 
         return (true, null);
     }

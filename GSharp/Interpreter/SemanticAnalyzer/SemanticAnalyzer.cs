@@ -389,9 +389,10 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
       if (tup.error != null)
         errorHandler(new(binary.Oper, tup.error));
 
+
       return tup.type;
     }
-    
+
     switch (binary.Oper.type)
     {
       case TokenType.PLUS: return HandleError(IOperable<Add>.Operable<Add>(LeftT, RightT));
@@ -467,10 +468,10 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
   public GSType VisitIntRangeExpr(IntRange intRange)
   {
     const string ERROR = " limit in range expression must be integer literal";
-    var L = (double)intRange.Left.literal;
+    var L = double.Parse((string)intRange.Left.literal);
     if (!double.IsInteger(L))
       errorHandler(new(intRange.Left, "Left" + ERROR));
-    if (intRange.Right != null && !double.IsInteger((double)intRange.Right.literal))
+    if (intRange.Right != null && !double.IsInteger(double.Parse((string)intRange.Right.literal)))
       errorHandler(new(intRange.Left, "Right" + ERROR));
 
     return new SequenceType(TypeName.Scalar);
@@ -499,8 +500,8 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
     if (literal.Value is INumericLiteral) return new SimpleType(TypeName.Scalar);
     else if (literal.Value is string) return new SimpleType(TypeName.String);
     else if (literal.Value is bool) return new SimpleType(TypeName.Scalar);
-
-    throw new NotImplementedException("UNSUPPORTED LITERAL TYPE" + literal.Value.ToString());
+    
+    throw new NotImplementedException("UNSUPPORTED LITERAL TYPE");
   }
 
   public GSType VisitLogicalExpr(Logical logical)

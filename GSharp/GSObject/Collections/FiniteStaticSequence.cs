@@ -79,7 +79,9 @@ public partial class FiniteStaticSequence : Sequence, IEnumerable<GSObject>
             answ.AddRange(", ");
         }
 
-        answ.AddRange(items[Count - 1].ToString());
+        if (items.Count > 0) 
+            answ.AddRange(items[Count - 1].ToString());
+        
         answ.Add('}');
 
         return new string(answ.ToArray());

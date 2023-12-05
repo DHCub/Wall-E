@@ -86,7 +86,11 @@ public class GUIInterface
     {
       errorHandler(error.ToString());
     }
-    List<Stmt> importHandler(string dir) => throw new NotImplementedException();
+    string newImportHandler(string dir)
+    {
+      var src = importHandler(dir);
+      throw new NotImplementedException();
+    }
 
     void ScanError(ScanError scanError)
     {
@@ -132,7 +136,7 @@ public class GUIInterface
       Error(semanticError.token, semanticError.Message);
     }
 
-    var interpreter = new Interpreter.Interpreter(runtimeErrorHandler, standardOutputHandler, importHandler, drawFigure, drawLabeledFigure);
+    var interpreter = new Interpreter.Interpreter(runtimeErrorHandler, standardOutputHandler, newImportHandler, drawFigure, drawLabeledFigure);
     object? result = interpreter.Eval(source, ScanError, ParseError, NameResolutionError, SemanticAnalyzerError);
   }
 }
