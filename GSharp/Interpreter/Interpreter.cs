@@ -429,6 +429,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
     switch (calle)
     {
       case ICallable callable:
+        System.Console.WriteLine(calle.ToString());
         if (arguments.Count != callable.Arity())
         {
           throw new RuntimeError(expr.Paren, "Expected" + callable.Arity() + " argument(s) but got " + arguments.Count + ".");

@@ -293,7 +293,6 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
   {
     foreach (var consts in stmt.Names)
     {
-      Console.WriteLine("declare " + consts);
       Declare(consts);
     }
 
@@ -301,7 +300,6 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
 
     foreach (var consts in stmt.Names)
     {
-      System.Console.WriteLine("define " + consts);
       Define(consts, new TypeReference(consts));
     }
 
@@ -310,7 +308,6 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
 
   public VoidObject VisitDrawStmt(Draw stmt)
   {
-    Console.WriteLine(stmt.Elements);
     Resolve(stmt.Elements);
 
     return VoidObject.Void;
