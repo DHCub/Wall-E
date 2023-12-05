@@ -102,7 +102,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
         semanticErrorHandler(semanticAnalizerError);
       });
 
-      semanticAnalyzer.Analyze();
+      // semanticAnalyzer.Analyze();
 
 
       if (typeValidationFailed)
