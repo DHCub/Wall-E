@@ -95,11 +95,11 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
       bool typeValidationFailed = false;
 
-      // var semanticAnalyzer = new SemanticAnalyzer(result.statements, semanticAnalizerError =>
-      // {
-      //   typeValidationFailed = true;
-      //   semanticErrorHandler(semanticAnalizerError);
-      // });
+      var semanticAnalyzer = new SemanticAnalyzer(result.statements, semanticAnalizerError =>
+      {
+        typeValidationFailed = true;
+        semanticErrorHandler(semanticAnalizerError);
+      });
 
       if (typeValidationFailed)
       {
