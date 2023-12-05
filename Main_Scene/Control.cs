@@ -52,7 +52,8 @@ public partial class Control : Godot.Control
 		}
 		void drawLabeledFigure(GSharp.GUIInterface.Colors color, Figure fig, string label)
 		{
-			throw new NotImplementedException();
+			draw_area.AddDrawable(GetColor(color), fig, label);
+			draw_area.QueueRedraw();
 		}
 		string importHandler(string dir)
 		{
@@ -148,6 +149,7 @@ public partial class Control : Godot.Control
 			// }
 		}
 
+		draw_area.Clear();
 		gsharp.Interpret(txt);
 		// Line l1 = new();
 		// Line l2 = new();		

@@ -141,9 +141,6 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
     builtInFunctions = new();
     DefineBuiltIns();
 
-    variablesContext = new();
-    functionsContext = new();
-
     this.errorHandler = errorHandler;
   }
 

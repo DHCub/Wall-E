@@ -3,7 +3,7 @@ using GSharp.Objects.Figures;
 
 public partial class Draw_Area_Marg : MarginContainer
 {
-	private float axesVectorMultiplier = 1;
+	public float axesVectorMultiplier {get; private set;}
 	private Node2D draw_area;
 	public Vector2 Translation;
 
@@ -11,6 +11,7 @@ public partial class Draw_Area_Marg : MarginContainer
 	public override void _Ready()
 	{
 		Translation = new(0, 0);
+		axesVectorMultiplier = 100;
 		Center_Transform();
 		Update_IDrawable_Window();
 		draw_area = GetNode<Node2D>("Viewport_Container/SubViewport/Background/Node2D");
