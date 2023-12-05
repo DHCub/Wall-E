@@ -53,7 +53,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
     this.currentEnvironment = globals;
   }
 
-  public object? Eval(string source, ScanErrorHandler scanErrorHandler, ParseErrorHandler parseErrorHandler, NameResolutionErrorHandler nameResolutionErrorHandler)
+  public object? Eval(string source, ScanErrorHandler scanErrorHandler, ParseErrorHandler parseErrorHandler, NameResolutionErrorHandler nameResolutionErrorHandler, SemanticErrorHandler semanticErrorHandler)
   {
     if (string.IsNullOrWhiteSpace(source))
     {
@@ -95,7 +95,11 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
       bool typeValidationFailed = false;
 
-      // ...
+      var semanticAnalyzer = new SemanticAnalyzer(result.statements, semanticAnalizerError =>
+      {
+        typeValidationFailed = true;
+        semanticErrorHandler(semanticAnalizerError);
+      });
 
       if (typeValidationFailed)
       {

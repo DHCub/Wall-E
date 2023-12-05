@@ -75,9 +75,9 @@ public class GUIInterface
   //   List<Stmt> importHandler(string dir) => throw new NotImplementedException();
 
   //   var interpreter = new Interpreter.Interpreter(runtimeErrorHandler, standardOutputHandler, importHandler, drawFigure, drawLabeledFigure);
-    
+
   //   interpreter.Eval(source, ScanErrorHandler, ParseErrorHandler, )
-    
+
   // }
 
   public void Interpret(string source)
@@ -89,46 +89,50 @@ public class GUIInterface
     List<Stmt> importHandler(string dir) => throw new NotImplementedException();
 
     void ScanError(ScanError scanError)
-		{
-			ReportError(scanError.line, string.Empty, scanError.Message);
-		}
+    {
+      ReportError(scanError.line, string.Empty, scanError.Message);
+    }
 
-		void RuntimeError(RuntimeError error)
-		{
-			string line = error.token?.line.ToString() ?? "unknown";
+    void RuntimeError(RuntimeError error)
+    {
+      string line = error.token?.line.ToString() ?? "unknown";
 
-			errorHandler($"[line {line}] {error.Message}");
-		}
+      errorHandler($"[line {line}] {error.Message}");
+    }
 
-		void Error(Token token, string message)
-		{
-			if (token.type == TokenType.EOF)
-			{
-				ReportError(token.line, " at end", message);
-			}
-			else
-			{
-				ReportError(token.line, " at '" + token.lexeme + "'", message);
-			}
-		}
+    void Error(Token token, string message)
+    {
+      if (token.type == TokenType.EOF)
+      {
+        ReportError(token.line, " at end", message);
+      }
+      else
+      {
+        ReportError(token.line, " at '" + token.lexeme + "'", message);
+      }
+    }
 
-		void ReportError(int line, string where, string message)
-		{
-			errorHandler($"[line {line}] Error{where}: {message}");
-		}
+    void ReportError(int line, string where, string message)
+    {
+      errorHandler($"[line {line}] Error{where}: {message}");
+    }
 
-		void ParseError(ParseError parseError)
-		{
-			Error(parseError.token, parseError.Message);
-		}
+    void ParseError(ParseError parseError)
+    {
+      Error(parseError.token, parseError.Message);
+    }
 
-		void NameResolutionError(NameResolutionError nameResolutionError)
-		{
-			Error(nameResolutionError.Token, nameResolutionError.Message);
-		}
+    void NameResolutionError(NameResolutionError nameResolutionError)
+    {
+      Error(nameResolutionError.Token, nameResolutionError.Message);
+    }
+
+    void SemanticAnalyzerError(SemanticError semanticError)
+    {
+      Error(semanticError.token, semanticError.Message);
+    }
 
     var interpreter = new Interpreter.Interpreter(runtimeErrorHandler, standardOutputHandler, importHandler, drawFigure, drawLabeledFigure);
-    object? result = interpreter.Eval(source, ScanError, ParseError, NameResolutionError);
-
+    object? result = interpreter.Eval(source, ScanError, ParseError, NameResolutionError, SemanticAnalyzerError);
   }
 }

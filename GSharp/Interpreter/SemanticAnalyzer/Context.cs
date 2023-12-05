@@ -1,4 +1,4 @@
-namespace GSharp.SemanticAnalyzer;
+namespace GSharp.Interpreter;
 using System.Collections.Generic;
 using GSharp.Statement;
 

@@ -243,7 +243,6 @@ public class Scanner
     string text = source[start..current];
 
     var type = ReservedKeywords.ContainsKey(text) ? ReservedKeywords[text] : IDENTIFIER;
-    Console.WriteLine(text + type.ToString());
     AddToken(type);
   }
 
@@ -369,7 +368,6 @@ public class Scanner
     Token newToken = new Token(type, text, literal, line, current);
     if (type == SEQUENCE)
     {
-      Console.WriteLine("aquiasdasd");
       if (tokens.Count > 0)
       {
         switch (tokens.Last().type)

@@ -4,7 +4,7 @@ namespace GSharp.Exceptions;
 
 public class SemanticError : Exception
 {
-    private readonly Token token;
+    public readonly Token token;
     public SemanticError(Token token, string message) : base(message)
     {
         this.token = token;

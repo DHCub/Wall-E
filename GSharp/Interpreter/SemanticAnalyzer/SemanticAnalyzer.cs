@@ -1,4 +1,4 @@
-namespace GSharp.SemanticAnalyzer;
+namespace GSharp.Interpreter;
 
 using GSharp.Exceptions;
 using GSharp.Expression;
