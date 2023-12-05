@@ -16,9 +16,8 @@ public abstract class Sequence : GSObject
     public abstract GSObject this[int i] {get;}
     public abstract GSObject GSCount();
     public abstract int PrefixLength();
+    public override string GetTypeName() => $"Seq<{this[0].GetTypeName()}>";
     public abstract IEnumerable<GSObject> GetPrefixValues();
-    public override string GetTypeName() => SEQUENCE;
-
     public override GSObject OperateScalar(Scalar other, Add op) => UnsupportedOperError(other, op);
     public override GSObject OperateScalar(Scalar other, Subst op) => UnsupportedOperError(other, op);
     public override GSObject OperateScalar(Scalar other, Mult op) => UnsupportedOperError(other, op);

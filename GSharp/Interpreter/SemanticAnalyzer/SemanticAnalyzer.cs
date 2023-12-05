@@ -298,7 +298,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
       var FunSymbol = new FunSymbol(name, Parameters, retType);
       functionsContext.Define(name, FunSymbol);
 
-      foreach (var stmt in function.Body)
+      foreach(var stmt in function.Body)
       {
         if (stmt is Statement.Return ret)
         {
@@ -375,7 +375,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
   public GSType VisitReturnStmt(GSharp.Statement.Return @return)
   {
     if (@return.Value != null) TypeCheck(@return.Value);
-
+    
     return new UndefinedType();
   }
 
@@ -389,9 +389,10 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
       if (tup.error != null)
         errorHandler(new(binary.Oper, tup.error));
 
+
       return tup.type;
     }
-    
+
     switch (binary.Oper.type)
     {
       case TokenType.PLUS: return HandleError(IOperable<Add>.Operable<Add>(LeftT, RightT));
@@ -433,7 +434,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
       var argType = TypeCheck(call.Arguments[i]);
 
       if (!paramType.SameTypeAs(argType))
-        errorHandler(new(nameTok, $"Function {name} takes {paramType} as its #{i + 1} parameter, {argType} passed instead"));
+        errorHandler(new(nameTok, $"Function {name} takes {paramType} as its #{i+1} parameter, {argType} passed instead"));
     }
 
     return FunSymbol.ReturnType;
@@ -482,7 +483,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
     var ogFunctionContext = new FunctionContext(functionsContext);
 
 
-    foreach (var stmt in letIn.Stmts)
+    foreach(var stmt in letIn.Stmts)
       TypeCheck(stmt);
 
     var retType = TypeCheck(letIn.Body);
@@ -496,12 +497,11 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
 
   public GSType VisitLiteralExpr(Literal literal)
   {
-    return literal.Value switch{
-      double => new SimpleType(TypeName.Scalar),
-      string => new SimpleType(TypeName.String),
-      bool => new SimpleType(TypeName.Scalar),
-      _ => throw new NotImplementedException("UNSUPPORTED LITERAL TYPE")
-    };
+    if (literal.Value is INumericLiteral) return new SimpleType(TypeName.Scalar);
+    else if (literal.Value is string) return new SimpleType(TypeName.String);
+    else if (literal.Value is bool) return new SimpleType(TypeName.Scalar);
+    
+    throw new NotImplementedException("UNSUPPORTED LITERAL TYPE");
   }
 
   public GSType VisitLogicalExpr(Logical logical)
@@ -516,13 +516,13 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
   {
     SequenceType seqT = new();
 
-    foreach (var item in sequence.Items)
+    foreach(var item in sequence.Items)
     {
       var type = TypeCheck(item);
-
-      if (item is IntRange)
+      
+      if(item is IntRange)
         type = new SimpleType(TypeName.Scalar);
-
+      
       var (accepted, errorMessage) = seqT.AcceptNewType(type);
 
       if (!accepted)
@@ -543,7 +543,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
         errorHandler(new(unary.Token, $"Cannot apply minus unary operand to " + left.ToString()));
       return type;
     }
-
+    
     else if (unary.Token.type == TokenType.NOT)
       return new SimpleType(TypeName.Scalar);
 
@@ -568,7 +568,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
       return new UndefinedType();
     }
 
-    return symbol.Type;
+    return symbol.Type;  
   }
 
 }

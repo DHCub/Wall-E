@@ -35,11 +35,11 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
   private Action<Colors, Figure> drawFigure;
   private Action<Colors, Figure, string> drawLabeledFigure;
-  private readonly Func<string, List<Stmt>> importHandler;
+  private readonly Func<string, string> importHandler;
 
   private readonly Stack<Colors> colors;
 
-  public Interpreter(Action<RuntimeError> runtimeErrorHandler, Action<string> standardOutputHandler, Func<string, List<Stmt>> importHandler, Action<Colors, Figure> drawFigure, Action<Colors, Figure, string> drawLabeledFigure, IBindingHandler? bindingHandler = null)
+  public Interpreter(Action<RuntimeError> runtimeErrorHandler, Action<string> standardOutputHandler, Func<string, string> importHandler, Action<Colors, Figure> drawFigure, Action<Colors, Figure, string> drawLabeledFigure, IBindingHandler? bindingHandler = null)
   {
     this.runtimeErrorHandler = runtimeErrorHandler;
     this.BindingHandler = bindingHandler ?? new BindingHandler();
@@ -430,7 +430,6 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
     switch (calle)
     {
       case ICallable callable:
-        System.Console.WriteLine(calle.ToString());
         if (arguments.Count != callable.Arity())
         {
           throw new RuntimeError(expr.Paren, "Expected" + callable.Arity() + " argument(s) but got " + arguments.Count + ".");
@@ -650,6 +649,10 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
         }
         else drawLabeledFigure(colors.Peek(), figure, (string)stmt.Label.literal);
       }
+      else if (gso is GSharp.Objects.Collections.Sequence)
+      {
+        throw new RuntimeError(stmt.Command, $"Cannot draw Infinite Sequence");
+      }
 
       else throw new RuntimeError(stmt.Command, $"Cannot draw {gso.GetTypeName()}");
     }
@@ -674,11 +677,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
   public VoidObject VisitImportStmt(Import stmt)
   {
-    var statements = importHandler(stmt.DirName.lexeme);
-
-    Interpret(statements);
-
-    return VoidObject.Void;
+    throw new NotImplementedException();
   }
 
   public VoidObject VisitPrintStmt(Print stmt)
