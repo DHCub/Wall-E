@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 public partial class Node2D : Godot.Node2D
 {
-    private List<(Figure drawable, Godot.Color color)> shapes = new();
+    private List<(Figure drawable, Godot.Color color, string? label, Point labelLoc)> shapes = new();
 
     private bool ShowAxes;
 
@@ -27,6 +27,8 @@ public partial class Node2D : Godot.Node2D
     {
         var lineWidth = 2/Transform.X.X;
         const double Point_Representation_Radius = 5;
+        var axesVectorMultiplier = GetNode<Draw_Area_Marg>("../../../..").axesVectorMultiplier;
+
 
         // DrawCircle(container.Size/2, PointRadius, Colors.Green);
         Godot.Vector2 GetVect2(Point P) {
@@ -115,10 +117,27 @@ public partial class Node2D : Godot.Node2D
             draw_segment(Y, new(0, 0), new(0, 1), Colors.Black, true, true);
         }
 
+
+        // foreach(var child in this.GetChildren())
+        //     if (child is Label) this.RemoveChild(child);
+
         if (ShowAxes) show_axes();
 
-        foreach(var (drawable, color) in shapes)
+        for(int i = 0; i < shapes.Count; i++)
         {
+            var (drawable, color, label, labelLoc) = shapes[i];
+            if (label != null) 
+            {
+                if (labelLoc == null)
+                {
+                    labelLoc = drawable.Sample();
+                    shapes[i] = (drawable, color, label, labelLoc);
+                }
+                DrawSetTransform(GetVect2(labelLoc), 0, new(1/axesVectorMultiplier, -1/axesVectorMultiplier));
+                DrawString(ThemeDB.FallbackFont, GetVect2(labelLoc), label, modulate: Colors.Black);
+                DrawSetTransform(Vector2.Zero, 0, Vector2.One);
+            }
+
             if (drawable is Point P)
             {
                 DrawCircle(GetVect2(P), (float)Point_Representation_Radius/Transform.X.X, color);
@@ -189,13 +208,20 @@ public partial class Node2D : Godot.Node2D
     {
         foreach(var drawable in drawable_array)
         {
-            this.shapes.Add((drawable, color));
+            this.shapes.Add((drawable, color, null, null));
         }
+    }
+
+    public void AddDrawable(Color color, Figure figure, string label)
+    {
+        this.shapes.Add((figure, color, label, null));
     }
 
     public void Clear()
     {
         this.shapes.Clear();
+        foreach(var child in this.GetChildren())
+            if (child is Label) this.RemoveChild(child);
         QueueRedraw();
     }        
 

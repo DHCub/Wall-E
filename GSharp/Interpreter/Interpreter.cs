@@ -627,6 +627,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
   public VoidObject VisitDrawStmt(Draw stmt)
   {
     var drawe = Evaluate(stmt.Elements);
+
     void draw(GSObject gso)
     {
       if (gso is FiniteStaticSequence finSeq)
@@ -642,7 +643,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
         {
           drawFigure(colors.Peek(), figure);
         }
-        else drawLabeledFigure(colors.Peek(), figure, stmt.Label.lexeme);
+        else drawLabeledFigure(colors.Peek(), figure, (string)stmt.Label.literal);
       }
 
       else throw new RuntimeError(stmt.Command, $"Cannot draw {gso.GetTypeName()}");
