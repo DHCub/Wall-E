@@ -140,7 +140,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
 
     builtInFunctions = new();
     DefineBuiltIns();
-
+    this.statements = statements;
     this.errorHandler = errorHandler;
   }
 
@@ -267,7 +267,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
           );
 
           if (redefined)
-            errorHandler(new(paramName, $"Parameter {paramName.lexeme} is already defined in this context"));
+            errorHandler(new(paramName, $"Parameter {paramName.lexeme} is already defined in this Context"));
         }
 
         for (int i = 0; i < function.Parameters.Count; i++)
@@ -275,6 +275,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
           var parameter = function.Parameters[i];
           var name = parameter.Name;
           var type = parameter.typeName;
+
 
           DefineParameterOrError(name, type);
 
@@ -390,7 +391,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
 
       return tup.type;
     }
-
+    
     switch (binary.Oper.type)
     {
       case TokenType.PLUS: return HandleError(IOperable<Add>.Operable<Add>(LeftT, RightT));
@@ -418,7 +419,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
     var name = nameTok.lexeme;
     var argCount = call.Arguments.Count;
 
-    var FunSymbol = functionsContext.GetSymbol(name, argCount);
+    var FunSymbol = builtInFunctions.GetSymbol(name, argCount) ?? functionsContext.GetSymbol(name, argCount);
 
     if (FunSymbol == null)
     {
@@ -495,12 +496,11 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
 
   public GSType VisitLiteralExpr(Literal literal)
   {
-    return literal.Value switch{
-      double => new SimpleType(TypeName.Scalar),
-      string => new SimpleType(TypeName.String),
-      bool => new SimpleType(TypeName.Scalar),
-      _ => throw new NotImplementedException("UNSUPPORTED LITERAL TYPE")
-    };
+    if (literal.Value is INumericLiteral) return new SimpleType(TypeName.Scalar);
+    else if (literal.Value is string) return new SimpleType(TypeName.String);
+    else if (literal.Value is bool) return new SimpleType(TypeName.Scalar);
+
+    throw new NotImplementedException("UNSUPPORTED LITERAL TYPE" + literal.Value.ToString());
   }
 
   public GSType VisitLogicalExpr(Logical logical)

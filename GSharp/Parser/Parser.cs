@@ -235,7 +235,7 @@ public class Parser
           typeName = getTypeNameOrError(parameterTypeSpecifier);
         }
 
-        parameters.Add(new Parameter(name, new TypeReference(parameterTypeSpecifier), typeName));
+        parameters.Add(new Parameter(parameterName, new TypeReference(parameterTypeSpecifier), typeName));
       } while (Match(COMMA));
     }
 

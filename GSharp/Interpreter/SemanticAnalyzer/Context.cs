@@ -10,7 +10,8 @@ public class VariableContext
 
     public VariableContext(VariableContext enclosing = null)
     {
-        this.enclosing = enclosing ?? new();
+        this.enclosing = enclosing;
+        this.variables = new();
     }
 
     public VariableSymbol? GetSymbol(string name)
