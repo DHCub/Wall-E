@@ -26,6 +26,7 @@ public partial class Node2D : Godot.Node2D
     public override void _Draw()
     {
         var lineWidth = 2/Transform.X.X;
+        const double Point_Representation_Radius = 5;
 
         // DrawCircle(container.Size/2, PointRadius, Colors.Green);
         Godot.Vector2 GetVect2(Point P) {
@@ -120,7 +121,7 @@ public partial class Node2D : Godot.Node2D
         {
             if (drawable is Point P)
             {
-                DrawCircle(GetVect2(P), Figure.Point_Representation_Radius/Transform.X.X, color);
+                DrawCircle(GetVect2(P), (float)Point_Representation_Radius/Transform.X.X, color);
             }
             else if (drawable is Line L)
             {

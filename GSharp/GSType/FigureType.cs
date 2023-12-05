@@ -1,3 +1,4 @@
+
 namespace GSharp.Types;
 
 public class FigureType : GSType

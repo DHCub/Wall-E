@@ -12,13 +12,13 @@ public partial class Circle : GeometricLocation
     {
         this.Center = new Point();
 
-        float XMin = Math.Abs((float)Center.X_Coord - Figure.Window_StartX);
-        XMin = Math.Min(XMin, Math.Abs((float)Center.X_Coord - Figure.Window_EndX));
+        double XMin = Math.Abs(Center.X_Coord - Figure.Window_StartX);
+        XMin = Math.Min(XMin, Math.Abs(Center.X_Coord - Figure.Window_EndX));
 
-        float YMin = Math.Abs((float)Center.Y_Coord - Figure.Window_StartY);
-        YMin = Math.Min(YMin, Math.Abs((float)Center.Y_Coord - Figure.Window_EndY));
+        double YMin = Math.Abs(Center.Y_Coord - Figure.Window_StartY);
+        YMin = Math.Min(YMin, Math.Abs(Center.Y_Coord - Figure.Window_EndY));
 
-        float rad = Math.Min(XMin, YMin);
+        double rad = Math.Min(XMin, YMin);
         rad = Math.Max(rad, 10 * Figure.Point_Representation_Radius / Figure.ZoomFactor);
 
         this.Radius = rad;
@@ -32,7 +32,7 @@ public partial class Circle : GeometricLocation
 
     public override Point Sample()
     {
-        var angle = Figure.rnd.RandfRange(0, (float)(2 * Math.PI));
+        var angle = Figure.rnd.RandDoubleRange(0, 2 * Math.PI);
 
         var vector = new Point(200, 0).GetRotatedAsVector(angle);
 

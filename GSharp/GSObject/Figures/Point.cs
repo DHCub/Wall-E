@@ -21,8 +21,8 @@ public class Point : Figure
     }
 
     public Point() : this(
-        Figure.rnd.RandfRange(Figure.Window_StartX, Figure.Window_EndX),
-        Figure.rnd.RandfRange(Figure.Window_StartY, Figure.Window_EndY))
+        Figure.rnd.RandDoubleRange(Figure.Window_StartX, Figure.Window_EndX),
+        Figure.rnd.RandDoubleRange(Figure.Window_StartY, Figure.Window_EndY))
     { }
 
     public Point(double X_Coord, double Y_Coord)
@@ -101,7 +101,7 @@ public class Point : Figure
         if (!Functions.Equal_Vectors_Approx(p1, p2)) return (p1, p2);
 
         p2 = new Point(1E-7, 0);
-        p2 = p2.GetRotatedAsVector(Figure.rnd.RandfRange(0, (float)(2 * Math.PI)));
+        p2 = p2.GetRotatedAsVector(Figure.rnd.RandDoubleRange(0, (2 * Math.PI)));
 
         p2 = p1 + p2;
 

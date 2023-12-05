@@ -19,7 +19,7 @@ public class Arc : GeometricLocation
     var core = new Circle();
 
     this.Start_Ray = new Ray(core.Center, new Point());
-    this.Angle = Figure.rnd.RandfRange(0, (float)(2 * Math.PI));
+    this.Angle = Figure.rnd.RandDoubleRange(0, 2 * Math.PI);
     this.Center = core.Center;
     this.Radius = core.Radius;
   }
@@ -35,7 +35,7 @@ public class Arc : GeometricLocation
 
   public override Point Sample()
   {
-    var newAngle = Figure.rnd.RandfRange(0, (float)Angle);
+    var newAngle = Figure.rnd.RandDoubleRange(0, Angle);
 
     var vector = this.Start_Ray.Director_Vector.GetRotatedAsVector(newAngle);
 

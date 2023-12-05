@@ -9,7 +9,7 @@ public class RandomNumberGenerator
     private Random random;
     public RandomNumberGenerator(){random = new();}
 
-    public double RandfRange(double from, double to)
+    public double RandDoubleRange(double from, double to)
     {
         var delta = (to - from)*random.NextDouble();
 
@@ -21,16 +21,16 @@ public abstract class Figure : GSObject
 {
     public static RandomNumberGenerator rnd = new();
 
-    public static float Window_StartX {get; private set;}
-    public static float Window_EndX {get; private set;}
-    public static float Window_StartY {get; private set;}
-    public static float Window_EndY {get; private set;}
+    public static double Window_StartX {get; private set;}
+    public static double Window_EndX {get; private set;}
+    public static double Window_StartY {get; private set;}
+    public static double Window_EndY {get; private set;}
 
-    public static float ZoomFactor {get; private set;}
+    public static double ZoomFactor {get; private set;}
 
-    public const float Point_Representation_Radius = 5;
+    public const double Point_Representation_Radius = 5;
 
-    public static void UpdateWindow(float startX, float endX, float startY, float endY, float zoomFactor)
+    public static void UpdateWindow(double startX, double endX, double startY, double endY, double zoomFactor)
     {
         Window_StartX = startX;
         Window_StartY = startY;

@@ -29,7 +29,7 @@ public partial class Segment : GeometricLocation
         var Vector = this.B_Point - this.A_Point;
 
         var norm = Vector.Norm;
-        var length = Figure.rnd.RandfRange(0, (float)norm);
+        var length = Figure.rnd.RandDoubleRange(0, norm);
 
         Vector = (length / norm) * Vector;
 

@@ -27,11 +27,11 @@ public partial class Draw_Area_Marg : MarginContainer
 		var Center = -Translation / axesVectorMultiplier;
 		// Center/=axesVectorMultiplier;
 
-		float x1 = Center.X - Size.X / 2 / axesVectorMultiplier;
-		float x2 = Center.X + Size.X / 2 / axesVectorMultiplier;
+		double x1 = Center.X - Size.X / 2 / axesVectorMultiplier;
+		double x2 = Center.X + Size.X / 2 / axesVectorMultiplier;
 
-		float y1 = -Center.Y - Size.Y / 2 / axesVectorMultiplier;
-		float y2 = -Center.Y + Size.Y / 2 / axesVectorMultiplier;
+		double y1 = -Center.Y - Size.Y / 2 / axesVectorMultiplier;
+		double y2 = -Center.Y + Size.Y / 2 / axesVectorMultiplier;
 
 		// IDrawable.UpdateWindow(
 		// 	-this.Size.X/2/axesVectorMultiplier, this.Size.X/2/axesVectorMultiplier,
@@ -66,7 +66,7 @@ public partial class Draw_Area_Marg : MarginContainer
 	{
 		var draw_area = GetNode<Node2D>("Viewport_Container/SubViewport/Background/Node2D");
 		Translation = new(0, 0);
-		axesVectorMultiplier = 1;
+		axesVectorMultiplier = 100;
 		Center_Transform();
 		Update_IDrawable_Window();
 		draw_area.QueueRedraw();

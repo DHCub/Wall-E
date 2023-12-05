@@ -64,12 +64,12 @@ public partial class Line : GeometricLocation
 
         if(Functions.Greater_Than_Approx(Math.Abs(A), Math.Abs(B)))
         {
-            var y = Figure.rnd.RandfRange(Figure.Window_StartY, Figure.Window_EndY);
+            var y = Figure.rnd.RandDoubleRange(Figure.Window_StartY, Figure.Window_EndY);
 
             return new Point(-C/A - B/A*y, y);
         }
 
-        var x = Figure.rnd.RandfRange(Figure.Window_StartX, Figure.Window_EndX); 
+        var x = Figure.rnd.RandDoubleRange(Figure.Window_StartX, Figure.Window_EndX); 
         return new Point(x, -C/B - A/B*x);
     }
 

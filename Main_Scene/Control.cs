@@ -6,10 +6,12 @@ using GSharp.Interpreter;
 using GSharp.Objects.Figures;
 using System.Collections.Generic;
 using System;
+using GSharp.GUIInterface;
 
 public partial class Control : Godot.Control
 {
 	static readonly Segment S = new(new(0, 0), new(200, 200));
+	GUIInterface gsharp;
 	// Declare member variables here. Examples:
 	// private int a = 2;
 	// private string b = "text";
@@ -17,6 +19,47 @@ public partial class Control : Godot.Control
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
+		var draw_area = GetNode<Node2D>("Draw_Area_Marg/Viewport_Container/SubViewport/Background/Node2D");
+		var console = GetNode<RichTextLabel>("Console_Margin/Console");
+
+
+		void standardOutputHandler(string text)
+		{
+			console.Text += text + '\n';
+		}
+		void errorHandler(string text)
+		{
+			console.Text += text + '\n';
+		}
+		Godot.Color GetColor(GSharp.GUIInterface.Colors color) => color switch{
+			GSharp.GUIInterface.Colors.Black => Godot.Colors.Black,
+			GSharp.GUIInterface.Colors.Red => Godot.Colors.Red,
+			GSharp.GUIInterface.Colors.Green => Godot.Colors.Green,
+			GSharp.GUIInterface.Colors.Blue => Godot.Colors.Blue,
+			GSharp.GUIInterface.Colors.Magenta => Godot.Colors.Magenta,
+			GSharp.GUIInterface.Colors.Purple => Godot.Colors.Purple,
+			GSharp.GUIInterface.Colors.Gray => Godot.Colors.Gray,
+			GSharp.GUIInterface.Colors.Cyan => Godot.Colors.Cyan,
+			GSharp.GUIInterface.Colors.Yellow => Godot.Colors.Yellow,
+			GSharp.GUIInterface.Colors.White => Godot.Colors.White,
+
+			_ => throw new NotImplementedException("UNSUPPORTED COLOR")
+		};
+		void drawFigure(GSharp.GUIInterface.Colors color, Figure fig)
+		{
+			draw_area.AddDrawable(GetColor(color), fig);
+			draw_area.QueueRedraw();
+		}
+		void drawLabeledFigure(GSharp.GUIInterface.Colors color, Figure fig, string label)
+		{
+			throw new NotImplementedException();
+		}
+		string importHandler(string dir)
+		{
+			throw new NotImplementedException();
+		}
+
+		gsharp = new GUIInterface(standardOutputHandler, errorHandler, importHandler, drawFigure, drawLabeledFigure);
 
 	}
 
@@ -39,70 +82,73 @@ public partial class Control : Godot.Control
 					if (intersect is FiniteStaticSequence Seq)
 					{
 						foreach (var P in Seq.GetPrefixValues())
-							draw_area.AddDrawable(Colors.Black, (Point)P);
+							draw_area.AddDrawable(Godot.Colors.Black, (Point)P);
 					}
 				}
 			}
 		}
 
 		var txt = code.Text;
-
-		bool hadError = false, hadRuntimeError = false;
-
-		void ScanError(ScanError scanError)
+		// old code
 		{
-			ReportError(scanError.line, string.Empty, scanError.Message);
-		}
+		// bool hadError = false, hadRuntimeError = false;
 
-		void RuntimeError(RuntimeError error)
-		{
-			string line = error.token?.line.ToString() ?? "unknown";
+		// void ScanError(ScanError scanError)
+		// {
+		// 	ReportError(scanError.line, string.Empty, scanError.Message);
+		// }
 
-			console.Text += $"[line {line}] {error.Message}\n";
-			hadRuntimeError = true;
-		}
+		// void RuntimeError(RuntimeError error)
+		// {
+		// 	string line = error.token?.line.ToString() ?? "unknown";
 
-		void Error(Token token, string message)
-		{
-			if (token.type == TokenType.EOF)
-			{
-				ReportError(token.line, " at end", message);
-			}
-			else
-			{
-				ReportError(token.line, " at '" + token.lexeme + "'", message);
-			}
-		}
+		// 	console.Text += $"[line {line}] {error.Message}\n";
+		// 	hadRuntimeError = true;
+		// }
 
-		void ReportError(int line, string where, string message)
-		{
-			Console.WriteLine($"[line {line}] Error{where}: {message}");
-			hadError = true;
-		}
+		// void Error(Token token, string message)
+		// {
+		// 	if (token.type == TokenType.EOF)
+		// 	{
+		// 		ReportError(token.line, " at end", message);
+		// 	}
+		// 	else
+		// 	{
+		// 		ReportError(token.line, " at '" + token.lexeme + "'", message);
+		// 	}
+		// }
 
-		void ParseError(ParseError parseError)
-		{
-			Error(parseError.token, parseError.Message);
-		}
+		// void ReportError(int line, string where, string message)
+		// {
+		// 	Console.WriteLine($"[line {line}] Error{where}: {message}");
+		// 	hadError = true;
+		// }
 
-		void NameResolutionError(NameResolutionError nameResolutionError)
-		{
-			Error(nameResolutionError.Token, nameResolutionError.Message);
-		}
+		// void ParseError(ParseError parseError)
+		// {
+		// 	Error(parseError.token, parseError.Message);
+		// }
 
-		void fun(string x) {
-			console.Text += x + "\n";
-		}
+		// void NameResolutionError(NameResolutionError nameResolutionError)
+		// {
+		// 	Error(nameResolutionError.Token, nameResolutionError.Message);
+		// }
 
-		Interpreter interpreter = new Interpreter(RuntimeError, fun);
+		// void fun(string x) {
+		// 	console.Text += x + "\n";
+		// }
 
-		object? result = interpreter.Eval(txt, ScanError, ParseError, NameResolutionError);
+		// Interpreter interpreter = new Interpreter(RuntimeError, fun);
 
-		if (result != null && result != VoidObject.Void)
-		{
-			fun(result.ToString());
-		}
+		// object? result = interpreter.Eval(txt, ScanError, ParseError, NameResolutionError);
 
+		// if (result != null && result != VoidObject.Void)
+		// {
+		// 	fun(result.ToString());
+		// }
+	}
+
+		gsharp.Interpret(txt);
 		// Line l1 = new();
 		// Line l2 = new();		
 		// Line l3 = new();		

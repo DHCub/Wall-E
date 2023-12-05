@@ -12,6 +12,7 @@ using GSharp.Objects.Figures;
 using GSharp.Parser;
 using GSharp.Statement;
 using static GSharp.TokenType;
+using GSharp.GUIInterface;
 
 namespace GSharp.Interpreter;
 
@@ -31,11 +32,23 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
   private ImmutableList<Stmt> previousStmts = ImmutableList.Create<Stmt>();
   private IEnvironment currentEnvironment;
 
-  public Interpreter(Action<RuntimeError> runtimeErrorHandler, Action<string> standardOutputHandler, IBindingHandler? bindingHandler = null)
+  private Action<Colors, Figure> drawFigure;
+  private Action<Colors, Figure, string> drawLabeledFigure;
+  private Func<string, List<Stmt>> importHandler;
+
+  private Stack<Colors> colors;
+
+  public Interpreter(Action<RuntimeError> runtimeErrorHandler, Action<string> standardOutputHandler, Func<string, List<Stmt>> importHandler, Action<Colors, Figure> drawFigure, Action<Colors, Figure, string> drawLabeledFigure, IBindingHandler? bindingHandler = null)
   {
     this.runtimeErrorHandler = runtimeErrorHandler;
     this.bindingHandler = bindingHandler ?? new BindingHandler();
     this.standardOutputHandler = standardOutputHandler;
+    this.drawFigure = drawFigure;
+    this.drawLabeledFigure = drawLabeledFigure;
+    this.importHandler = importHandler;
+
+    colors = new();
+    colors.Push(Colors.Black);
 
     this.currentEnvironment = globals;
   }
@@ -492,7 +505,8 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
   public VoidObject VisitColorStmt(ColorStmt stmt)
   {
-    throw new NotImplementedException();
+    colors.Push(GUIInterface.GUIInterface.GetColor(stmt.Color.lexeme));
+    return VoidObject.Void;
   }
 
   public VoidObject VisitConstantStmt(ConstantStmt stmt)
@@ -524,7 +538,31 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
   public VoidObject VisitDrawStmt(Draw stmt)
   {
-    throw new NotImplementedException();
+    var drawe = Evaluate(stmt.Elements);
+    void draw(GSObject gso)
+    {
+      if (gso is FiniteStaticSequence finSeq)
+      {
+        foreach(var elem in finSeq)
+        {
+          draw(elem);
+        }
+      }
+      else if(gso is Figure figure)
+      {
+        if (stmt.Label == null)
+        {
+          drawFigure(colors.Peek(), figure);
+        }
+        else drawLabeledFigure(colors.Peek(), figure, stmt.Label.lexeme);
+      }
+
+      else throw new RuntimeError(stmt.Command, $"Cannot draw {gso.GetTypeName()}");
+    }
+
+    draw(drawe);
+
+    return VoidObject.Void;
   }
 
   public VoidObject VisitExpressionStmt(ExpressionStmt stmt)
@@ -542,7 +580,11 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
   public VoidObject VisitImportStmt(Import stmt)
   {
-    throw new NotImplementedException();
+    var statements = importHandler(stmt.DirName.lexeme);
+
+    Interpret(statements);
+
+    return VoidObject.Void;
   }
 
   public VoidObject VisitPrintStmt(Print stmt)
@@ -562,7 +604,9 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
   public VoidObject VisitRestoreStmt(Restore stmt)
   {
-    throw new NotImplementedException();
+    if (colors.Count > 1) colors.Pop();
+
+    return VoidObject.Void;
   }
 
   public VoidObject VisitReturnStmt(Statement.Return stmt)
