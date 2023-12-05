@@ -76,7 +76,6 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
       //
       // resolving names phase
       //
-
       bool hasNameResolutionErrors = false;
       var nameResolver = new NameResolver(BindingHandler, nameResolutionError =>
       {
@@ -84,7 +83,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
         nameResolutionErrorHandler(nameResolutionError);
       });
 
-      nameResolver.Resolve(previousAndNewStmts);
+      // nameResolver.Resolve(previousAndNewStmts);
 
       if (hasNameResolutionErrors)
       {
@@ -102,6 +101,9 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
         typeValidationFailed = true;
         semanticErrorHandler(semanticAnalizerError);
       });
+
+      semanticAnalyzer.Analyze();
+
 
       if (typeValidationFailed)
       {
@@ -320,7 +322,6 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
     catch (SystemException ex)
     {
       Token? token = (expr as IToken)?.Token;
-
       throw new RuntimeError(token, ex.Message, ex);
     }
   }
