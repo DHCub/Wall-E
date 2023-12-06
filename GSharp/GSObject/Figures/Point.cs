@@ -42,9 +42,9 @@ public class Point : Figure
 
     public static Point operator *(Point A, double alpha)
         => new(A.X_Coord * alpha, A.Y_Coord * alpha);
-    
-    public static Point operator / (Point P, double alpha)
-        => new(P.X_Coord/alpha, P.Y_Coord/alpha);
+
+    public static Point operator /(Point P, double alpha)
+        => new(P.X_Coord / alpha, P.Y_Coord / alpha);
 
     public double Dot_Product(Point other) => this.X_Coord * other.X_Coord + this.Y_Coord * other.Y_Coord;
 
@@ -77,10 +77,10 @@ public class Point : Figure
     public bool Equal_Approx(Point other)
         => Functions.Equal_Vectors_Approx(this, other);
 
-    public double Distance_To(Point other)
+    public double DistanceTo(Point other)
         => Functions.Distance(this, other);
 
-    public double Distance_To(Line L)
+    public double DistanceTo(Line L)
         => Functions.Distance(this, L);
 
     public Point GetRotatedAsVector(double Angle)
@@ -115,16 +115,16 @@ public class Point : Figure
     public override bool SameTypeAs(GSObject gso) => gso is Point;
 
     public override GSObject OperateScalar(Scalar other, Mult op)
-        => this*other.value;
+        => this * other.value;
     public override GSObject OperateScalar(Scalar other, Div op)
-        => this/other.value;
-   
+        => this / other.value;
+
 
 
     public override GSObject OperateMeasure(Measure other, Div op)
-        => this/other.value;
+        => this / other.value;
     public override GSObject OperateMeasure(Measure other, Mult op)
-        => this*other.value;
+        => this * other.value;
 
     public override GSObject OperatePoint(Point other, Add op)
         => this + other;

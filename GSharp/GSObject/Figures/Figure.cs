@@ -7,11 +7,11 @@ using GSharp.Objects.Collections;
 public class RandomNumberGenerator
 {
     private Random random;
-    public RandomNumberGenerator(){random = new();}
+    public RandomNumberGenerator() { random = new(); }
 
     public double RandDoubleRange(double from, double to)
     {
-        var delta = (to - from)*random.NextDouble();
+        var delta = (to - from) * random.NextDouble();
 
         return from + delta;
     }
@@ -21,12 +21,12 @@ public abstract class Figure : GSObject
 {
     public static RandomNumberGenerator rnd = new();
 
-    public static double Window_StartX {get; private set;}
-    public static double Window_EndX {get; private set;}
-    public static double Window_StartY {get; private set;}
-    public static double Window_EndY {get; private set;}
+    public static double Window_StartX { get; private set; }
+    public static double Window_EndX { get; private set; }
+    public static double Window_StartY { get; private set; }
+    public static double Window_EndY { get; private set; }
 
-    public static double ZoomFactor {get; private set;}
+    public static double ZoomFactor { get; private set; }
 
     public const double Point_Representation_Radius = 5;
 
@@ -51,7 +51,7 @@ public abstract class Figure : GSObject
     public override GSObject OperateInfiniteStaticSequence(InfiniteStaticSequence other, Add op) => UnsupportedOperError(other, op);
     public override GSObject OperateGeneratorSequence(GeneratorSequence other, Add op) => UnsupportedOperError(other, op);
 
-    public override GSObject OperateUndefined(Undefined other, Add op)  => UnsupportedOperError(other, op);
+    public override GSObject OperateUndefined(Undefined other, Add op) => UnsupportedOperError(other, op);
 
     public override GSObject OperatePoint(Point other, Mult op) => UnsupportedOperError(other, op);
 

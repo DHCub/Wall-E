@@ -28,6 +28,21 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
 
   private FunctionType currentFunction = FunctionType.NONE;
 
+  private HashSet<string> builtins = new HashSet<string>()
+  {
+    "line",
+    "segment",
+    "ray",
+    "arc",
+    "circle",
+    "measure",
+    "intersect",
+    "count",
+    "randoms",
+    "points",
+    "samples"
+  };
+
   internal NameResolver(IBindingHandler bindingHandler, NameResolutionErrorHandler nameResolutionErrorHandler)
   {
     this.bindingHandler = bindingHandler;
@@ -73,9 +88,16 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
     // and so that we know the variable exists.
     var scope = scopes.Last();
 
+    if (builtins.Contains(name.lexeme))
+    {
+      nameResolutionErrorHandler(new NameResolutionError("Native function with this name is available.", name));
+      return;
+    }
+
     if (scope.ContainsKey(name.lexeme))
     {
       nameResolutionErrorHandler(new NameResolutionError("Variable with this name already declared in this scope.", name));
+      return;
     }
 
     // we mark it as "not ready yet" by binding a know None-value in the scope map. Each
@@ -93,6 +115,12 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
   private void Define(Token name, ITypeReference typeReference)
   {
     if (name.lexeme == "_") return;
+
+    if (builtins.Contains(name.lexeme))
+    {
+      nameResolutionErrorHandler(new NameResolutionError("Native function with this name is available.", name));
+      return;
+    }
 
     if (typeReference == null)
     {
@@ -112,6 +140,12 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
 
   private void DefineFunction(Token name, ITypeReference typeReference, Function function)
   {
+    if (builtins.Contains(name.lexeme))
+    {
+      nameResolutionErrorHandler(new NameResolutionError("Native function with this name is available.", name));
+      return;
+    }
+
     if (typeReference == null)
     {
       throw new ArgumentException("typeReference cannot be null");
@@ -270,7 +304,7 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
     BeginScope();
     Resolve(expr.Stmts);
     EndScope();
-    
+
     return VoidObject.Void;
   }
 
