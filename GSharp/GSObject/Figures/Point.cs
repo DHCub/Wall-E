@@ -42,9 +42,9 @@ public class Point : Figure
 
     public static Point operator *(Point A, double alpha)
         => new(A.XCoord * alpha, A.YCoord * alpha);
-    
-    public static Point operator / (Point P, double alpha)
-        => new(P.XCoord/alpha, P.YCoord/alpha);
+
+    public static Point operator /(Point P, double alpha)
+        => new(P.XCoord / alpha, P.YCoord / alpha);
 
     public double DotProduct(Point other) => this.XCoord * other.XCoord + this.YCoord * other.YCoord;
 
@@ -115,16 +115,16 @@ public class Point : Figure
     public override bool SameTypeAs(GSObject gso) => gso is Point;
 
     public override GSObject OperateScalar(Scalar other, Mult op)
-        => this*other.value;
+        => this * other.value;
     public override GSObject OperateScalar(Scalar other, Div op)
-        => this/other.value;
-   
+        => this / other.value;
+
 
 
     public override GSObject OperateMeasure(Measure other, Div op)
-        => this/other.value;
+        => this / other.value;
     public override GSObject OperateMeasure(Measure other, Mult op)
-        => this*other.value;
+        => this * other.value;
 
     public override GSObject OperatePoint(Point other, Add op)
         => this + other;

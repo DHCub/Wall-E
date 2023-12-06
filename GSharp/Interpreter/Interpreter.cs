@@ -37,6 +37,22 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
   private Action<Colors, Figure, string> drawLabeledFigure;
   private readonly Func<string, string> importHandler;
 
+  private HashSet<string> builtins = new HashSet<string>()
+  {
+    "line",
+    "segment",
+    "ray",
+    "arc",
+    "circle",
+    "measure",
+    "intersect",
+    "count",
+    "randoms",
+    "points",
+    "samples",
+    "point"
+  };
+
   private readonly Stack<Colors> colors;
 
   public Interpreter(Action<RuntimeError> runtimeErrorHandler, Action<string> standardOutputHandler, Func<string, string> importHandler, Action<Colors, Figure> drawFigure, Action<Colors, Figure, string> drawLabeledFigure, IBindingHandler? bindingHandler = null)
@@ -429,6 +445,82 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
           }
         }
       default:
+        if (expr.Calle is Variable funName)
+        {
+          if (builtins.Contains(funName.Name.lexeme))
+          {
+            switch (funName.Name.lexeme)
+            {
+              case "point":
+                if (arguments[0].SameTypeAs(new Scalar(0)) && arguments[1].SameTypeAs(new Scalar(0)))
+                {
+                  return new Point(((Scalar)arguments[0]).value, ((Scalar)arguments[1]).value);
+                }
+                throw new RuntimeError(expr.Token, "Expected scalars as arguments.");
+              case "line":
+                if (arguments[0].SameTypeAs(new Point()) && arguments[1].SameTypeAs(new Point()))
+                {
+                  return new Line((Point)arguments[0], (Point)arguments[1]);
+                }
+                throw new RuntimeError(expr.Token, "Expected point as arguments.");
+              case "segment":
+                if (arguments[0].SameTypeAs(new Point()) && arguments[1].SameTypeAs(new Point()))
+                {
+                  return new Segment((Point)arguments[0], (Point)arguments[1]);
+                }
+                throw new RuntimeError(expr.Token, "Expected point as arguments.");
+              case "ray":
+                if (arguments[0].SameTypeAs(new Point()) && arguments[1].SameTypeAs(new Point()))
+                {
+                  return new Ray((Point)arguments[0], (Point)arguments[1]);
+                }
+                throw new RuntimeError(expr.Token, "Expected point as arguments.");
+              case "arc":
+                if (arguments[0].SameTypeAs(new Point()) && arguments[1].SameTypeAs(new Point()) && arguments[2].SameTypeAs(new Point()) && arguments[3].SameTypeAs(new Measure(0.0)))
+                {
+                  return new Arc((Point)arguments[0], (Point)arguments[1], (Point)arguments[1], ((Measure)arguments[2]).value);
+                }
+                throw new RuntimeError(expr.Token, "Invalid arguments.");
+              case "circle":
+                if (arguments[0].SameTypeAs(new Point()) && arguments[1].SameTypeAs(new Measure(0.0)))
+                {
+                  return new Circle((Point)arguments[0], ((Measure)arguments[1]).value);
+                }
+                throw new RuntimeError(expr.Token, "Expected point and measure as arguments.");
+              case "measure":
+                if (arguments[0].SameTypeAs(new Point()) && arguments[1].SameTypeAs(new Point()))
+                {
+                  return new Measure(((Point)arguments[0]).DistanceTo((Point)arguments[1]));
+                }
+                throw new RuntimeError(expr.Token, "Expected point as arguments.");
+              case "intersect":
+                if (arguments[0] is Figure fig1 && arguments[1] is Figure fig2)
+                {
+                  return Functions.Intersect(fig1, fig2);
+                }
+                throw new RuntimeError(expr.Token, "Expected figures as arguments.");
+              case "count":
+                if (arguments[0] is Objects.Collections.Sequence seq)
+                {
+                  return seq.GSCount();
+                }
+                throw new RuntimeError(expr.Token, "Expected sequence as argument.");
+              case "randoms":
+                return new GeneratorSequence(new RandomDoubleGenerator());
+              case "points":
+                if (arguments[0] is Figure fig)
+                {
+                  return new GeneratorSequence(new RandomPointInFigureGenerator(fig));
+                }
+                throw new RuntimeError(expr.Token, "Expected figure as argument.");
+              case "samples":
+                return new GeneratorSequence(new RandomPointInCanvasGenerator());
+              default:
+                throw new RuntimeError(expr.Paren, $"Can only call functions and native methods, not {calle}");
+            }
+            throw new RuntimeError(expr.Paren, $"Can only call functions and native methods, not {calle}");
+          }
+        }
         throw new RuntimeError(expr.Paren, $"Can only call functions and native methods, not {calle}");
     }
   }

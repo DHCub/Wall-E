@@ -72,22 +72,22 @@ public partial class FiniteStaticSequence : Sequence, IEnumerable<GSObject>
     {
         List<char> answ = new();
         answ.Add('{');
-        
+
         for (int i = 0; i < this.Count - 1; i++)
         {
             answ.AddRange(items[i].ToString());
             answ.AddRange(", ");
         }
 
-        if (items.Count > 0) 
+        if (items.Count > 0)
             answ.AddRange(items[Count - 1].ToString());
-        
+
         answ.Add('}');
 
         return new string(answ.ToArray());
     }
 
-    public override GSObject this[int i] {get => (i >= Count) ? new Undefined() : items[i];}
+    public override GSObject this[int i] { get => (i >= Count) ? new Undefined() : items[i]; }
 
     public override bool GetTruthValue() => this.Count != 0;
     public override Sequence GetRemainder(int start)
@@ -107,7 +107,7 @@ public partial class FiniteStaticSequence : Sequence, IEnumerable<GSObject>
     {
         List<GSObject> newItems = this.items.ToList();
 
-        foreach(var item in other)
+        foreach (var item in other)
             newItems.Add(item);
 
         return new FiniteStaticSequence(newItems);
@@ -117,7 +117,7 @@ public partial class FiniteStaticSequence : Sequence, IEnumerable<GSObject>
     {
         List<GSObject> newItems = items.ToList();
 
-        foreach(var prefixItem in other.GetPrefixValues())
+        foreach (var prefixItem in other.GetPrefixValues())
             newItems.Add(prefixItem);
 
         return new InfiniteStaticSequence(newItems);
@@ -127,7 +127,7 @@ public partial class FiniteStaticSequence : Sequence, IEnumerable<GSObject>
     {
         List<GSObject> newItems = this.items.ToList();
 
-        foreach(var prefixItem in other.GetPrefixValues())
+        foreach (var prefixItem in other.GetPrefixValues())
             newItems.Add(prefixItem);
 
         return new GeneratorSequence(other.generator, newItems);

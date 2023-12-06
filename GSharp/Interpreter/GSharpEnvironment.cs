@@ -44,6 +44,7 @@ internal class GSharpEnvironment : IEnvironment
   public void AssignAt(int distance, Token name, GSObject value)
   {
     if (name.lexeme == "_") return;
+
     Ancestor(distance).values[name.lexeme] = value;
   }
 
