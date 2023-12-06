@@ -40,7 +40,8 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
     "count",
     "randoms",
     "points",
-    "samples"
+    "samples",
+    "point"
   };
 
   internal NameResolver(IBindingHandler bindingHandler, NameResolutionErrorHandler nameResolutionErrorHandler)

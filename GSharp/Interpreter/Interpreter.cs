@@ -49,7 +49,8 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
     "count",
     "randoms",
     "points",
-    "samples"
+    "samples",
+    "point"
   };
 
   private readonly Stack<Colors> colors;
@@ -450,6 +451,12 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
           {
             switch (funName.Name.lexeme)
             {
+              case "point":
+                if (arguments[0].SameTypeAs(new Scalar(0)) && arguments[1].SameTypeAs(new Scalar(0)))
+                {
+                  return new Point(((Scalar)arguments[0]).value, ((Scalar)arguments[1]).value);
+                }
+                throw new RuntimeError(expr.Token, "Expected scalars as arguments.");
               case "line":
                 if (arguments[0].SameTypeAs(new Point()) && arguments[1].SameTypeAs(new Point()))
                 {
@@ -469,7 +476,11 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
                 }
                 throw new RuntimeError(expr.Token, "Expected point as arguments.");
               case "arc":
-                throw new NotImplementedException();
+                if (arguments[0].SameTypeAs(new Point()) && arguments[1].SameTypeAs(new Point()) && arguments[2].SameTypeAs(new Point()) && arguments[3].SameTypeAs(new Measure(0.0)))
+                {
+                  return new Arc((Point)arguments[0], (Point)arguments[1], (Point)arguments[1], ((Measure)arguments[2]).value);
+                }
+                throw new RuntimeError(expr.Token, "Invalid arguments.");
               case "circle":
                 if (arguments[0].SameTypeAs(new Point()) && arguments[1].SameTypeAs(new Measure(0.0)))
                 {
