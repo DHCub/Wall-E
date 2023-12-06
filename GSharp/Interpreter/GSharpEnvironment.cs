@@ -19,6 +19,8 @@ internal class GSharpEnvironment : IEnvironment
 
   public void Define(Token name, GSObject value)
   {
+    if (name.lexeme == "_") return;
+
     if (values.ContainsKey(name.lexeme))
     {
       throw new RuntimeError(name, "Variable with this name already declared in this scope.");
@@ -34,13 +36,14 @@ internal class GSharpEnvironment : IEnvironment
     if (Ancestor(distance).values.ContainsKey(name))
     {
       return Ancestor(distance).values[name];
-    } 
+    }
 
     return new Objects.Undefined();
   }
 
   public void AssignAt(int distance, Token name, GSObject value)
   {
+    if (name.lexeme == "_") return;
     Ancestor(distance).values[name.lexeme] = value;
   }
 
@@ -72,6 +75,8 @@ internal class GSharpEnvironment : IEnvironment
 
   internal void Assign(Token name, GSObject value)
   {
+    if (name.lexeme == "_") return;
+
     if (values.ContainsKey(name.lexeme))
     {
       values[name.lexeme] = value;

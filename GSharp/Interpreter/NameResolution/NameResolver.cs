@@ -62,6 +62,8 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
   // with the same name.
   private void Declare(Token name)
   {
+    if (name.lexeme == "_") return;
+
     if (IsEmpty(scopes))
     {
       return;
@@ -90,6 +92,8 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
   // defines a previously declared variable as initialized, available for use.
   private void Define(Token name, ITypeReference typeReference)
   {
+    if (name.lexeme == "_") return;
+
     if (typeReference == null)
     {
       throw new ArgumentException("typeReference cannot be null");
