@@ -608,7 +608,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
       int cntConsts = stmt.Names.Count;
       for (int i = 0; i < cntConsts - 1; i++)
       {
-        if ((string)stmt.Names[i].literal == "_")
+        if ((string)stmt.Names[i].literal != "_")
           currentEnvironment.Define(stmt.Names[i], valueSeq[i]);
       }
 
@@ -621,7 +621,8 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
         throw new RuntimeError(stmt.Token, "Cannot assign some constants to unique value.");
       }
 
-      currentEnvironment.Define(stmt.Names[0], value);
+      if ((string)stmt.Names[0].literal != "_")
+        currentEnvironment.Define(stmt.Names[0], value);
     }
 
     return VoidObject.Void;
