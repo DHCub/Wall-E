@@ -351,33 +351,6 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
     }
   }
 
-  private GSObject ExecuteInternalBlock(IEnumerable<Stmt>? statements, Expr body, IEnvironment blockEnvironment)
-  {
-    IEnvironment previousEnvironment = currentEnvironment;
-
-    GSObject result;
-    try
-    {
-      currentEnvironment = blockEnvironment;
-
-      if (statements is not null)
-      {
-        foreach (var statement in statements)
-        {
-          Execute(statement);
-        }
-      }
-
-      result = Evaluate(body);
-    }
-    finally
-    {
-      currentEnvironment = previousEnvironment;
-    }
-
-    return result;
-  }
-
   public GSObject VisitBinaryExpr(Binary expr)
   {
     GSObject left = Evaluate(expr.Left);
@@ -499,7 +472,17 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
   public GSObject VisitLetInExpr(LetIn expr)
   {
-    return ExecuteInternalBlock(expr.Stmts, expr.Body, currentEnvironment);
+    var LetEnvironment = new GSharpEnvironment(currentEnvironment);
+
+    try
+    {
+      ExecuteBlock(expr.Stmts, LetEnvironment);
+      return new Objects.Undefined();
+    }
+    catch (Exceptions.Return returnValue)
+    {
+      return returnValue.Value;
+    }
   }
 
   public GSObject VisitSequenceExpr(Expression.Sequence expr)
@@ -622,7 +605,8 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
         throw new RuntimeError(stmt.Token, "Cannot assign some constants to unique value.");
       }
 
-      currentEnvironment.Define(stmt.Names[0], value);
+      if ((string)stmt.Names[0].literal != "_")
+        currentEnvironment.Define(stmt.Names[0], value);
     }
 
     return VoidObject.Void;

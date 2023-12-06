@@ -485,20 +485,21 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
 
   public GSType VisitLetInExpr(LetIn letIn)
   {
-    var ogVarContext = new VariableContext(variablesContext);
-    var ogFunctionContext = new FunctionContext(functionsContext);
+    return new UndefinedType();
+    // var ogVarContext = new VariableContext(variablesContext);
+    // var ogFunctionContext = new FunctionContext(functionsContext);
 
 
-    foreach(var stmt in letIn.Stmts)
-      TypeCheck(stmt);
+    // foreach(var stmt in letIn.Stmts)
+    //   TypeCheck(stmt);
 
-    var retType = TypeCheck(letIn.Body);
+    // var retType = TypeCheck(letIn.Body);
 
 
-    variablesContext = ogVarContext;
-    functionsContext = ogFunctionContext;
+    // variablesContext = ogVarContext;
+    // functionsContext = ogFunctionContext;
 
-    return retType;
+    // return retType;
   }
 
   public GSType VisitLiteralExpr(Literal literal)
