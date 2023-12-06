@@ -145,6 +145,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
     this.statements = statements;
     this.errorHandler = errorHandler;
     this.importHandler = importHandler;
+    this.importedFiles = new();
   }
 
   public void Analyze()

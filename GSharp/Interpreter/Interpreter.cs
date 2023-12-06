@@ -14,6 +14,7 @@ using GSharp.Statement;
 using static GSharp.TokenType;
 using GSharp.GUIInterface;
 using GSharp;
+using System.Net.Mail;
 
 namespace GSharp.Interpreter;
 
@@ -53,6 +54,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
     "point"
   };
 
+  public Func<string, List<Stmt>> newImportHandler;
   private readonly Stack<Colors> colors;
 
   public Interpreter(Action<RuntimeError> runtimeErrorHandler, Action<string> standardOutputHandler, Func<string, string> importHandler, Action<Colors, Figure> drawFigure, Action<Colors, Figure, string> drawLabeledFigure, IBindingHandler? bindingHandler = null)
@@ -112,13 +114,23 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
       bool typeValidationFailed = false;
 
-      List<Stmt> importHandler(string dir) => throw new NotImplementedException();
+      List<Stmt> newImportHandler2(string dir) {
+        var src = importHandler(dir);   
+        var liststmt = Parse(src, scanErrorHandler, parseErrorHandler);
+        if (liststmt is null)
+        {
+          throw new RuntimeError(new Token(STRING, dir, null, -1, -1), "Error found!");
+        }
+        return liststmt;
+      }
+
+      this.newImportHandler = newImportHandler2;
 
       var semanticAnalyzer = new SemanticAnalyzer(result.statements, semanticAnalizerError =>
       {
         typeValidationFailed = true;
         semanticErrorHandler(semanticAnalizerError);
-      }, importHandler);
+      }, newImportHandler);
 
       semanticAnalyzer.Analyze();
 
@@ -145,7 +157,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
     throw new IllegalStateException("syntax was not list of Stmt");
   }
 
-  public string? Parse(string source, Action<ScanError> scanErrorHandler, Action<ParseError> parseErrorHandler)
+  public List<Stmt> Parse(string source, ScanErrorHandler scanErrorHandler, ParseErrorHandler parseErrorHandler)
   {
     // ... 
     // scanning phase
@@ -190,9 +202,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
     if (syntax is List<Stmt> stmts)
     {
-      StringBuilder result = new();
-
-      throw new NotImplementedException();
+      return stmts;
     }
     else
     {
@@ -409,6 +419,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
   public GSObject VisitCallExpr(Call expr)
   {
+    System.Console.WriteLine(expr.ToString());
     GSObject calle = Evaluate(expr.Calle);
 
     var arguments = new List<GSObject>();
@@ -762,7 +773,12 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
   public VoidObject VisitImportStmt(Import stmt)
   {
-    standardOutputHandler(importHandler((string)stmt.DirName.literal));
+    foreach (var item in newImportHandler((string)stmt.DirName.literal))
+    {
+      System.Console.WriteLine(item.ToString());
+    }
+
+    Interpret(newImportHandler((string)stmt.DirName.literal));
 
     return VoidObject.Void;
   }
