@@ -49,7 +49,7 @@ public class Scalar : GSObject
     public override GSObject OperateScalar(Scalar other, Mod op) 
         => Functions.Equal_Approx(other.value, 0) ? 
            throw new RuntimeError(null, "Zero Division Error") :
-           new Scalar(this.value / other.value);
+           new Scalar(this.value % other.value);
     
 
     public override GSObject OperateScalar(Scalar other, LessTh op)
