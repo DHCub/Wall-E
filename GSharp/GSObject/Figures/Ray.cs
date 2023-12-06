@@ -19,8 +19,8 @@ public class Ray : GeometricLocation
 
     public Ray(Point FirstPoint, Point SecondPoint)
     {
-        if (Functions.EqualVectorsApprox(FirstPoint, SecondPoint))
-            throw new RuntimeError(null, "Equal Points Cannot determine a Ray");
+        // if (Functions.EqualVectorsApprox(FirstPoint, SecondPoint))
+        //     throw new RuntimeError(null, "Equal Points Cannot determine a Ray");
 
         this.FirstPoint = FirstPoint;
         this.DirectorVector = SecondPoint - FirstPoint;

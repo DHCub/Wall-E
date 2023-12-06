@@ -29,8 +29,8 @@ public partial class Line : GeometricLocation
 
     public Line(Point APoint, Point BPoint)
     {
-        if (Functions.EqualVectorsApprox(APoint, BPoint))
-            throw new RuntimeError(null, "Equal Points Cannot determine a Line");
+        // if (Functions.EqualVectorsApprox(APoint, BPoint))
+        //     throw new RuntimeError(null, "Equal Points Cannot determine a Line");
         
         this.APoint = APoint;
         DirectorVector = BPoint - APoint;
