@@ -6,77 +6,77 @@ using GSharp.Exceptions;
 public partial class Line : GeometricLocation
 {
 
-    public readonly Point A_Point;
+    public readonly Point APoint;
 
-    public readonly Point Normal_Vector;
-    public readonly Point Director_Vector;
-    public readonly double Algebraic_Trace;
+    public readonly Point NormalVector;
+    public readonly Point DirectorVector;
+    public readonly double AlgebraicTrace;
 
     public override string ToString()
     {
-        return $"L:({Normal_Vector.X_Coord})x + ({Normal_Vector.Y_Coord})y + ({Algebraic_Trace}) = 0";
+        return $"L:({NormalVector.XCoord})x + ({NormalVector.YCoord})y + ({AlgebraicTrace}) = 0";
     }
 
     public Line()
     {
         (Point p1, Point p2) = Point.TwoDifferentPoints();
 
-        this.A_Point = p1;
-        Director_Vector = p2 - A_Point;
-        Normal_Vector = Director_Vector.Orthogonal();
-        Algebraic_Trace = -Normal_Vector.X_Coord*A_Point.X_Coord - Normal_Vector.Y_Coord*A_Point.Y_Coord;
+        this.APoint = p1;
+        DirectorVector = p2 - APoint;
+        NormalVector = DirectorVector.Orthogonal();
+        AlgebraicTrace = -NormalVector.XCoord*APoint.XCoord - NormalVector.YCoord*APoint.YCoord;
     }
 
-    public Line(Point A_Point, Point B_Point)
+    public Line(Point APoint, Point BPoint)
     {
-        if (Functions.Equal_Vectors_Approx(A_Point, B_Point))
+        if (Functions.EqualVectorsApprox(APoint, BPoint))
             throw new RuntimeError(null, "Equal Points Cannot determine a Line");
         
-        this.A_Point = A_Point;
-        Director_Vector = B_Point - A_Point;
-        Normal_Vector = Director_Vector.Orthogonal();
-        Algebraic_Trace = -Normal_Vector.X_Coord*A_Point.X_Coord - Normal_Vector.Y_Coord*A_Point.Y_Coord; 
+        this.APoint = APoint;
+        DirectorVector = BPoint - APoint;
+        NormalVector = DirectorVector.Orthogonal();
+        AlgebraicTrace = -NormalVector.XCoord*APoint.XCoord - NormalVector.YCoord*APoint.YCoord; 
     }
 
     public Line(double A, double B, double C)
     {
-        var a0 = Functions.Equal_Approx(A, 0);
-        if (a0 && Functions.Equal_Approx(B, 0))
+        var a0 = Functions.EqualApprox(A, 0);
+        if (a0 && Functions.EqualApprox(B, 0))
             throw new ArgumentException("Invalid Coefficients");
         
-        this.Normal_Vector = new Point(A, B);
-        this.Director_Vector = this.Normal_Vector.Orthogonal();
-        this.Algebraic_Trace = C;
+        this.NormalVector = new Point(A, B);
+        this.DirectorVector = this.NormalVector.Orthogonal();
+        this.AlgebraicTrace = C;
         
         if (a0)
-            this.A_Point = new Point(0, -C/B);
-        else this.A_Point = new Point(-C/A, 0);
+            this.APoint = new Point(0, -C/B);
+        else this.APoint = new Point(-C/A, 0);
     }
 
-    public static Line Point_DirectorVec(Point Point, Point Direction_Vector)
-        => new(Point, Point + Direction_Vector);
+    public static Line PointDirectorVec(Point Point, Point DirectionVector)
+        => new(Point, Point + DirectionVector);
 
     public override Point Sample()
     {
-        var A = this.Normal_Vector.X_Coord;
-        var B = this.Normal_Vector.Y_Coord;
-        var C = this.Algebraic_Trace;
+        var A = this.NormalVector.XCoord;
+        var B = this.NormalVector.YCoord;
+        var C = this.AlgebraicTrace;
 
-        if(Functions.Greater_Than_Approx(Math.Abs(A), Math.Abs(B)))
+        if(Functions.GreaterThanApprox(Math.Abs(A), Math.Abs(B)))
         {
-            var y = Figure.rnd.RandDoubleRange(Figure.Window_StartY, Figure.Window_EndY);
+            var y = Figure.rnd.RandDoubleRange(Figure.WindowStartY, Figure.WindowEndY);
 
             return new Point(-C/A - B/A*y, y);
         }
 
-        var x = Figure.rnd.RandDoubleRange(Figure.Window_StartX, Figure.Window_EndX); 
+        var x = Figure.rnd.RandDoubleRange(Figure.WindowStartX, Figure.WindowEndX); 
         return new Point(x, -C/B - A/B*x);
     }
 
     public override bool Equals(GSObject obj) => 
         obj is Line L && 
-            L.Director_Vector.IsColinear(this.Director_Vector) && 
-            Functions.Intersect(this.A_Point, L).Count > 0;
+            L.DirectorVector.IsColinear(this.DirectorVector) && 
+            Functions.Intersect(this.APoint, L).Count > 0;
 
     public override string GetTypeName() => TypeName.Line.ToString();
 
