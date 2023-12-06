@@ -102,8 +102,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
         semanticErrorHandler(semanticAnalizerError);
       });
 
-      // semanticAnalyzer.Analyze();
-
+      semanticAnalyzer.Analyze();
 
       if (typeValidationFailed)
       {
@@ -608,7 +607,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
       int cntConsts = stmt.Names.Count;
       for (int i = 0; i < cntConsts - 1; i++)
       {
-        if ((string)stmt.Names[i].literal == "_")
+        if ((string)stmt.Names[i].literal != "_")
           currentEnvironment.Define(stmt.Names[i], valueSeq[i]);
       }
 
@@ -684,7 +683,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
     GSObject? value = Evaluate(stmt.Expression);
     if (stmt.Label is not null)
     {
-      standardOutputHandler(stmt.Label.lexeme + ": " + value.ToString());
+      standardOutputHandler(stmt.Label.literal + ": " + value.ToString());
     }
     else
     {

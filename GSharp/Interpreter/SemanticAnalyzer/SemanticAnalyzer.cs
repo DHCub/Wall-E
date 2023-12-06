@@ -468,10 +468,10 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
   public GSType VisitIntRangeExpr(IntRange intRange)
   {
     const string ERROR = " limit in range expression must be integer literal";
-    var L = (double)intRange.Left.literal;
+    var L = double.Parse((string)intRange.Left.literal);
     if (!double.IsInteger(L))
       errorHandler(new(intRange.Left, "Left" + ERROR));
-    if (intRange.Right != null && !double.IsInteger((double)intRange.Right.literal))
+    if (intRange.Right != null && !double.IsInteger(double.Parse((string)intRange.Right.literal)))
       errorHandler(new(intRange.Left, "Right" + ERROR));
 
     return new SequenceType(TypeName.Scalar);
