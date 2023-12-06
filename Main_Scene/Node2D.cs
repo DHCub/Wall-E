@@ -37,8 +37,8 @@ public partial class Node2D : Godot.Node2D
 
         void draw_segment(Line L, Point P1, Point P2, Godot.Color color, bool P1_inf = false, bool P2_inf = false)
         {
-            if (Functions.EqualVectorsApprox(P1, P2)) 
-                throw new ArgumentException("Cannot Draw Line Passing Through Equal Points");
+            // if (Functions.EqualVectorsApprox(P1, P2)) 
+            //     throw new ArgumentException("Cannot Draw Line Passing Through Equal Points");
             
             if (Functions.GreaterThanApprox(P1.XCoord, P2.XCoord)) 
             {
