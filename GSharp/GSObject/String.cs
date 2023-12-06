@@ -13,7 +13,7 @@ public class String : GSObject
   }
 
   public override string ToString()
-      => $"\"{this.value}\"";
+      => $"{this.value}";
 
   public override string GetTypeName()
       => TypeName.String.ToString();

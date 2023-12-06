@@ -675,7 +675,9 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
   public VoidObject VisitImportStmt(Import stmt)
   {
-    throw new NotImplementedException();
+    standardOutputHandler(importHandler(stmt.DirName.lexeme));
+
+    return VoidObject.Void;
   }
 
   public VoidObject VisitPrintStmt(Print stmt)
@@ -683,7 +685,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
     GSObject? value = Evaluate(stmt.Expression);
     if (stmt.Label is not null)
     {
-      standardOutputHandler(stmt.Label.lexeme + ": " + value.ToString());
+      standardOutputHandler(stmt.Label.literal + ": " + value.ToString());
     }
     else
     {
