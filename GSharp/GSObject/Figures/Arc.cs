@@ -42,6 +42,15 @@ public class Arc : GeometricLocation
     Angle = (A - Center).AngleTo(B - Center);
   }
 
+  public Arc(Point Center, Point A, Point B, double Radius)
+  {
+    this.Radius = Radius;
+    this.Center = Center;
+    this.Start_Ray = new(Center, A);
+
+    Angle = (A - Center).AngleTo(B - Center);
+  }
+
   public override Point Sample()
   {
     var newAngle = Figure.rnd.RandDoubleRange(0, Angle);
