@@ -21,21 +21,21 @@ public abstract class Figure : GSObject
 {
     public static RandomNumberGenerator rnd = new();
 
-    public static double Window_StartX { get; private set; }
-    public static double Window_EndX { get; private set; }
-    public static double Window_StartY { get; private set; }
-    public static double Window_EndY { get; private set; }
+    public static double WindowStartX { get; private set; }
+    public static double WindowEndX { get; private set; }
+    public static double WindowStartY { get; private set; }
+    public static double WindowEndY { get; private set; }
 
     public static double ZoomFactor { get; private set; }
 
-    public const double Point_Representation_Radius = 5;
+    public const double PointRepresentationRadius = 5;
 
     public static void UpdateWindow(double startX, double endX, double startY, double endY, double zoomFactor)
     {
-        Window_StartX = startX;
-        Window_StartY = startY;
-        Window_EndX = endX;
-        Window_EndY = endY;
+        WindowStartX = startX;
+        WindowStartY = startY;
+        WindowEndX = endX;
+        WindowEndY = endY;
         ZoomFactor = zoomFactor;
     }
     public abstract Point Sample();

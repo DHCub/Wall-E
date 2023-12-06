@@ -154,21 +154,21 @@ public abstract class GSObject : IOperate<Add>,
     {
         (bool isInteger, int val) GetInteger(double d)
         {
-            if (Functions.Equal_Approx(d, double.Floor(d))) return (true, (int)double.Floor(d));
-            if (Functions.Equal_Approx(d, double.Ceiling(d))) return (true, (int)double.Ceiling(d));
+            if (Functions.EqualApprox(d, double.Floor(d))) return (true, (int)double.Floor(d));
+            if (Functions.EqualApprox(d, double.Ceiling(d))) return (true, (int)double.Ceiling(d));
 
             return (false, default);
         }
 
         if (this is Scalar thisScalar)
         {
-            if (Functions.Equal_Approx(other.value, 0)) return new Scalar(1);
-            if (Functions.Equal_Approx(thisScalar.value, 0))
+            if (Functions.EqualApprox(other.value, 0)) return new Scalar(1);
+            if (Functions.EqualApprox(thisScalar.value, 0))
             {
-                if (Functions.Greater_Than_Approx(other.value, 0)) return new Scalar(0);
+                if (Functions.GreaterThanApprox(other.value, 0)) return new Scalar(0);
                 throw new RuntimeError(null, "Tried to elevate 0 to a negative exponent");
             }
-            if (Functions.Less_Than_Approx(thisScalar.value, 0))
+            if (Functions.LessThanApprox(thisScalar.value, 0))
             {
                 var (isInteger, val) = GetInteger(other.value);
                 if (!isInteger) throw new RuntimeError(null, "Tried to elevate a negative number to a non-integer exponent");

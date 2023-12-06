@@ -18,11 +18,11 @@ public class Measure : GSObject
     {
         if (obj is Measure measure)
         {
-            return Functions.Equal_Approx(Math.Abs(measure.value), this.value);
+            return Functions.EqualApprox(Math.Abs(measure.value), this.value);
         }
         if (obj is Scalar scalar)
         {
-            return Functions.Equal_Approx(Math.Abs(scalar.value), this.value);
+            return Functions.EqualApprox(Math.Abs(scalar.value), this.value);
         }
 
         return false;
@@ -41,14 +41,14 @@ public class Measure : GSObject
     public override GSObject OperateScalar(Scalar other, Mult op) => new Measure(this.value * Math.Floor(other.value));
     public override GSObject OperateScalar(Scalar other, Div op) => new Measure(this.value / Math.Floor(other.value));
     public override GSObject OperateScalar(Scalar other, Mod op) => UnsupportedOperError(other, op);
-    public override GSObject OperateScalar(Scalar other, LessTh op) => new Scalar(Functions.Less_Than_Approx(this.value, Math.Abs(other.value)));
+    public override GSObject OperateScalar(Scalar other, LessTh op) => new Scalar(Functions.LessThanApprox(this.value, Math.Abs(other.value)));
 
 
     public override GSObject OperateMeasure(Measure other, Add op) => new Measure(this.value + other.value);
     public override GSObject OperateMeasure(Measure other, Subst op) => new Measure(this.value - other.value);
     public override GSObject OperateMeasure(Measure other, Mult op) => UnsupportedOperError(other, op);
     public override GSObject OperateMeasure(Measure other, Div op) => new Scalar(Math.Floor(this.value / other.value));
-    public override GSObject OperateMeasure(Measure other, LessTh op) => new Scalar(Functions.Less_Than_Approx(this.value, other.value));
+    public override GSObject OperateMeasure(Measure other, LessTh op) => new Scalar(Functions.LessThanApprox(this.value, other.value));
     public override GSObject OperateMeasure(Measure other, Mod op) => UnsupportedOperError(other, op);
 
     public override GSObject OperateFiniteStaticSequence(FiniteStaticSequence other, Add op) => UnsupportedOperError(other, op);

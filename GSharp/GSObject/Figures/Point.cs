@@ -4,78 +4,78 @@ using GSharp.Types;
 using GSharp.Exceptions;
 public class Point : Figure
 {
-    public readonly double X_Coord;
-    public readonly double Y_Coord;
+    public readonly double XCoord;
+    public readonly double YCoord;
     public double Norm
     {
         get
         {
-            return Math.Sqrt(this.X_Coord * this.X_Coord + this.Y_Coord * this.Y_Coord);
+            return Math.Sqrt(this.XCoord * this.XCoord + this.YCoord * this.YCoord);
         }
     }
 
 
     public override string ToString()
     {
-        return $"({X_Coord}, {Y_Coord})";
+        return $"({XCoord}, {YCoord})";
     }
 
     public Point() : this(
-        Figure.rnd.RandDoubleRange(Figure.Window_StartX, Figure.Window_EndX),
-        Figure.rnd.RandDoubleRange(Figure.Window_StartY, Figure.Window_EndY))
+        Figure.rnd.RandDoubleRange(Figure.WindowStartX, Figure.WindowEndX),
+        Figure.rnd.RandDoubleRange(Figure.WindowStartY, Figure.WindowEndY))
     { }
 
-    public Point(double X_Coord, double Y_Coord)
+    public Point(double XCoord, double YCoord)
     {
-        this.X_Coord = X_Coord;
-        this.Y_Coord = Y_Coord;
+        this.XCoord = XCoord;
+        this.YCoord = YCoord;
     }
 
     public static Point operator -(Point A, Point B)
-        => new(A.X_Coord - B.X_Coord, A.Y_Coord - B.Y_Coord);
+        => new(A.XCoord - B.XCoord, A.YCoord - B.YCoord);
 
     public static Point operator +(Point A, Point B)
-        => new(A.X_Coord + B.X_Coord, A.Y_Coord + B.Y_Coord);
+        => new(A.XCoord + B.XCoord, A.YCoord + B.YCoord);
 
     public static Point operator *(double alpha, Point A)
-        => new(A.X_Coord * alpha, A.Y_Coord * alpha);
+        => new(A.XCoord * alpha, A.YCoord * alpha);
 
     public static Point operator *(Point A, double alpha)
-        => new(A.X_Coord * alpha, A.Y_Coord * alpha);
+        => new(A.XCoord * alpha, A.YCoord * alpha);
 
     public static Point operator /(Point P, double alpha)
-        => new(P.X_Coord / alpha, P.Y_Coord / alpha);
+        => new(P.XCoord / alpha, P.YCoord / alpha);
 
-    public double Dot_Product(Point other) => this.X_Coord * other.X_Coord + this.Y_Coord * other.Y_Coord;
+    public double DotProduct(Point other) => this.XCoord * other.XCoord + this.YCoord * other.YCoord;
 
     public bool IsColinear(Point other)
     {
         if (this.isOrigin() || other.isOrigin()) return true;
-        var cos = this.Dot_Product(other);
-        var norm_Mult = this.Norm * other.Norm;
+        var cos = this.DotProduct(other);
+        var normMult = this.Norm * other.Norm;
 
-        return Functions.Equal_Approx(cos, -norm_Mult) || Functions.Equal_Approx(cos, norm_Mult);
+        return Functions.EqualApprox(cos, -normMult) || Functions.EqualApprox(cos, normMult);
     }
 
     public bool isOrigin()
-        => Functions.Equal_Approx(this.X_Coord, 0) && Functions.Equal_Approx(this.Y_Coord, 0);
+        => Functions.EqualApprox(this.XCoord, 0) && Functions.EqualApprox(this.YCoord, 0);
 
     public double AngleTo(Point other)
     {
-        var cos_times_Norm = this.Dot_Product(other);
-        var sin_times_Norm = this.X_Coord * other.Y_Coord - this.Y_Coord * other.X_Coord;
+        var cosTimesNorm = this.DotProduct(other);
+        var sinTimesNorm = this.XCoord * other.YCoord - this.YCoord * other.XCoord;
 
-        var angle = Math.Atan2(sin_times_Norm, cos_times_Norm);
+        var angle = Math.Atan2(sinTimesNorm, cosTimesNorm);
         if (angle < 0) angle = angle + 2 * Math.PI;
 
         return angle;
     }
 
     public Point Orthogonal()
-        => new(this.Y_Coord, -this.X_Coord);
+        => new(this.YCoord, -this.XCoord);
 
-    public bool Equal_Approx(Point other)
-        => Functions.Equal_Vectors_Approx(this, other);
+    public bool EqualApprox(Point other)
+        => Functions.EqualVectorsApprox(this, other);
 
     public double DistanceTo(Point other)
         => Functions.Distance(this, other);
@@ -85,8 +85,8 @@ public class Point : Figure
 
     public Point GetRotatedAsVector(double Angle)
     {
-        var x2 = Math.Cos(Angle) * X_Coord - Math.Sin(Angle) * Y_Coord;
-        var y2 = Math.Sin(Angle) * X_Coord + Math.Cos(Angle) * Y_Coord;
+        var x2 = Math.Cos(Angle) * XCoord - Math.Sin(Angle) * YCoord;
+        var y2 = Math.Sin(Angle) * XCoord + Math.Cos(Angle) * YCoord;
 
         return new(x2, y2);
     }
@@ -98,7 +98,7 @@ public class Point : Figure
         Point p1 = new();
         Point p2 = new();
 
-        if (!Functions.Equal_Vectors_Approx(p1, p2)) return (p1, p2);
+        if (!Functions.EqualVectorsApprox(p1, p2)) return (p1, p2);
 
         p2 = new Point(1E-7, 0);
         p2 = p2.GetRotatedAsVector(Figure.rnd.RandDoubleRange(0, (2 * Math.PI)));
@@ -110,7 +110,7 @@ public class Point : Figure
 
     public override string GetTypeName() => TypeName.Point.ToString();
 
-    public override bool Equals(GSObject obj) => obj is Point P && Functions.Equal_Vectors_Approx(this, P);
+    public override bool Equals(GSObject obj) => obj is Point P && Functions.EqualVectorsApprox(this, P);
 
     public override bool SameTypeAs(GSObject gso) => gso is Point;
 

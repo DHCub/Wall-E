@@ -12,14 +12,14 @@ public partial class Circle : GeometricLocation
     {
         this.Center = new Point();
 
-        double XMin = Math.Abs(Center.X_Coord - Figure.Window_StartX);
-        XMin = Math.Min(XMin, Math.Abs(Center.X_Coord - Figure.Window_EndX));
+        double XMin = Math.Abs(Center.XCoord - Figure.WindowStartX);
+        XMin = Math.Min(XMin, Math.Abs(Center.XCoord - Figure.WindowEndX));
 
-        double YMin = Math.Abs(Center.Y_Coord - Figure.Window_StartY);
-        YMin = Math.Min(YMin, Math.Abs(Center.Y_Coord - Figure.Window_EndY));
+        double YMin = Math.Abs(Center.YCoord - Figure.WindowStartY);
+        YMin = Math.Min(YMin, Math.Abs(Center.YCoord - Figure.WindowEndY));
 
         double rad = Math.Min(XMin, YMin);
-        rad = Math.Max(rad, 10 * Figure.Point_Representation_Radius / Figure.ZoomFactor);
+        rad = Math.Max(rad, 10 * Figure.PointRepresentationRadius / Figure.ZoomFactor);
 
         this.Radius = rad;
     }
@@ -44,7 +44,7 @@ public partial class Circle : GeometricLocation
     }
 
     public override bool Equals(GSObject obj) 
-        => obj is Circle C && Functions.Equal_Vectors_Approx(C.Center, this.Center) && Functions.Equal_Approx(this.Radius, C.Radius);
+        => obj is Circle C && Functions.EqualVectorsApprox(C.Center, this.Center) && Functions.EqualApprox(this.Radius, C.Radius);
 
 
 

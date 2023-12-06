@@ -32,23 +32,23 @@ public partial class Node2D : Godot.Node2D
 
         // DrawCircle(container.Size/2, PointRadius, Colors.Green);
         Godot.Vector2 GetVect2(Point P) {
-            return new Godot.Vector2((float)P.X_Coord, (float)P.Y_Coord);
+            return new Godot.Vector2((float)P.XCoord, (float)P.YCoord);
         }
 
         void draw_segment(Line L, Point P1, Point P2, Godot.Color color, bool P1_inf = false, bool P2_inf = false)
         {
-            if (Functions.Equal_Vectors_Approx(P1, P2)) 
+            if (Functions.EqualVectorsApprox(P1, P2)) 
                 throw new ArgumentException("Cannot Draw Line Passing Through Equal Points");
             
-            if (Functions.Greater_Than_Approx(P1.X_Coord, P2.X_Coord)) 
+            if (Functions.GreaterThanApprox(P1.XCoord, P2.XCoord)) 
             {
                 draw_segment(L, P2, P1, color, P2_inf, P1_inf);
                 return;
             }
 
-            if (Functions.Equal_Approx(P1.X_Coord, P2.X_Coord))
+            if (Functions.EqualApprox(P1.XCoord, P2.XCoord))
             {
-                if (Functions.Greater_Than_Approx(P1.Y_Coord , P2.Y_Coord))
+                if (Functions.GreaterThanApprox(P1.YCoord , P2.YCoord))
                 {
                     draw_segment(L, P2, P1, color, P2_inf, P1_inf);
                     return;
@@ -57,29 +57,29 @@ public partial class Node2D : Godot.Node2D
 
             // P1 is left, bottom, P2 is right, top
 
-            double x1 = P1.X_Coord;
-            double x2 = P2.X_Coord;
+            double x1 = P1.XCoord;
+            double x2 = P2.XCoord;
             
-            double y1 = P1.Y_Coord;
-            double y2 = P2.Y_Coord;
+            double y1 = P1.YCoord;
+            double y2 = P2.YCoord;
             
-            double A = L.Normal_Vector.X_Coord;
-            double B = L.Normal_Vector.Y_Coord;
-            double C = L.Algebraic_Trace;
+            double A = L.NormalVector.XCoord;
+            double B = L.NormalVector.YCoord;
+            double C = L.AlgebraicTrace;
 
-            double Window_X_Size = Figure.Window_EndX - Figure.Window_StartX;
-            double Window_Y_Size = Figure.Window_EndY - Figure.Window_StartY;
+            double Window_X_Size = Figure.WindowEndX - Figure.WindowStartX;
+            double Window_Y_Size = Figure.WindowEndY - Figure.WindowStartY;
 
-            if (Functions.Greater_Than_Approx(Math.Abs(A), Math.Abs(B)))
+            if (Functions.GreaterThanApprox(Math.Abs(A), Math.Abs(B)))
             {
                 if (P1_inf)
                 {
-                    y1 = Figure.Window_StartY - Window_Y_Size/2;
+                    y1 = Figure.WindowStartY - Window_Y_Size/2;
                     x1 = -C/A - B/A*y1;
                 }
                 if (P2_inf)
                 {
-                    y2 = Figure.Window_EndY + Window_Y_Size/2;
+                    y2 = Figure.WindowEndY + Window_Y_Size/2;
                     x2 = -C/A - B/A*y2;
                 }
             }
@@ -87,14 +87,14 @@ public partial class Node2D : Godot.Node2D
             {
                 if (P1_inf)
                 {
-                    x1 = Figure.Window_StartX - Window_X_Size/2;
-                    if (!Functions.Equal_Approx(B, 0)) y1 = -C/B - A/B*x1;
+                    x1 = Figure.WindowStartX - Window_X_Size/2;
+                    if (!Functions.EqualApprox(B, 0)) y1 = -C/B - A/B*x1;
                 }
 
                 if (P2_inf)
                 {
-                    x2 = Figure.Window_EndX + Window_Y_Size/2;
-                    if (!Functions.Equal_Approx(B, 0)) y2 = -C/B - A/B*x2;
+                    x2 = Figure.WindowEndX + Window_Y_Size/2;
+                    if (!Functions.EqualApprox(B, 0)) y2 = -C/B - A/B*x2;
                 }
             }
 
@@ -146,8 +146,8 @@ public partial class Node2D : Godot.Node2D
             {
                 draw_segment(
                     L,
-                    L.A_Point,
-                    L.A_Point + L.Director_Vector,
+                    L.APoint,
+                    L.APoint + L.DirectorVector,
                     color,
                     true,
                     true
@@ -156,9 +156,9 @@ public partial class Node2D : Godot.Node2D
             else if (drawable is Ray R)
             {
                 draw_segment(
-                    Line.Point_DirectorVec(R.First_Point, R.Director_Vector),
-                    R.First_Point,
-                    R.First_Point + R.Director_Vector,
+                    Line.PointDirectorVec(R.FirstPoint, R.DirectorVector),
+                    R.FirstPoint,
+                    R.FirstPoint + R.DirectorVector,
                     color,
                     false,
                     true
@@ -166,7 +166,7 @@ public partial class Node2D : Godot.Node2D
             }
             else if (drawable is Segment S)
             {
-                draw_segment(new Line(S.A_Point, S.B_Point), S.A_Point, S.B_Point, color);
+                draw_segment(new Line(S.APoint, S.BPoint), S.APoint, S.BPoint, color);
             }
             else if (drawable is Circle Circle)
             {
@@ -183,7 +183,7 @@ public partial class Node2D : Godot.Node2D
             }
             else if (drawable is Arc Arc)
             {
-                var start_angle = new Point(1, 0).AngleTo(Arc.Start_Ray.Director_Vector);
+                var start_angle = new Point(1, 0).AngleTo(Arc.Start_Ray.DirectorVector);
 
 
                 DrawArc(

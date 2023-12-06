@@ -8,12 +8,12 @@ using System.Collections.Generic;
 
 static class Functions
 {
-  public static double Distance(Point Point_A, Point Point_B)
-      => (Point_B - Point_A).Norm;
+  public static double Distance(Point PointA, Point PointB)
+      => (PointB - PointA).Norm;
 
   public static double Distance(Point Point, Line L)
-      => Math.Abs(L.Normal_Vector.X_Coord * Point.X_Coord + L.Normal_Vector.Y_Coord * Point.X_Coord + L.Algebraic_Trace) /
-         L.Normal_Vector.Norm;
+      => Math.Abs(L.NormalVector.XCoord * Point.XCoord + L.NormalVector.YCoord * Point.XCoord + L.AlgebraicTrace) /
+         L.NormalVector.Norm;
 
   public static double Distance(Line L, Point P)
       => Distance(P, L);
@@ -23,7 +23,7 @@ static class Functions
     if (A is Point P)
     {
       if (B is Point P2)
-        if (Equal_Vectors_Approx(P, P2))
+        if (EqualVectorsApprox(P, P2))
           return new FiniteStaticSequence(new Point[] { P });
         else return new FiniteStaticSequence();
 
@@ -127,8 +127,8 @@ static class Functions
 
   public static FiniteStaticSequence Intersect(Point Point, Segment S)
   {
-    Ray R1 = new(S.A_Point, S.B_Point);
-    Ray R2 = new(S.B_Point, S.A_Point);
+    Ray R1 = new(S.APoint, S.BPoint);
+    Ray R2 = new(S.BPoint, S.APoint);
 
     var intersect = Intersect(Point, R1);
     if (intersect.Count == 0) return new();
@@ -138,7 +138,7 @@ static class Functions
 
   public static FiniteStaticSequence Intersect(Point Point, Circle C)
   {
-    if (Equal_Approx(Distance(Point, C.Center), C.Radius))
+    if (EqualApprox(Distance(Point, C.Center), C.Radius))
       return new FiniteStaticSequence(new Point[] { Point });
 
     return new FiniteStaticSequence();
@@ -148,10 +148,10 @@ static class Functions
   {
     var list = new List<Objects.GSObject>();
 
-    if (Equal_Approx(Distance(Point, A.Center), A.Radius))
+    if (EqualApprox(Distance(Point, A.Center), A.Radius))
     {
       var CP_Vector = Point - A.Center;
-      if (Less_Equal_Approx(A.Start_Ray.Director_Vector.AngleTo(CP_Vector), A.Angle)) list.Add(Point);
+      if (LessEqualApprox(A.Start_Ray.DirectorVector.AngleTo(CP_Vector), A.Angle)) list.Add(Point);
     }
 
     return new FiniteStaticSequence(list);
@@ -163,7 +163,7 @@ static class Functions
 
   public static FiniteStaticSequence Intersect(Line L, Point Point)
   {
-    if ((L.A_Point - Point).IsColinear(L.Director_Vector))
+    if ((L.APoint - Point).IsColinear(L.DirectorVector))
       return new FiniteStaticSequence(new List<Objects.GSObject>(new Point[] { Point }));
 
     return new FiniteStaticSequence();
@@ -172,20 +172,20 @@ static class Functions
 
   public static Sequence Intersect(Line A, Line B)
   {
-    double A1 = A.Normal_Vector.X_Coord;
-    double B1 = A.Normal_Vector.Y_Coord;
-    double C1 = -A.Algebraic_Trace;
+    double A1 = A.NormalVector.XCoord;
+    double B1 = A.NormalVector.YCoord;
+    double C1 = -A.AlgebraicTrace;
 
-    double A2 = B.Normal_Vector.X_Coord;
-    double B2 = B.Normal_Vector.Y_Coord;
-    double C2 = -B.Algebraic_Trace;
+    double A2 = B.NormalVector.XCoord;
+    double B2 = B.NormalVector.YCoord;
+    double C2 = -B.AlgebraicTrace;
 
     double Determinant = A1 * B2 - B1 * A2;
     // paralell lines
-    if (Equal_Approx(Determinant, 0))
+    if (EqualApprox(Determinant, 0))
     {
       // same lines
-      if (Equal_Approx(C1, C2))
+      if (EqualApprox(C1, C2))
         return new InfiniteStaticSequence();
 
       // no intersection
@@ -201,7 +201,7 @@ static class Functions
 
   public static Sequence Intersect(Line A, Ray R)
   {
-    Line R_Line = Line.Point_DirectorVec(R.First_Point, R.Director_Vector);
+    Line R_Line = Line.PointDirectorVec(R.FirstPoint, R.DirectorVector);
     var Line_intersect = Intersect(A, R_Line);
 
     if (Line_intersect is FiniteStaticSequence)
@@ -220,7 +220,7 @@ static class Functions
 
   public static Sequence Intersect(Line A, Segment S)
   {
-    Line S_Line = new(S.A_Point, S.B_Point);
+    Line S_Line = new(S.APoint, S.BPoint);
 
     var line_intersection = Intersect(A, S_Line);
 
@@ -238,7 +238,7 @@ static class Functions
   public static FiniteStaticSequence Intersect(Line L, Circle C)
   {
 
-    if (Equal_Approx(C.Radius, 0))
+    if (EqualApprox(C.Radius, 0))
     {
       return Intersect(L, C.Center);
     }
@@ -252,32 +252,32 @@ static class Functions
 
 
     // we move the circle to the origin, we move the line with it
-    var L_Prime = Line.Point_DirectorVec(L.A_Point - C.Center, L.Director_Vector);
+    var L_Prime = Line.PointDirectorVec(L.APoint - C.Center, L.DirectorVector);
 
     var origin = new Point(0, 0);
     // here we are taking the point in L which is closest to the origin
-    var Line_Point = (Point)Intersect(Line.Point_DirectorVec(origin, L_Prime.Normal_Vector), L_Prime)[0]!;
+    var Line_Point = (Point)Intersect(Line.PointDirectorVec(origin, L_Prime.NormalVector), L_Prime)[0]!;
     // this will not be null because perpendicular lines always intersect
 
 
     var list = new List<Objects.GSObject>();
 
-    if (!Equal_Vectors_Approx(Line_Point, origin))
+    if (!EqualVectorsApprox(Line_Point, origin))
     {
       var d = Distance(Line_Point, origin);
-      if (Equal_Approx(d, C.Radius))
+      if (EqualApprox(d, C.Radius))
       {
         // this would mean the line is tangent to the centered circumference
         list.Add(Line_Point + C.Center);
         return new FiniteStaticSequence(list);
       }
-      if (Greater_Than_Approx(d, C.Radius))
+      if (GreaterThanApprox(d, C.Radius))
         return new FiniteStaticSequence();
 
 
       var Point_To_Intersection_D = Math.Sqrt(C.Radius * C.Radius - d * d);
 
-      var scaled_Direction = scale_Vector(L.Director_Vector, Point_To_Intersection_D);
+      var scaled_Direction = scale_Vector(L.DirectorVector, Point_To_Intersection_D);
 
       list.Add(Line_Point + scaled_Direction + C.Center);
       list.Add(Line_Point - scaled_Direction + C.Center);
@@ -286,7 +286,7 @@ static class Functions
     }
 
 
-    var radius_Vector = scale_Vector(L.Director_Vector, C.Radius);
+    var radius_Vector = scale_Vector(L.DirectorVector, C.Radius);
 
     list.Add(origin + radius_Vector + C.Center);
     list.Add(origin - radius_Vector + C.Center);
@@ -307,7 +307,7 @@ static class Functions
     foreach (var P in intersection)
     {
       var CP_Vector = (Point)P - A.Center;
-      if (Less_Equal_Approx(A.Start_Ray.Director_Vector.AngleTo(CP_Vector), A.Angle)) list.Add(P);
+      if (LessEqualApprox(A.Start_Ray.DirectorVector.AngleTo(CP_Vector), A.Angle)) list.Add(P);
     }
 
     return new FiniteStaticSequence(list);
@@ -319,11 +319,11 @@ static class Functions
 
   public static FiniteStaticSequence Intersect(Ray R, Point Point)
   {
-    var AP_vector = Point - R.First_Point;
+    var AP_vector = Point - R.FirstPoint;
 
-    if (!AP_vector.IsColinear(R.Director_Vector)) return new FiniteStaticSequence();
+    if (!AP_vector.IsColinear(R.DirectorVector)) return new FiniteStaticSequence();
 
-    if (Less_Than_Approx(AP_vector.Dot_Product(R.Director_Vector), 0)) return new FiniteStaticSequence();
+    if (LessThanApprox(AP_vector.DotProduct(R.DirectorVector), 0)) return new FiniteStaticSequence();
     else return new FiniteStaticSequence(new Point[] { Point });
   }
 
@@ -332,8 +332,8 @@ static class Functions
 
   public static Sequence Intersect(Ray R, Ray B)
   {
-    var Line_A = Line.Point_DirectorVec(R.First_Point, R.Director_Vector);
-    var Line_B = Line.Point_DirectorVec(B.First_Point, B.Director_Vector);
+    var Line_A = Line.PointDirectorVec(R.FirstPoint, R.DirectorVector);
+    var Line_B = Line.PointDirectorVec(B.FirstPoint, B.DirectorVector);
 
     var Line_intersect = Functions.Intersect(Line_A, Line_B);
 
@@ -357,7 +357,7 @@ static class Functions
 
   public static Sequence Intersect(Ray R, Segment S)
   {
-    var line_intersect = Intersect(new Line(R.First_Point, R.First_Point + R.Director_Vector), S);
+    var line_intersect = Intersect(new Line(R.FirstPoint, R.FirstPoint + R.DirectorVector), S);
 
     if (line_intersect is FiniteStaticSequence intersect)
     {
@@ -372,7 +372,7 @@ static class Functions
 
   public static FiniteStaticSequence Intersect(Ray R, Circle C)
   {
-    var Line_R = Line.Point_DirectorVec(R.First_Point, R.Director_Vector);
+    var Line_R = Line.PointDirectorVec(R.FirstPoint, R.DirectorVector);
 
     var intersection = Intersect(Line_R, C);
 
@@ -419,8 +419,8 @@ static class Functions
 
   public static Sequence Intersect(Segment S1, Segment S2)
   {
-    Ray R1 = new(S1.A_Point, S1.B_Point);
-    Ray R2 = new(S1.B_Point, S1.A_Point);
+    Ray R1 = new(S1.APoint, S1.BPoint);
+    Ray R2 = new(S1.BPoint, S1.APoint);
 
     var ray_intersect = Intersect(R1, S2);
     if (ray_intersect is FiniteStaticSequence intersect)
@@ -436,7 +436,7 @@ static class Functions
   {
     List<Objects.GSObject> list = new(2);
 
-    foreach (var P in Intersect(new Line(S.A_Point, S.B_Point), C))
+    foreach (var P in Intersect(new Line(S.APoint, S.BPoint), C))
     {
       if (Intersect((Point)P, S).Count > 0) list.Add(P);
     }
@@ -476,20 +476,20 @@ static class Functions
 
   public static Sequence Intersect(Circle C1, Circle C2)
   {
-    if (Equal_Vectors_Approx(C1.Center, C2.Center))
+    if (EqualVectorsApprox(C1.Center, C2.Center))
     {
-      if (Equal_Approx(C1.Radius, C2.Radius))
+      if (EqualApprox(C1.Radius, C2.Radius))
         return new InfiniteStaticSequence();
 
       return new FiniteStaticSequence();
     }
 
-    var k1 = C1.Center.X_Coord;
-    var h1 = C1.Center.Y_Coord;
+    var k1 = C1.Center.XCoord;
+    var h1 = C1.Center.YCoord;
     var r1 = C1.Radius;
 
-    var k2 = C2.Center.X_Coord;
-    var h2 = C2.Center.Y_Coord;
+    var k2 = C2.Center.XCoord;
+    var h2 = C2.Center.YCoord;
     var r2 = C2.Radius;
 
     var A = 2 * (k2 - k1);
@@ -559,7 +559,7 @@ static class Functions
 
   #region Comparers
 
-  public static int Approx_Compare_Double(double A, double B)
+  public static int ApproxCompareDouble(double A, double B)
   {
     const double Epsilon = 1E-9;
     if (Math.Abs(A - B) <= Epsilon) return 0;
@@ -568,13 +568,13 @@ static class Functions
     return 1;
   }
 
-  public static bool Greater_Than_Approx(double A, double B) => Approx_Compare_Double(A, B) == 1;
-  public static bool Less_Than_Approx(double A, double B) => Approx_Compare_Double(A, B) == -1;
-  public static bool Equal_Approx(double A, double B) => Approx_Compare_Double(A, B) == 0;
-  public static bool Equal_Vectors_Approx(Point A, Point B)
-      => Equal_Approx(A.X_Coord, B.X_Coord) && Equal_Approx(A.Y_Coord, B.Y_Coord);
-  public static bool Greater_Equal_Approx(double A, double B) => Approx_Compare_Double(A, B) >= 0;
-  public static bool Less_Equal_Approx(double A, double B) => Approx_Compare_Double(A, B) <= 0;
+  public static bool GreaterThanApprox(double A, double B) => ApproxCompareDouble(A, B) == 1;
+  public static bool LessThanApprox(double A, double B) => ApproxCompareDouble(A, B) == -1;
+  public static bool EqualApprox(double A, double B) => ApproxCompareDouble(A, B) == 0;
+  public static bool EqualVectorsApprox(Point A, Point B)
+      => EqualApprox(A.XCoord, B.XCoord) && EqualApprox(A.YCoord, B.YCoord);
+  public static bool GreaterEqualApprox(double A, double B) => ApproxCompareDouble(A, B) >= 0;
+  public static bool LessEqualApprox(double A, double B) => ApproxCompareDouble(A, B) <= 0;
 
 
   #endregion
