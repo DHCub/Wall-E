@@ -456,12 +456,15 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
   {
     if (expr.Right is null)
     {
-      return new GeneratorSequence(new IntRangeGenerator((int)expr.Left.literal));
+      int left = int.Parse(expr.Left.lexeme);
+      return new GeneratorSequence(new IntRangeGenerator(left));
     }
     else
     {
       List<GSObject> rangeInt = new();
-      for (int i = (int)expr.Left.literal; i <= (int)expr.Right.literal; i++)
+      int left = int.Parse(expr.Left.lexeme);
+      int right = int.Parse(expr.Right.lexeme);
+      for (int i = left; i <= right; i++)
       {
         rangeInt.Add(new Scalar(i));
       }
@@ -518,11 +521,14 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
           if (range.Right is null)
           {
             IsFinite = false;
-            genSequence = new GeneratorSequence(new IntRangeGenerator((int)range.Left.literal), prefix);
+            int left = int.Parse(range.Left.lexeme);
+            genSequence = new GeneratorSequence(new IntRangeGenerator(left), prefix);
           }
           else
           {
-            for (int v = (int)range.Left.literal; v <= (int)range.Right.literal; v++)
+            int left = int.Parse(range.Left.lexeme);
+            int right = int.Parse(range.Right.lexeme);
+            for (int v = left; v <= right; v++)
             {
               prefix.Add(new Scalar(v));
             }
@@ -592,8 +598,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
       int cntConsts = stmt.Names.Count;
       for (int i = 0; i < cntConsts - 1; i++)
       {
-        if ((string)stmt.Names[i].literal != "_")
-          currentEnvironment.Define(stmt.Names[i], valueSeq[i]);
+        currentEnvironment.Define(stmt.Names[i], valueSeq[i]);
       }
 
       currentEnvironment.Define(stmt.Names.Last(), valueSeq.GetRemainder(cntConsts - 1));
@@ -605,8 +610,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
         throw new RuntimeError(stmt.Token, "Cannot assign some constants to unique value.");
       }
 
-      if ((string)stmt.Names[0].literal != "_")
-        currentEnvironment.Define(stmt.Names[0], value);
+      currentEnvironment.Define(stmt.Names[0], value);
     }
 
     return VoidObject.Void;
