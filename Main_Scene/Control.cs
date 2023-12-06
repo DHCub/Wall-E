@@ -52,10 +52,11 @@ public partial class Control : Godot.Control
 			draw_area.AddDrawable(GetColor(color), fig);
 			draw_area.QueueRedraw();
 		}
-		void drawLabeledFigure(GSharp.GUIInterface.Colors color, Figure fig, string label)
+		async void drawLabeledFigure(GSharp.GUIInterface.Colors color, Figure fig, string label)
 		{
 			draw_area.AddDrawable(GetColor(color), fig, label);
 			draw_area.QueueRedraw();
+			await ToSignal(GetTree(), "idle_frame");
 		}
 		string importHandler(string dir)
 		{

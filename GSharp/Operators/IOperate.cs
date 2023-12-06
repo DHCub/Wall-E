@@ -19,6 +19,10 @@ public interface IOperate<OP> where OP: Operator
         if (operable2 is Objects.String str) return operable1.OperateString(str, null);
         if (operable2 is Undefined u) return operable1.OperateUndefined(u, null);
 
+        if (operable2 is FiniteStaticSequence finSeq) return operable1.OperateFiniteStaticSequence(finSeq, null);
+        if (operable2 is InfiniteStaticSequence infSeq) return operable1.OperateInfiniteStaticSequence(infSeq, null);
+        if (operable2 is GeneratorSequence genSeq) return operable1.OperateGeneratorSequence(genSeq, null);
+
         throw new NotImplementedException("GSOBJECT UNSUPPORTED");
     }
 
