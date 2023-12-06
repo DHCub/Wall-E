@@ -12,11 +12,13 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
 {
   private readonly List<Stmt> statements;
   private SemanticErrorHandler errorHandler;
+  private Func<string, List<Stmt>> importHandler;
   private VariableContext variablesContext;
   private FunctionContext builtInFunctions;
   private FunctionContext functionsContext;
+  private List<string> importedFiles;
 
-  public SemanticAnalyzer(List<Stmt> statements, SemanticErrorHandler errorHandler)
+  public SemanticAnalyzer(List<Stmt> statements, SemanticErrorHandler errorHandler, Func<string, List<Stmt>> importHandler)
   {
     void DefineBuiltIns()
     {
@@ -142,6 +144,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
     DefineBuiltIns();
     this.statements = statements;
     this.errorHandler = errorHandler;
+    this.importHandler = importHandler;
   }
 
   public void Analyze()
@@ -330,7 +333,10 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
 
   }
 
-  public GSType VisitImportStmt(Import import) => new UndefinedType();
+  public GSType VisitImportStmt(Import import)
+  {
+    throw new NotImplementedException();
+  }
   public GSType VisitPrintStmt(Print print)
   {
     TypeCheck(print.Expression);

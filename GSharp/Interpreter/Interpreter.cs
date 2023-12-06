@@ -96,11 +96,13 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
       bool typeValidationFailed = false;
 
+      List<Stmt> importHandler(string dir) => throw new NotImplementedException();
+
       var semanticAnalyzer = new SemanticAnalyzer(result.statements, semanticAnalizerError =>
       {
         typeValidationFailed = true;
         semanticErrorHandler(semanticAnalizerError);
-      });
+      }, importHandler);
 
       semanticAnalyzer.Analyze();
 
@@ -675,7 +677,9 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
   public VoidObject VisitImportStmt(Import stmt)
   {
-    throw new NotImplementedException();
+    standardOutputHandler(importHandler((string)stmt.DirName.literal));
+
+    return VoidObject.Void;
   }
 
   public VoidObject VisitPrintStmt(Print stmt)
@@ -683,7 +687,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
     GSObject? value = Evaluate(stmt.Expression);
     if (stmt.Label is not null)
     {
-      standardOutputHandler(stmt.Label.lexeme + ": " + value.ToString());
+      standardOutputHandler(stmt.Label.literal + ": " + value.ToString());
     }
     else
     {
