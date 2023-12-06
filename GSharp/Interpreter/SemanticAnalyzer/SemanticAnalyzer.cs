@@ -335,7 +335,17 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
 
   public GSType VisitImportStmt(Import import)
   {
-    throw new NotImplementedException();
+    var dir = (string)import.DirName.literal;
+
+    if (importedFiles.Contains(dir)) return new UndefinedType();
+    importedFiles.Add(dir);
+
+    foreach(var stmt in importHandler(dir))
+    {
+      TypeCheck(stmt);
+    }
+
+    return new UndefinedType();
   }
   public GSType VisitPrintStmt(Print print)
   {
@@ -380,9 +390,9 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
 
   public GSType VisitReturnStmt(GSharp.Statement.Return @return)
   {
-    if (@return.Value != null) TypeCheck(@return.Value);
+    if (@return.Value != null) return TypeCheck(@return.Value);
     
-    return new UndefinedType();
+    throw new Exception("RETURN STATEMENT WITH NULL VALUE");
   }
 
   public GSType VisitBinaryExpr(Binary binary)
@@ -485,21 +495,26 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
 
   public GSType VisitLetInExpr(LetIn letIn)
   {
-    return new UndefinedType();
-    // var ogVarContext = new VariableContext(variablesContext);
-    // var ogFunctionContext = new FunctionContext(functionsContext);
+    var ogVarContext = new VariableContext(variablesContext);
+    var ogFunctionContext = new FunctionContext(functionsContext);
 
+    GSType retType = null;
 
-    // foreach(var stmt in letIn.Stmts)
-    //   TypeCheck(stmt);
+    for (int i = 0; i < letIn.Stmts.Count; i++)
+    {
+      if (letIn.Stmts[i] is Statement.Return retStmt)
+      {
+        retType = TypeCheck(retStmt.Value); 
+      }
+      else TypeCheck(letIn.Stmts[i]);
+    }
 
-    // var retType = TypeCheck(letIn.Body);
+    if (retType == null) throw new Exception("RETURN STATEMENT NEVER REACHED");
 
+    variablesContext = ogVarContext;
+    functionsContext = ogFunctionContext;
 
-    // variablesContext = ogVarContext;
-    // functionsContext = ogFunctionContext;
-
-    // return retType;
+    return retType;
   }
 
   public GSType VisitLiteralExpr(Literal literal)
@@ -541,7 +556,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
 
   public GSType VisitUnaryExpr(Unary unary)
   {
-    var left = TypeCheck(unary);
+    var left = TypeCheck(unary.Right);
 
     if (unary.Token.type == TokenType.MINUS)
     {
