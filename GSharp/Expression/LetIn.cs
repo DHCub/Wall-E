@@ -7,12 +7,10 @@ public class LetIn : Expr, IToken
 {
   public readonly Token Let;
   public readonly List<Stmt> Stmts;
-  public readonly Expr Body;
 
-  public LetIn(Token Let, List<Stmt> Stmts, Expr Body)
+  public LetIn(Token Let, List<Stmt> Stmts)
   {
     this.Stmts = Stmts;
-    this.Body = Body;
     this.Let = Let;
   }
 

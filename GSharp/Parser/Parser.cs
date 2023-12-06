@@ -403,9 +403,20 @@ public class Parser
 
   private Expr LetInExpression(Token Let)
   {
+
+    List<Stmt> body = new List<Stmt>();
+
     var instructions = Block();
-    Expr body = Expression();
-    return new LetIn(Let, instructions, body);
+    foreach (var instruction in instructions)
+    {
+      body.Add(instruction);
+    }
+
+    Stmt returnValue = ReturnStatement();
+    
+    body.Add(returnValue);
+
+    return new LetIn(Let, body);
   }
 
   private List<Stmt> Block()

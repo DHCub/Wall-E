@@ -263,9 +263,10 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
 
   public VoidObject VisitLetInExpr(LetIn expr)
   {
-    ExecuteBlock(expr.Stmts);
-    Resolve(expr.Body);
-
+    BeginScope();
+    Resolve(expr.Stmts);
+    EndScope();
+    
     return VoidObject.Void;
   }
 

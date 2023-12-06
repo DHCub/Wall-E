@@ -118,7 +118,6 @@ public abstract class VisitorBase : Expr.IVisitor<VoidObject>, Stmt.IVisitor<Voi
   public virtual VoidObject VisitLetInExpr(LetIn expr)
   {
     Visit(expr.Stmts);
-    Visit(expr.Body);
 
     return VoidObject.Void;
   }
