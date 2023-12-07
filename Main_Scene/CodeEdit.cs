@@ -46,6 +46,8 @@ public partial class CodeEdit : Godot.CodeEdit
 		codeHighlighter.SymbolColor = Colors.Red;
 		codeHighlighter.FunctionColor = Colors.Yellow;
 
+		codeHighlighter.AddColorRegion("//", "", Colors.PaleGreen);
+
 		SyntaxHighlighter = codeHighlighter;
 	}
 

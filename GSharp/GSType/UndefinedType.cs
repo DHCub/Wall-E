@@ -27,8 +27,10 @@ public class UndefinedType : GSType
     public override bool IsDrawable() => true;
     public override bool IsFigure() => true;
 
+    public override (GSType, string) OperableMeasure(Div op)
+        => (this, null);
     public override (GSType, string) OperableMeasure(Mult op)
-        => (TypeName.Measure, null);
+        => (this, null);
     public override (GSType, string) OperableMeasure(LessTh op)
         => (TypeName.Scalar, null);
 

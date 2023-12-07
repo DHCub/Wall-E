@@ -1,7 +1,8 @@
-[gd_scene load_steps=7 format=3 uid="uid://d3yslyxw1h4yg"]
+[gd_scene load_steps=8 format=3 uid="uid://d3yslyxw1h4yg"]
 
 [ext_resource type="Script" path="res://Main_Scene/Control.cs" id="1"]
 [ext_resource type="Script" path="res://Main_Scene/CodeEdit.cs" id="2_5ew5k"]
+[ext_resource type="FontFile" uid="uid://bvf2ow0blxjsc" path="res://Main_Scene/Inconsolata-Bold.ttf" id="2_gjtyg"]
 [ext_resource type="Script" path="res://Main_Scene/Node2D.cs" id="3"]
 [ext_resource type="Script" path="res://Main_Scene/Draw_Area_Marg.cs" id="3_np2pc"]
 
@@ -26,7 +27,89 @@ anchor_bottom = 0.734
 [node name="CodeEdit" type="CodeEdit" parent="Code_Edit_Marg"]
 layout_mode = 2
 focus_mode = 1
+theme_override_fonts/font = ExtResource("2_gjtyg")
+theme_override_font_sizes/font_size = 20
+text = "// try pressing draw!
+
+mediatrix(p1, p2) = 
+    let
+		l1 = line(p1, p2);
+		m = measure (p1, p2);
+		c1 = circle (p1, m);
+		c2 = circle (p2, m);
+		i1,i2,_ = intersect(c1, c2);
+		l2 = line(i1, i2);
+    in l2;
+
+getLast(seq) = let
+	a, r = seq;
+	in
+	if !r then a
+	else getLast(r);
+
+_drawPoly(poly) = let
+	a, b, r1 = poly;
+	draw segment(a, b);
+	in
+		if !r1 then 1 else let
+		_, r = poly;
+		_drawPoly(r);
+		in 1;
+
+drawPoly(poly) = let 
+	_drawPoly(poly);
+	a, _ = poly;
+	draw segment(a, getLast(poly));
+	in 1;
+
+normalize(p1) = let
+	m = measure(point(0, 0), p1);
+	in p1/m;
+
+fib(n) = let
+	_f(a, b, n) = if n <= 1 then b else let
+		c1 = a + b;
+		in
+		_f(b, c1, n - 1)
+	;
+	in _f(1, 1, n);
+
+leftRight(a, b) = let
+	c1 = a + 2*(b - a);
+	l1 = mediatrix(a, c1);
+	i1, i2, _ = intersect(l1, circle(b, measure(a, b)));
+	in
+	{i1, i2};
+	
+mtcm(n, a, b, c) = if n == 2 then 1 else let
+	_mtcm(og, n, prevA, b, c) = if n == 0 then 1 else let
+		v = normalize(b - c)*fib(og - n + 1);
+		up = c + v;
+		i1, i2, _ = leftRight(c, up);
+		m1 = measure(i1, prevA);
+		m2 = measure(i2, prevA);
+		q = if (m1 > m2) then i1 else i2;
+		draw segment(c, up);
+		draw segment(c, q);
+		draw segment(q, up);
+		in
+		_mtcm(og, n - 1, c, up, q)
+	;
+	in _mtcm(n, n - 1, a, b, c);
+	
+color blue;
+a = point(0, -1);
+b = point(1, -1);
+c1 = a + 2*(b - a);
+l1 = mediatrix(a, c1);
+_, c, _ =  intersect(l1, circle(b, measure(a, b)));
+drawPoly({a, b, c});
+
+mtcm(4, a, b, c);"
+placeholder_text = "// code goes here"
 gutters_draw_line_numbers = true
+indent_size = 2
+indent_use_spaces = true
 auto_brace_completion_enabled = true
 auto_brace_completion_highlight_matching = true
 script = ExtResource("2_5ew5k")

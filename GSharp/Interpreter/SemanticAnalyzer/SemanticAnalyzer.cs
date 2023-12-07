@@ -145,6 +145,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
     this.statements = statements;
     this.errorHandler = errorHandler;
     this.importHandler = importHandler;
+    importedFiles = new();
   }
 
   public void Analyze()
@@ -340,7 +341,11 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
     if (importedFiles.Contains(dir)) return new UndefinedType();
     importedFiles.Add(dir);
 
-    foreach(var stmt in importHandler(dir))
+    var stmts = importHandler(dir);
+
+    if (stmts == null)
+      errorHandler(new(import.Command, "File " + (string)import.DirName.literal + " not found"));
+    else foreach(var stmt in stmts)
     {
       TypeCheck(stmt);
     }

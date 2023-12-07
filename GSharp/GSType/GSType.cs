@@ -107,7 +107,7 @@ public abstract class GSType : IOperable<Add>,
         if (T2 == UNDEFINED) return T1 + IS_NOT_COMPARABLE;
         if (T1 == UNDEFINED) return T2 + IS_NOT_COMPARABLE;
 
-        return $"Cannot Compare {T1} andd {T2}";
+        return $"Cannot Compare {T1} and {T2}";
     }
 
 
@@ -215,7 +215,7 @@ public abstract class GSType : IOperable<Add>,
     public (GSType, string?) OperableMeasure(Add op) => this.SameTypeAs(TypeName.Measure)? (TypeName.Measure, null) : UnsupportedOperator(TypeName.Measure.ToString(), op);
     public (GSType, string?) OperableMeasure(Subst op) => this.SameTypeAs(TypeName.Measure)? (TypeName.Measure, null) : UnsupportedOperator(TypeName.Measure.ToString(), op);
     public abstract (GSType, string?) OperableMeasure(Mult op);
-    public (GSType, string?) OperableMeasure(Div op) => this.SameTypeAs(TypeName.Measure)? (TypeName.Measure, null) : UnsupportedOperator(TypeName.Measure.ToString(), op);
+    public abstract (GSType, string?) OperableMeasure(Div op);
     public (GSType, string?) OperableMeasure(Mod op) => UnsupportedOperator(TypeName.Measure.ToString(), op);
     public (GSType, string?) OperableMeasure(Power op) => UnsupportedOperator(TypeName.Measure.ToString(), op);
     public abstract (GSType, string?) OperableMeasure(LessTh op);

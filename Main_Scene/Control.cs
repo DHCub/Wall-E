@@ -60,8 +60,9 @@ public partial class Control : Godot.Control
 		}
 		string importHandler(string dir)
 		{
-			var txt = new StreamReader(dir).ReadToEnd();
-			return txt;
+			if (!Godot.FileAccess.FileExists(dir)) return null;
+			var txt = Godot.FileAccess.Open(dir, Godot.FileAccess.ModeFlags.Read);
+			return txt.GetAsText();
 		}
 
 		gsharp = new GUIInterface(standardOutputHandler, errorHandler, importHandler, drawFigure, drawLabeledFigure);

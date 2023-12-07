@@ -1,3 +1,5 @@
+using System;
+
 namespace GSharp.Types;
 
 public class SimpleType : GSType
@@ -60,10 +62,18 @@ public class SimpleType : GSType
             TypeName.Point => (TypeName.Point, null),
             _ => UnsupportedOperator(TypeName.Measure.ToString(), op)
         };
+    public override (GSType, string) OperableMeasure(Div op)
+        => type switch{
+            TypeName.Point => (TypeName.Point, null),
+            TypeName.Measure => (TypeName.Scalar, null),
+
+            _ => UnsupportedOperator(TypeName.Measure.ToString(), op)
+        };
+    
 
     public override (GSType, string) OperableMeasure(LessTh op)
         => type switch{
-            TypeName.Scalar or TypeName.Scalar => (TypeName.Scalar, null),
+            TypeName.Scalar or TypeName.Measure => (TypeName.Scalar, null),
             _ => UnsupportedOperator(TypeName.Measure.ToString(), op)
         };
 
