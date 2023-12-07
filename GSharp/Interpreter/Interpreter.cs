@@ -535,7 +535,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
       case "arc":
         if (arguments[0].SameTypeAs(new Point()) && arguments[1].SameTypeAs(new Point()) && arguments[2].SameTypeAs(new Point()) && arguments[3].SameTypeAs(new Measure(0.0)))
         {
-          return new Arc((Point)arguments[0], (Point)arguments[1], (Point)arguments[1], ((Measure)arguments[2]).value);
+          return new Arc((Point)arguments[0], (Point)arguments[1], (Point)arguments[2], ((Measure)arguments[3]).value);
         }
         throw new RuntimeError(expr.Token, "Invalid arguments.");
       case "circle":
