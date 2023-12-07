@@ -42,7 +42,7 @@ internal class GSFunction : GSObject, ICallable, IFunction
 
   public override bool SameTypeAs(GSObject gso) => throw new NotImplementedException();
 
-    public int Arity()
+  public int Arity()
   {
     return declaration.Parameters.Count;
   }

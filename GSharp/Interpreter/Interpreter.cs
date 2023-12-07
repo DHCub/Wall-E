@@ -114,8 +114,9 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
       bool typeValidationFailed = false;
 
-      List<Stmt> newImportHandler2(string dir) {
-        var src = importHandler(dir);   
+      List<Stmt> newImportHandler2(string dir)
+      {
+        var src = importHandler(dir);
         var liststmt = Parse(src, scanErrorHandler, parseErrorHandler);
         if (liststmt is null)
         {
@@ -155,6 +156,43 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
     }
 
     throw new IllegalStateException("syntax was not list of Stmt");
+  }
+
+  public VoidObject ResolveAndInterpret(List<Stmt> parseResult, NameResolutionErrorHandler nameResolutionErrorHandler)
+  {
+    var previousAndNewStmts = previousStmts.Concat(parseResult!).ToImmutableList();
+
+    //
+    // resolving names phase
+    //
+
+    bool hasNameResolutionErrors = false;
+    var nameResolver = new NameResolver(BindingHandler, nameResolutionError =>
+    {
+      hasNameResolutionErrors = true;
+      nameResolutionErrorHandler(nameResolutionError);
+    });
+
+    nameResolver.Resolve(previousAndNewStmts);
+
+    if (hasNameResolutionErrors)
+    {
+      return null;
+    }
+
+    previousStmts = previousAndNewStmts.ToImmutableList();
+
+    try
+    {
+      Interpret(parseResult);
+    }
+    catch (RuntimeError e)
+    {
+      runtimeErrorHandler(e);
+      return VoidObject.Void;
+    }
+
+    return VoidObject.Void;
   }
 
   public List<Stmt> Parse(string source, ScanErrorHandler scanErrorHandler, ParseErrorHandler parseErrorHandler)
@@ -419,7 +457,6 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
   public GSObject VisitCallExpr(Call expr)
   {
-    System.Console.WriteLine(expr.ToString());
     GSObject calle = Evaluate(expr.Calle);
 
     var arguments = new List<GSObject>();
@@ -773,12 +810,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
   public VoidObject VisitImportStmt(Import stmt)
   {
-    foreach (var item in newImportHandler((string)stmt.DirName.literal))
-    {
-      System.Console.WriteLine(item.ToString());
-    }
-
-    Interpret(newImportHandler((string)stmt.DirName.literal));
+    ResolveAndInterpret(newImportHandler((string)stmt.DirName.literal), Console.WriteLine);
 
     return VoidObject.Void;
   }
