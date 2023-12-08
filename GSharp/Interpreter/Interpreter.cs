@@ -38,6 +38,9 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
   private Action<Colors, Figure, string> drawLabeledFigure;
   private readonly Func<string, string> importHandler;
 
+  private const int MaxNumberOfCalls = 2000;
+  private int NumberOfCalls = 0;
+
   private HashSet<string> builtins = new HashSet<string>()
   {
     "line",
@@ -262,6 +265,10 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
         throw new RuntimeError(null, message);
       }
+      catch (StackOverflowException ex)
+      {
+        throw new RuntimeError(null, ex.Message, ex);
+      }
       catch (SystemException ex)
       {
         throw new RuntimeError(null, ex.Message, ex);
@@ -457,6 +464,11 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
   public GSObject VisitCallExpr(Call expr)
   {
+    if (NumberOfCalls >= MaxNumberOfCalls)
+    {
+      throw new StackOverflowException();
+    }
+
     GSObject calle = Evaluate(expr.Calle);
 
     var arguments = new List<GSObject>();
@@ -473,9 +485,14 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
           throw new RuntimeError(expr.Paren, "Expected" + callable.Arity() + " argument(s) but got " + arguments.Count + ".");
         }
 
+        NumberOfCalls++;
+
         try
         {
-          return callable.Call(this, arguments);
+          var returnValue = callable.Call(this, arguments);
+          NumberOfCalls--;
+
+          return returnValue;
         }
         catch (RuntimeError)
         {
