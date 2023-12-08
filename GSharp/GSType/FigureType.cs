@@ -20,6 +20,7 @@ public class FigureType : GSType
     public override (GSType, string) OperablePoint(Mult op) => UnsupportedOperator(FIGURE, op);
     
     public override (GSType, string) OperableMeasure(Mult op) => (TypeName.Point, null);
+    public override (GSType, string) OperableMeasure(Div op) => (TypeName.Point, null);
     public override (GSType, string) OperableMeasure(LessTh op) => UnsupportedOperator(FIGURE, op);
 
     public override (GSType, string) OperableScalar(Mult op) => (TypeName.Point, null);

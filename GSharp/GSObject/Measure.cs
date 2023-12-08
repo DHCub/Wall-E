@@ -11,7 +11,7 @@ public class Measure : GSObject
 
     public Measure(double value)
     {
-        this.value = Math.Abs(Math.Floor(value));
+        this.value = Math.Abs(value);
     }
     
     public override bool Equals(GSObject obj)

@@ -52,16 +52,16 @@ public partial class Control : Godot.Control
 			draw_area.AddDrawable(GetColor(color), fig);
 			draw_area.QueueRedraw();
 		}
-		async void drawLabeledFigure(GSharp.GUIInterface.Colors color, Figure fig, string label)
+		void drawLabeledFigure(GSharp.GUIInterface.Colors color, Figure fig, string label)
 		{
 			draw_area.AddDrawable(GetColor(color), fig, label);
 			draw_area.QueueRedraw();
-			await ToSignal(GetTree(), "idle_frame");
 		}
 		string importHandler(string dir)
 		{
-			var txt = new StreamReader(dir).ReadToEnd();
-			return txt;
+			if (!Godot.FileAccess.FileExists(dir)) return null;
+			var txt = Godot.FileAccess.Open(dir, Godot.FileAccess.ModeFlags.Read);
+			return txt.GetAsText();
 		}
 
 		gsharp = new GUIInterface(standardOutputHandler, errorHandler, importHandler, drawFigure, drawLabeledFigure);

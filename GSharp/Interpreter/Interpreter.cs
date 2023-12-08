@@ -120,6 +120,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
       List<Stmt> newImportHandler2(string dir)
       {
         var src = importHandler(dir);
+        if (src == null) return null;
         var liststmt = Parse(src, scanErrorHandler, parseErrorHandler);
         if (liststmt is null)
         {

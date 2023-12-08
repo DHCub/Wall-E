@@ -70,7 +70,7 @@ public partial class Node2D : Godot.Node2D
             double Window_X_Size = Figure.WindowEndX - Figure.WindowStartX;
             double Window_Y_Size = Figure.WindowEndY - Figure.WindowStartY;
 
-            if (Functions.GreaterThanApprox(Math.Abs(A), Math.Abs(B)))
+            if (Functions.EqualApprox(Math.Abs(B), 0))
             {
                 if (P1_inf)
                 {

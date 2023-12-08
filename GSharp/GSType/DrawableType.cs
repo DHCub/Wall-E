@@ -35,6 +35,7 @@ public class DrawableType : GSType
     public override bool IsFigure() => true;
 
     public override (GSType, string) OperableMeasure(Mult op) => (TypeName.Point, null);
+    public override (GSType, string) OperableMeasure(Div op) => (TypeName.Point, null);
     public override (GSType, string) OperableMeasure(LessTh op) => UnsupportedOperator(TypeName.Measure.ToString(), op);
     public override (GSType, string) OperablePoint(Mult op) => UnsupportedOperator(TypeName.Point.ToString(), op);
     public override (GSType, string) OperableScalar(Div op) => (TypeName.Point, null);

@@ -69,6 +69,7 @@ public class SequenceType : GSType
 
 
     public override (GSType, string) OperableMeasure(Mult op) => UnsupportedOperator(TypeName.Measure.ToString(), op);
+    public override (GSType, string) OperableMeasure(Div op) => UnsupportedOperator(TypeName.Measure.ToString(), op);
     public override (GSType, string) OperableMeasure(LessTh op) => UnsupportedOperator(TypeName.Measure.ToString(), op);
 
 
