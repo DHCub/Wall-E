@@ -731,7 +731,7 @@ public class Parser
   {
     return Peek().type == EOF;
   }
-
+   
   private Token Peek()
   {
     // returns the token at the current position
