@@ -274,7 +274,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
       }
       catch (StackOverflowException ex)
       {
-        throw new RuntimeError(null, ex.Message, ex);
+        throw new RuntimeError(null, ex.Message, importStack, ex);
       }
       catch (SystemException ex)
       {

@@ -14,7 +14,7 @@ public class RuntimeError : Exception
     this.ImportTrace = importTrace;
   }
 
-  public RuntimeError(Token? token, string message, Stack<string> importTrace ,Exception innerException) : base(message, innerException)
+  public RuntimeError(Token? token, string message, Stack<string> importTrace, Exception innerException) : base(message, innerException)
   {
     this.token = token;
     this.ImportTrace = importTrace;
