@@ -86,7 +86,7 @@ public class Parser
     }
     else
     {
-      throw new IllegalStateException($"syntax expected to be List<Stmt>, not {syntax}");
+      throw new IllegalStateException($"syntax expected to be List<Stmt>, not {syntax}", null);
     }
   }
 

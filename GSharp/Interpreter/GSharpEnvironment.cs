@@ -23,7 +23,7 @@ internal class GSharpEnvironment : IEnvironment
 
     if (values.ContainsKey(name.lexeme))
     {
-      throw new RuntimeError(name, "Variable with this name already declared in this scope.");
+      throw new RuntimeError(name, "Variable with this name already declared in this scope.", null);
     }
     else
     {
@@ -90,6 +90,6 @@ internal class GSharpEnvironment : IEnvironment
       return;
     }
 
-    throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
+    throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.", null);
   }
 }
