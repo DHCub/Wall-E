@@ -269,7 +269,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
 
           bool redefined = !variablesContext.Define(
               paramName.lexeme,
-              new VariableSymbol(new UndefinedType(), paramName.lexeme)
+              new VariableSymbol(type, paramName.lexeme)
           );
 
           if (redefined)
@@ -299,7 +299,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
 
       DefineParameters(Parameters);
 
-      GSType retType = new UndefinedType();
+      GSType retType = function.ReturnTypeName == null ? new UndefinedType() : function.ReturnTypeName;
 
       var FunSymbol = new FunSymbol(name, Parameters, retType);
       functionsContext.Define(name, FunSymbol);
