@@ -869,7 +869,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
   public VoidObject VisitFunctionStmt(Function stmt)
   {
-    var function = new GSFunction(stmt, currentEnvironment, importStack);
+    var function = new GSFunction(stmt, currentEnvironment, importTrace);
     try { currentEnvironment.Define(stmt.Name, function); }
     catch (RuntimeError e) { e.AddImportTrace(importTrace); throw e; }
     return VoidObject.Void;

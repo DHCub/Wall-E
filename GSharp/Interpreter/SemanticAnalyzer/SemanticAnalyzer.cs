@@ -350,14 +350,21 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
 
     var stmts = importHandler(dir, importTrace);
 
+    importTrace.Pop();
+
     if (stmts == null)
       errorHandler(new(import.Command, "File " + (string)import.DirName.literal + " not found", importTrace));
-    else foreach(var stmt in stmts)
+    else 
     {
-      TypeCheck(stmt);
+      importTrace.Push(dir);
+      foreach(var stmt in stmts)
+      {
+        TypeCheck(stmt);
+      }
+      importTrace.Pop();
     }
 
-    importTrace.Pop();
+    
 
     return new UndefinedType();
   }
