@@ -355,7 +355,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
           throw new RuntimeError(expr.Oper, $"Unsupported operator encountered: {expr.Oper.type}", null);
       }
     }
-    catch(RuntimeError e)
+    catch (RuntimeError e)
     {
       e.AddImportTrace(importStack);
       throw e;
@@ -496,6 +496,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
     var arguments = new List<GSObject>();
     foreach (var argument in expr.Arguments)
     {
+
       arguments.Add(Evaluate(argument));
     }
 
@@ -782,7 +783,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
       int cntConsts = stmt.Names.Count;
       for (int i = 0; i < cntConsts - 1; i++)
       {
-        try{ currentEnvironment.Define(stmt.Names[i], valueSeq[i]); }
+        try { currentEnvironment.Define(stmt.Names[i], valueSeq[i]); }
         catch (RuntimeError e) { e.AddImportTrace(importStack); throw e; }
       }
 
@@ -845,7 +846,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
   public VoidObject VisitFunctionStmt(Function stmt)
   {
-    var function = new GSFunction(stmt, currentEnvironment);
+    var function = new GSFunction(stmt, currentEnvironment, importStack);
     try { currentEnvironment.Define(stmt.Name, function); }
     catch (RuntimeError e) { e.AddImportTrace(importStack); throw e; }
     return VoidObject.Void;
