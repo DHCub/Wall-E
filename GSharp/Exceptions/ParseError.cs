@@ -28,6 +28,6 @@ public class ParseError : Exception
       where = " at '" + token.lexeme + "'";
     }
 
-    return $"[line {token.line}] Error{where}: {Message}";
+    return $"! PARSE ERROR: at line {token.line}: Error{where}: {Message}";
   }
 }

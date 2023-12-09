@@ -418,7 +418,7 @@ public class Parser
             right = Consume(NUMBER, "Range limit must be a integer constant.");
           }
 
-          items.Add(new IntRange(left, dots, right, true, rightNeg));
+          items.Add(new IntRange(left, dots, right, false, rightNeg));
         }
         else
         {
