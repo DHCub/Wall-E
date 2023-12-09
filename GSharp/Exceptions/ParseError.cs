@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace GSharp.Exceptions;
 
@@ -8,11 +9,13 @@ public class ParseError : Exception
 {
   public Token token { get; }
   public ParseErrorType? parseErrorType { get; }
+  private Stack<string> importTrace;
 
-  public ParseError(string message, Token token, ParseErrorType? errorType) : base(message)
+  public ParseError(string message, Token token, Stack<string> importTrace,ParseErrorType? errorType) : base(message)
   {
     this.token = token;
     this.parseErrorType = errorType;
+    this.importTrace = importTrace;
   }
 
   public override string ToString()
@@ -28,6 +31,9 @@ public class ParseError : Exception
       where = " at '" + token.lexeme + "'";
     }
 
-    return $"! PARSE ERROR: at line {token.line}: Error{where}: {Message}";
+    var answ = $"! PARSE ERROR: at line {token.line}: Error{where}: {Message}";
+    answ += ImportTraceBuilder.GetImportTraceString(importTrace);
+
+    return answ;
   }
 }

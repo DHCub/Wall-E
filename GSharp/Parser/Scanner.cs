@@ -88,11 +88,13 @@ public class Scanner
   private int start;
   private int current;
   private int line = 1;
+  private Stack<string> importTrace;
 
-  public Scanner(string source, ScanErrorHandler scanErrorHandler)
+  public Scanner(string source, ScanErrorHandler scanErrorHandler, Stack<string> importTrace)
   {
     this.source = source;
     this.scanErrorHandler = scanErrorHandler;
+    this.importTrace = importTrace;
   }
 
   public List<Token> ScanTokens()
@@ -212,7 +214,7 @@ public class Scanner
         if (errorFound)
         {
           // unexpected character
-          scanErrorHandler(new ScanError("Unexpected character.", line));
+          scanErrorHandler(new ScanError("Unexpected character.", line, importTrace));
         }
 
         break;
@@ -229,7 +231,7 @@ public class Scanner
         else
         {
           // unexpected character
-          scanErrorHandler(new ScanError("Unexpected character." + c, line));
+          scanErrorHandler(new ScanError("Unexpected character." + c, line, importTrace));
         }
         break;
     }
@@ -265,7 +267,7 @@ public class Scanner
       Advance();
       while (IsAlphaNumeric(Peek())) Advance();
       string text = source[start..current];
-      scanErrorHandler(new ScanError($"{text} is not a valid token", line));
+      scanErrorHandler(new ScanError($"{text} is not a valid token", line, importTrace));
       return;
     }
 
@@ -287,7 +289,7 @@ public class Scanner
     // unterminated string
     if (IsAtEnd())
     {
-      scanErrorHandler(new ScanError("Unterminated string.", line));
+      scanErrorHandler(new ScanError("Unterminated string.", line, importTrace));
       return;
     }
 
