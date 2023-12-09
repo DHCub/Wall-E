@@ -86,7 +86,7 @@ public class Parser
     }
     else
     {
-      throw new IllegalStateException($"syntax expected to be List<Stmt>, not {syntax}");
+      throw new IllegalStateException($"syntax expected to be List<Stmt>, not {syntax}", null);
     }
   }
 
@@ -195,7 +195,7 @@ public class Parser
           "measure" => TypeName.Measure,
           "string" => TypeName.String,
           
-          _ => throw Error(typeSpecifier, "Invalid type specifier")
+          _ => throw Error(typeSpecifier, "Expecting type name")
         };
     }
 
@@ -227,7 +227,10 @@ public class Parser
         // if the type is not provided, the compiler will try to infer the type based on the usage
         if (Match(TWO_DOTS))
         {
-          parameterTypeSpecifier = Consume(IDENTIFIER, "Expecting type name.");
+          if (Match(IDENTIFIER) || Match(POINT) || Match(LINE) || Match(RAY) || Match(SEGMENT) || Match(CIRCLE) || Match(ARC))
+            parameterTypeSpecifier = Previous();
+    
+          else throw Error(Peek(), "Expecting type name", null);
           
           typeName = getTypeNameOrError(parameterTypeSpecifier);
         }
@@ -243,8 +246,10 @@ public class Parser
 
     if (Match(TWO_DOTS))
     {
-      returnTypeSpecifier = Consume(IDENTIFIER, "Expecting type name.");
-
+      if (Match(IDENTIFIER) || Match(POINT) || Match(LINE) || Match(RAY) || Match(SEGMENT) || Match(CIRCLE) || Match(ARC))
+        returnTypeSpecifier = Previous();
+    
+      else throw Error(Peek(), "Expecting type name", null); 
       returnTypeName = getTypeNameOrError(returnTypeSpecifier);
     }
 
@@ -684,7 +689,7 @@ public class Parser
 
   private bool IsFunction()
   {
-    // check if the current stage correspond to a function declaration
+    // check if the current stage corresponds to a function declaration
 
     if (Check(IDENTIFIER) && CheckNext(LEFT_PARENTESIS))
     {
@@ -692,7 +697,7 @@ public class Parser
       {
         if (tokens[i].type == RIGHT_PARENTESIS)
         {
-          return tokens[i + 1].type == EQUAL;
+          return tokens[i + 1].type == EQUAL || tokens[i + 1].type == TokenType.TWO_DOTS;
         }
       }
     }

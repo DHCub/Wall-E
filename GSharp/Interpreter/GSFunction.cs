@@ -6,6 +6,7 @@ using GSharp.Statement;
 using GSharp;
 using System;
 using System.Collections.Generic;
+using GSharp.Types;
 
 namespace GSharp.Interpreter;
 
@@ -165,5 +166,10 @@ internal class GSFunction : GSObject, ICallable, IFunction
   public override GSObject OperateGeneratorSequence(GeneratorSequence other, Add op)
   {
     throw new NotImplementedException();
+  }
+
+  public override bool SameTypeAs(GSType gst)
+  {
+      throw new NotImplementedException();
   }
 }

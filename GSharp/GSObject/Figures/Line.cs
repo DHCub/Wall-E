@@ -79,5 +79,6 @@ public partial class Line : GeometricLocation
 
   public override string GetTypeName() => TypeName.Line.ToString();
 
-  public override bool SameTypeAs(GSObject gso) => gso is Line;
+    public override bool SameTypeAs(GSObject gso) => gso is Line;
+    public override bool SameTypeAs(GSType gst) => gst.SameTypeAs(TypeName.Line);
 }

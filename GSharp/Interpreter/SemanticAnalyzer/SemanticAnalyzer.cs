@@ -17,6 +17,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
   private FunctionContext builtInFunctions;
   private FunctionContext functionsContext;
   private List<string> importedFiles;
+  private Stack<string> importStack;
 
   public SemanticAnalyzer(List<Stmt> statements, SemanticErrorHandler errorHandler, Func<string, List<Stmt>> importHandler)
   {
@@ -146,6 +147,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
     this.errorHandler = errorHandler;
     this.importHandler = importHandler;
     importedFiles = new();
+    importStack = new();
   }
 
   public void Analyze()
@@ -176,7 +178,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
           new VariableSymbol(type, name.lexeme)
       );
 
-      if (redefined) errorHandler(new SemanticError(name, VariableRedefinedError(name.lexeme)));
+      if (redefined) errorHandler(new SemanticError(name, VariableRedefinedError(name.lexeme), importStack));
     }
 
     void HandleSequenceType(SequenceType initType)
@@ -192,7 +194,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
     {
       if (constantStmt.Names.Count > 1)
       {
-        errorHandler(new(constantStmt.Names[0], CANNOT_DESTRUCTURE_ + initType));
+        errorHandler(new(constantStmt.Names[0], CANNOT_DESTRUCTURE_ + initType, importStack));
         for (int i = 0; i < constantStmt.Names.Count; i++)
           DefineVariableOrError(constantStmt.Names[i], new UndefinedType());
       }
@@ -204,7 +206,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
     {
       if (constantStmt.Names.Count > 1)
       {
-        errorHandler(new(constantStmt.Names[0], CANNOT_DESTRUCTURE_ + initType));
+        errorHandler(new(constantStmt.Names[0], CANNOT_DESTRUCTURE_ + initType, importStack));
         for (int i = 0; i < constantStmt.Names.Count; i++)
           DefineVariableOrError(constantStmt.Names[i], new UndefinedType());
       }
@@ -243,7 +245,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
     var draweType = TypeCheck(draw.Elements);
 
     if (!draweType.IsDrawable())
-      errorHandler(new(draw.Command, "Cannot draw " + draweType));
+      errorHandler(new(draw.Command, "Cannot draw " + draweType, importStack));
 
     return new UndefinedType();
   }
@@ -267,11 +269,11 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
 
           bool redefined = !variablesContext.Define(
               paramName.lexeme,
-              new VariableSymbol(new UndefinedType(), paramName.lexeme)
+              new VariableSymbol(type, paramName.lexeme)
           );
 
           if (redefined)
-            errorHandler(new(paramName, $"Parameter {paramName.lexeme} is already defined in this Context"));
+            errorHandler(new(paramName, $"Parameter {paramName.lexeme} is already defined in this Context", importStack));
         }
 
         for (int i = 0; i < function.Parameters.Count; i++)
@@ -297,7 +299,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
 
       DefineParameters(Parameters);
 
-      GSType retType = new UndefinedType();
+      GSType retType = function.ReturnTypeName == null ? new UndefinedType() : function.ReturnTypeName;
 
       var FunSymbol = new FunSymbol(name, Parameters, retType);
       functionsContext.Define(name, FunSymbol);
@@ -306,7 +308,11 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
       {
         if (stmt is Statement.Return ret)
         {
-          retType = TypeCheck(ret);
+          var practicalRetType = TypeCheck(ret);
+          if (!practicalRetType.SameTypeAs(retType)) 
+          {
+            errorHandler(new(function.Token, $"Function returns {practicalRetType}, but {retType} is specified as expected return type", importStack));
+          }
           break;
         }
         else TypeCheck(stmt);
@@ -324,7 +330,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
 
     if (FunSymbol != null)
     {
-      errorHandler(new(nameTok, $"Function {name} is already defined in this Context"));
+      errorHandler(new(nameTok, $"Function {name} is already defined in this Context", importStack));
       return new UndefinedType();
     }
 
@@ -340,15 +346,18 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
 
     if (importedFiles.Contains(dir)) return new UndefinedType();
     importedFiles.Add(dir);
+    importStack.Push(dir);
 
     var stmts = importHandler(dir);
 
     if (stmts == null)
-      errorHandler(new(import.Command, "File " + (string)import.DirName.literal + " not found"));
+      errorHandler(new(import.Command, "File " + (string)import.DirName.literal + " not found", importStack));
     else foreach(var stmt in stmts)
     {
       TypeCheck(stmt);
     }
+
+    importStack.Pop();
 
     return new UndefinedType();
   }
@@ -388,7 +397,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
     bool redefined = !variablesContext.Define(name, new VariableSymbol(Type, name));
 
     if (redefined)
-      errorHandler(new SemanticError(nameTok, $"Variable {name} is already defined in this Context"));
+      errorHandler(new SemanticError(nameTok, $"Variable {name} is already defined in this Context", importStack));
 
     return new UndefinedType();
   }
@@ -408,7 +417,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
     GSType HandleError((GSType type, string? error) tup)
     {
       if (tup.error != null)
-        errorHandler(new(binary.Oper, tup.error));
+        errorHandler(new(binary.Oper, tup.error, importStack));
 
 
       return tup.type;
@@ -445,7 +454,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
 
     if (FunSymbol == null)
     {
-      errorHandler(new(nameTok, $"Function {name} is undefined in this Context"));
+      errorHandler(new(nameTok, $"Function {name} is undefined in this Context", importStack));
       return new UndefinedType();
     }
 
@@ -455,7 +464,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
       var argType = TypeCheck(call.Arguments[i]);
 
       if (!paramType.SameTypeAs(argType))
-        errorHandler(new(nameTok, $"Function {name} takes {paramType} as its #{i+1} parameter, {argType} passed instead"));
+        errorHandler(new(nameTok, $"Function {name} takes {paramType} as its #{i+1} parameter, {argType} passed instead", importStack));
     }
 
     return FunSymbol.ReturnType;
@@ -470,7 +479,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
 
     if (!thenBranch.SameTypeAs(elseBranch))
     {
-      errorHandler(new(conditional.If, $"Conditional expression must have equal return types, {thenBranch} and {elseBranch} returned instead"));
+      errorHandler(new(conditional.If, $"Conditional expression must have equal return types, {thenBranch} and {elseBranch} returned instead", importStack));
       return new UndefinedType();
     }
     return thenBranch.GetMostRestrictedOrError(elseBranch);
@@ -491,9 +500,9 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
     const string ERROR = " limit in range expression must be integer literal";
     var L = double.Parse((string)intRange.Left.literal);
     if (!double.IsInteger(L))
-      errorHandler(new(intRange.Left, "Left" + ERROR));
+      errorHandler(new(intRange.Left, "Left" + ERROR, importStack));
     if (intRange.Right != null && !double.IsInteger(double.Parse((string)intRange.Right.literal)))
-      errorHandler(new(intRange.Left, "Right" + ERROR));
+      errorHandler(new(intRange.Left, "Right" + ERROR, importStack));
 
     return new SequenceType(TypeName.Scalar);
   }
@@ -553,7 +562,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
       var (accepted, errorMessage) = seqT.AcceptNewType(type);
 
       if (!accepted)
-        errorHandler(new(sequence.Brace, errorMessage));
+        errorHandler(new(sequence.Brace, errorMessage, importStack));
     }
 
     return seqT;
@@ -567,7 +576,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
     {
       var (type, error) = IOperable<Mult>.Operable<Mult>(new SimpleType(TypeName.Scalar), left);
       if (error != null)
-        errorHandler(new(unary.Token, $"Cannot apply minus unary operand to " + left.ToString()));
+        errorHandler(new(unary.Token, $"Cannot apply minus unary operand to " + left.ToString(), importStack));
       return type;
     }
     
@@ -591,7 +600,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
 
     if (symbol == null)
     {
-      errorHandler(new(nameTok, $"Variable {name} is undefined in this Context"));
+      errorHandler(new(nameTok, $"Variable {name} is undefined in this Context", importStack));
       return new UndefinedType();
     }
 

@@ -94,9 +94,7 @@ public class GUIInterface
 
     void RuntimeError(RuntimeError error)
     {
-      string line = error.token?.line.ToString() ?? "unknown";
-
-      errorHandler($"[line {line}] {error.Message}");
+      errorHandler(error.ToString());
     }
 
     void Error(Token token, string message)
@@ -128,7 +126,7 @@ public class GUIInterface
 
     void SemanticAnalyzerError(SemanticError semanticError)
     {
-      Error(semanticError.token, semanticError.Message);
+      errorHandler(semanticError.ToString());
     }
 
     var interpreter = new Interpreter.Interpreter(runtimeErrorHandler, standardOutputHandler, importHandler, drawFigure, drawLabeledFigure);

@@ -113,6 +113,7 @@ public class Point : Figure
   public override bool Equals(GSObject obj) => obj is Point P && Functions.EqualVectorsApprox(this, P);
 
   public override bool SameTypeAs(GSObject gso) => gso is Point;
+  public override bool SameTypeAs(GSType gst) => gst.SameTypeAs(TypeName.Point);
 
   public override GSObject OperateScalar(Scalar other, Mult op)
       => this * other.value;

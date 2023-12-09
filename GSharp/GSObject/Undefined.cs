@@ -1,5 +1,6 @@
 using GSharp.Objects.Collections;
 using GSharp.Objects.Figures;
+using GSharp.Types;
 
 namespace GSharp.Objects;
 
@@ -15,8 +16,9 @@ public class Undefined : GSObject
   public override string ToString() => UNDEFINED;
 
   public override bool SameTypeAs(GSObject gso) => gso is Undefined;
+    public override bool SameTypeAs(GSType gst) => true;
 
-  public override GSObject OperateString(String other, Add op) => UnsupportedOperError(other, op);
+    public override GSObject OperateString(String other, Add op) => UnsupportedOperError(other, op);
 
 
 
