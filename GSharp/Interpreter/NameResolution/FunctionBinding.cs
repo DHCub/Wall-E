@@ -4,9 +4,9 @@ using GSharp.Exceptions;
 
 namespace GSharp.Interpreter;
 
-// <summary>
-// A binding to a function defined in GSharp.
-// </summary>
+/// <summary>
+/// A binding to a function defined in GSharp.
+/// </summary>
 internal class FunctionBinding : Binding, IDistanceBinding
 {
   public int Distance { get; }

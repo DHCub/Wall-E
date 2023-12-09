@@ -7,9 +7,9 @@ using GSharp.Exceptions;
 namespace GSharp.Parser;
 using static TokenType;
 
-// <summary>
-// Scans a GSharp program, converting it to a list of Tokens.
-// </summary>
+/// <summary>
+/// Scans a GSharp program, converting it to a list of Tokens.
+/// </summary>
 public class Scanner
 {
   public static readonly Dictionary<string, TokenType> ReservedKeywords = new Dictionary<string, TokenType>

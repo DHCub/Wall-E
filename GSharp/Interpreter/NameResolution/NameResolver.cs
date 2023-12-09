@@ -10,9 +10,9 @@ using GSharp.Statement;
 
 namespace GSharp.Interpreter;
 
-// <summary>
-// The NameResolver is responsible for resolving names of local and global variable/function names.
-// </summary>
+/// <summary>
+/// The NameResolver is responsible for resolving names of local and global variable/function names.
+/// </summary>
 internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObject>
 {
   private readonly IBindingHandler bindingHandler;

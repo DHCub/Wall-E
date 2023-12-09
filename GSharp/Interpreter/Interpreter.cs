@@ -18,10 +18,9 @@ using System.Net.Mail;
 
 namespace GSharp.Interpreter;
 
-// <summary>
-// Interpreter for GSharp code
-// </summary>
-
+/// <summary>
+/// Interpreter for GSharp code
+/// </summary>
 public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<VoidObject>
 {
   private readonly Action<RuntimeError> runtimeErrorHandler;
