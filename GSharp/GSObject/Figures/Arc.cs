@@ -67,8 +67,9 @@ public class Arc : GeometricLocation
   }
 
   public override bool SameTypeAs(GSObject gso) => gso is Arc;
+  public override bool SameTypeAs(GSType gst) => gst.SameTypeAs(TypeName.Arc);
 
-  public override string GetTypeName() => TypeName.Arc.ToString();
+    public override string GetTypeName() => TypeName.Arc.ToString();
   public override string ToString() => $"Arc{{C={Center}, R={this.Start_Ray}, Alpha={this.Angle}, Rad={this.Radius}}}";
 
 }

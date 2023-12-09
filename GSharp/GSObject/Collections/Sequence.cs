@@ -8,6 +8,7 @@ using System.Collections;
 using System.Linq;
 using GSharp.Objects.Figures;
 using System;
+using GSharp.Types;
 
 public abstract class Sequence : GSObject
 {    
@@ -17,6 +18,7 @@ public abstract class Sequence : GSObject
     public abstract GSObject GSCount();
     public abstract int PrefixLength();
     public override string GetTypeName() => $"Seq<{this[0].GetTypeName()}>";
+    public override bool SameTypeAs(GSType gst) => gst.SameTypeAs(new SequenceType());
     public abstract IEnumerable<GSObject> GetPrefixValues();
     public override GSObject OperateScalar(Scalar other, Add op) => UnsupportedOperError(other, op);
     public override GSObject OperateScalar(Scalar other, Subst op) => UnsupportedOperError(other, op);

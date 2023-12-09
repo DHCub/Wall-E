@@ -19,6 +19,7 @@ public abstract class GSObject : IOperate<Add>,
     public abstract string GetTypeName();
     public abstract bool GetTruthValue();
     public abstract bool SameTypeAs(GSObject gso);
+    public abstract bool SameTypeAs(GSType gst);
 
     protected static string NoOrderRelation(string T1, string T2)
         => $"No order relation between {T1} and {T2}";

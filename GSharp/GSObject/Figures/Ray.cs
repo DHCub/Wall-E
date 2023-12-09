@@ -43,4 +43,5 @@ public class Ray : GeometricLocation
     public override string GetTypeName() => TypeName.Ray.ToString();
 
     public override bool SameTypeAs(GSObject gso) => gso is Ray;
+    public override bool SameTypeAs(GSType gst) => gst.SameTypeAs(TypeName.Ray);
 }

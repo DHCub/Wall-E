@@ -52,4 +52,5 @@ public partial class Circle : GeometricLocation
     public override string ToString() => $"C({Center})";
 
     public override bool SameTypeAs(GSObject gso) => gso is Circle;
+    public override bool SameTypeAs(GSType gst) => gst.SameTypeAs(TypeName.Circle);
 }

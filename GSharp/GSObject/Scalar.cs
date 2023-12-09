@@ -30,6 +30,7 @@ public class Scalar : GSObject
     public override string GetTypeName() => TypeName.Scalar.ToString();
 
     public override bool SameTypeAs(GSObject gso) => gso is Scalar;
+    public override bool SameTypeAs(GSType gst) => gst.SameTypeAs(TypeName.Scalar);
 
     public override GSObject OperatePoint(Point P, Add op) => UnsupportedOperError(P, op);
 
