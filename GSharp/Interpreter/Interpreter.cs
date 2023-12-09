@@ -18,10 +18,9 @@ using System.Net.Mail;
 
 namespace GSharp.Interpreter;
 
-// <summary>
-// Interpreter for GSharp code
-// </summary>
-
+/// <summary>
+/// Interpreter for GSharp code
+/// </summary>
 public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<VoidObject>
 {
   private readonly Action<RuntimeError> runtimeErrorHandler;
@@ -498,6 +497,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
     var arguments = new List<GSObject>();
     foreach (var argument in expr.Arguments)
     {
+
       arguments.Add(Evaluate(argument));
     }
 
@@ -869,7 +869,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
   public VoidObject VisitFunctionStmt(Function stmt)
   {
-    var function = new GSFunction(stmt, currentEnvironment);
+    var function = new GSFunction(stmt, currentEnvironment, importStack);
     try { currentEnvironment.Define(stmt.Name, function); }
     catch (RuntimeError e) { e.AddImportTrace(importTrace); throw e; }
     return VoidObject.Void;

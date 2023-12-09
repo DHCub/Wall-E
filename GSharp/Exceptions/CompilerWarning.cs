@@ -3,10 +3,9 @@ using static GSharp.TokenType;
 
 namespace GSharp.Exceptions;
 
-// <summary>
-// Represent a compiler warning.
-// </summary>
-
+/// <summary>
+/// Represent a compiler warning.
+/// </summary>
 public class CompilerWarning : Exception
 {
   public Token Token { get; }

@@ -3,11 +3,10 @@ using static GSharp.TokenType;
 
 namespace GSharp.Exceptions;
 
-// <summary>
-// Emmited for name resolution errors which can be detected at an early stage,
-// before type validation is even attempted.
-// </summary>
-
+/// <summary>
+/// Emmited for name resolution errors which can be detected at an early stage,
+/// before type validation is even attempted.
+/// </summary>
 public class NameResolutionError : Exception
 {
   public Token Token { get; }

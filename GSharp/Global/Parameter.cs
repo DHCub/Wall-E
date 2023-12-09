@@ -12,12 +12,6 @@ public class Parameter
 
   public readonly TypeName? typeName;
 
-  // public Parameter(ITypeReference TypeReference, TypeName? typeName = null)
-  // {
-  //   this.typeName = typeName;
-  //   this.TypeReference = TypeReference;
-  // }
-
   public Parameter(Token Name, ITypeReference TypeReference, TypeName? typeName)
   {
     this.Name = Name;

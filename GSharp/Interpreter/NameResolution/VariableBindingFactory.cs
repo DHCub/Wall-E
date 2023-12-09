@@ -2,9 +2,9 @@ using GSharp.Expression;
 
 namespace GSharp.Interpreter;
 
-// <summary>
-// Container class which supports creating VariableBinding instances.
-// </summary>
+/// <summary>
+/// Container class which supports creating VariableBinding instances.
+/// </summary>
 internal class VariableBindingFactory : IBindingFactory
 {
   public static VariableBindingFactory None { get; } = new VariableBindingFactory(null);

@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 namespace GSharp.Interpreter;
 
-// <summary>
-// Holds information about the context for a static scope (functions and variable name binding).
-// </summary>
+/// <summary>
+/// Holds information about the context for a static scope (functions and variable name binding).
+/// </summary>
 internal class GSharpEnvironment : IEnvironment
 {
   private readonly GSharpEnvironment enclosing;

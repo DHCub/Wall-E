@@ -3,12 +3,12 @@ using GSharp.Expression;
 
 namespace GSharp.Interpreter;
 
-// <summary>
-// Holds information about a binding
-//
-// Different types of bindings provide slightly different mechanisms to retrieve
-// information about the variable or function being bound to.
-// </summary>
+/// <summary>
+/// Holds information about a binding
+///
+/// Different types of bindings provide slightly different mechanisms to retrieve
+/// information about the variable or function being bound to.
+/// </summary>
 public abstract class Binding
 {
   // gets the type reference of the declaring statement (typically a 'var' initializer or a function return type)

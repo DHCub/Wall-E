@@ -27,17 +27,17 @@ public abstract class Sequence : GSObject
     public override GSObject OperateScalar(Scalar other, Mod op) => UnsupportedOperError(other, op);
     public override GSObject OperateScalar(Scalar other, LessTh op) => UnsupportedOperError(other, op);
 
-    public override GSObject OperateMeasure(Measure other, Add op) => UnsupportedOperError(other, op);
-    public override GSObject OperateMeasure(Measure other, Subst op) => UnsupportedOperError(other, op);
-    public override GSObject OperateMeasure(Measure other, Mult op) => UnsupportedOperError(other, op);
-    public override GSObject OperateMeasure(Measure other, Div op) => UnsupportedOperError(other, op);
-    public override GSObject OperateMeasure(Measure other, Mod op) => UnsupportedOperError(other, op);
-    public override GSObject OperateMeasure(Measure other, LessTh op) => UnsupportedOperError(other, op);
+  public override GSObject OperateMeasure(Measure other, Add op) => UnsupportedOperError(other, op);
+  public override GSObject OperateMeasure(Measure other, Subst op) => UnsupportedOperError(other, op);
+  public override GSObject OperateMeasure(Measure other, Mult op) => UnsupportedOperError(other, op);
+  public override GSObject OperateMeasure(Measure other, Div op) => UnsupportedOperError(other, op);
+  public override GSObject OperateMeasure(Measure other, Mod op) => UnsupportedOperError(other, op);
+  public override GSObject OperateMeasure(Measure other, LessTh op) => UnsupportedOperError(other, op);
 
 
-    public override GSObject OperatePoint(Point other, Add op) => UnsupportedOperError(other, op);
-    public override GSObject OperatePoint(Point other, Subst op) => UnsupportedOperError(other, op);
-    public override GSObject OperatePoint(Point other, Mult op) => UnsupportedOperError(other, op);
+  public override GSObject OperatePoint(Point other, Add op) => UnsupportedOperError(other, op);
+  public override GSObject OperatePoint(Point other, Subst op) => UnsupportedOperError(other, op);
+  public override GSObject OperatePoint(Point other, Mult op) => UnsupportedOperError(other, op);
 
-    public override GSObject OperateString(GSharp.Objects.String other, Add op) => UnsupportedOperError(other, op);
+  public override GSObject OperateString(GSharp.Objects.String other, Add op) => UnsupportedOperError(other, op);
 }

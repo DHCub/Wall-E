@@ -30,13 +30,13 @@ public class Parser
   private readonly ParseErrorHandler parseErrorHandler;
   private readonly List<Token> tokens;
 
-  // <summary>
-  // Scans and parses the given program, to prepare for execution or inspection.
-  //
-  // This method is useful for inspecting the AST or perform other validation of the
-  // internal state after parsing a given program. It is also used for interpreting
-  // the statements.
-  // </summary>
+  /// <summary>
+  /// Scans and parses the given program, to prepare for execution or inspection.
+  ///
+  /// This method is useful for inspecting the AST or perform other validation of the
+  /// internal state after parsing a given program. It is also used for interpreting
+  /// the statements.
+  /// </summary>
   public static ScanAndParseResult ScanAndParse(string source, ScanErrorHandler scanErrorHandler, ParseErrorHandler parseErrorHandler, Stack<string> importTrace)
   {
     // ... 
@@ -767,7 +767,7 @@ public class Parser
   {
     return Peek().type == EOF;
   }
-
+   
   private Token Peek()
   {
     // returns the token at the current position

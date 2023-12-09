@@ -4,15 +4,14 @@ using GSharp.Statement;
 
 namespace GSharp;
 
-// <summary>
-// Abstract base class for expression visitors.
-//
-// All the methods implemented in this class are no-op, but they do their best to try
-// and make the whole tree be traversed. The idea is to give child classes an opportunity
-// to only override a smaller subset of the full set of expression types, to avoid 
-// unnecessary boilerplate code.
-// </summary>
-
+/// <summary>
+/// Abstract base class for expression visitors.
+///
+/// All the methods implemented in this class are no-op, but they do their best to try
+/// and make the whole tree be traversed. The idea is to give child classes an opportunity
+/// to only override a smaller subset of the full set of expression types, to avoid 
+/// unnecessary boilerplate code.
+/// </summary>
 public abstract class VisitorBase : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObject>
 {
   protected void Visit(IEnumerable<Stmt> statements)

@@ -11,127 +11,125 @@ using Figures;
 
 public partial class FiniteStaticSequence : Sequence, IEnumerable<GSObject>
 {
-    private List<GSObject> items;
-    public override int PrefixLength() => items.Count;
-    public FiniteStaticSequence(ICollection<GSObject> items = null)
+  private List<GSObject> items;
+  public override int PrefixLength() => items.Count;
+  public FiniteStaticSequence(ICollection<GSObject> items = null)
+  {
+    if (items == null) this.items = new();
+    else this.items = items.ToList();
+  }
+
+  public override GSObject GSCount() => (Scalar)items.Count;
+  public override IEnumerable<GSObject> GetPrefixValues() => this.items;
+  public int Count => items.Count;
+
+  public IEnumerator<GSObject> GetEnumerator() => items.GetEnumerator();
+
+  IEnumerator IEnumerable.GetEnumerator() => items.GetEnumerator();
+
+  public override bool Equals(GSObject obj)
+  {
+    if (obj is FiniteStaticSequence finSeq)
     {
-        if (items == null) this.items = new();
-        else this.items = items.ToList();
+      for (int i = 0; i < finSeq.Count; i++)
+      {
+        if (!this[i].Equals(finSeq[i])) return false;
+      }
+
+      return true;
     }
 
-    public override GSObject GSCount() => (Scalar)items.Count;
-    public override IEnumerable<GSObject> GetPrefixValues() => this.items;
-    public int Count => items.Count;
+    return false;
+  }
 
-    public IEnumerator<GSObject> GetEnumerator() => items.GetEnumerator();
+  public override bool SameTypeAs(GSObject gso)
+  {
+    if (gso is Sequence && this.Count == 0) return true;
 
-    IEnumerator IEnumerable.GetEnumerator() => items.GetEnumerator();
+    // Count != 0 if any of these ifs are entered
 
-    public override bool Equals(GSObject obj)
+    if (gso is FiniteStaticSequence finSeq)
     {
-        if (obj is FiniteStaticSequence finSeq)
-        {
-            for (int i = 0; i < finSeq.Count; i++)
-            {
-                if (!this[i].Equals(finSeq[i])) return false;
-            }
-
-            return true;
-        }
-
-        return false;
+      if (finSeq.Count == 0) return true;
+      return this[0].SameTypeAs(finSeq[0]);
     }
 
-    public override bool SameTypeAs(GSObject gso)
+    if (gso is InfiniteStaticSequence infseq)
     {
-        if (gso is Sequence && this.Count == 0) return true;
-
-        // Count != 0 if any of these ifs are entered
-
-        if (gso is FiniteStaticSequence finSeq)
-        {
-            if (finSeq.Count == 0) return true;
-            return this[0].SameTypeAs(finSeq[0]);
-        }
-
-        if (gso is InfiniteStaticSequence infseq)
-        {
-            if (infseq.PrefixLength() == 0) return true;
-            return this[0].SameTypeAs(infseq[0]);
-        }
-
-        if (gso is GeneratorSequence genSeq)
-        {
-            return this[0].SameTypeAs(genSeq[0]);
-        }
-
-        return false;
+      if (infseq.PrefixLength() == 0) return true;
+      return this[0].SameTypeAs(infseq[0]);
     }
 
-    public override string ToString()
+    if (gso is GeneratorSequence genSeq)
     {
-        List<char> answ = new();
-        answ.Add('{');
-
-        for (int i = 0; i < this.Count - 1; i++)
-        {
-            answ.AddRange(items[i].ToString());
-            answ.AddRange(", ");
-        }
-
-        if (items.Count > 0)
-            answ.AddRange(items[Count - 1].ToString());
-
-        answ.Add('}');
-
-        return new string(answ.ToArray());
+      return this[0].SameTypeAs(genSeq[0]);
     }
 
-    public override GSObject this[int i] { get => (i >= Count) ? new Undefined() : items[i]; }
+    return false;
+  }
 
-    public override bool GetTruthValue() => this.Count != 0;
-    public override Sequence GetRemainder(int start)
+  public override string ToString()
+  {
+    List<char> answ = new();
+    answ.Add('{');
+
+    for (int i = 0; i < this.Count - 1; i++)
     {
-        List<GSObject> newItems = new();
-
-        for (int i = start; i < this.Count; i++)
-            newItems.Add(items[i]);
-
-        return new FiniteStaticSequence(newItems);
+      answ.AddRange(items[i].ToString());
+      answ.AddRange(", ");
     }
 
-    public override GSObject OperateUndefined(Undefined other, Add op)
-        => new InfiniteStaticSequence(this.items);
+    if (items.Count > 0)
+      answ.AddRange(items[Count - 1].ToString());
 
-    public override GSObject OperateFiniteStaticSequence(FiniteStaticSequence other, Add op)
-    {
-        List<GSObject> newItems = this.items.ToList();
+    answ.Add('}');
 
-        foreach (var item in other)
-            newItems.Add(item);
+    return new string(answ.ToArray());
+  }
 
-        return new FiniteStaticSequence(newItems);
-    }
+  public override GSObject this[int i] { get => (i >= Count) ? new Undefined() : items[i]; }
 
-    public override GSObject OperateInfiniteStaticSequence(InfiniteStaticSequence other, Add op)
-    {
-        List<GSObject> newItems = items.ToList();
+  public override bool GetTruthValue() => this.Count != 0;
+  public override Sequence GetRemainder(int start)
+  {
+    List<GSObject> newItems = new();
 
-        foreach (var prefixItem in other.GetPrefixValues())
-            newItems.Add(prefixItem);
+    for (int i = start; i < this.Count; i++)
+      newItems.Add(items[i]);
 
-        return new InfiniteStaticSequence(newItems);
-    }
+    return new FiniteStaticSequence(newItems);
+  }
 
-    public override GSObject OperateGeneratorSequence(GeneratorSequence other, Add op)
-    {
-        List<GSObject> newItems = this.items.ToList();
+  public override GSObject OperateUndefined(Undefined other, Add op)
+      => new InfiniteStaticSequence(this.items);
 
-        foreach (var prefixItem in other.GetPrefixValues())
-            newItems.Add(prefixItem);
+  public override GSObject OperateFiniteStaticSequence(FiniteStaticSequence other, Add op)
+  {
+    List<GSObject> newItems = this.items.ToList();
 
-        return new GeneratorSequence(other.generator, newItems);
-    }
+    foreach (var item in other)
+      newItems.Add(item);
 
+    return new FiniteStaticSequence(newItems);
+  }
 
+  public override GSObject OperateInfiniteStaticSequence(InfiniteStaticSequence other, Add op)
+  {
+    List<GSObject> newItems = items.ToList();
+
+    foreach (var prefixItem in other.GetPrefixValues())
+      newItems.Add(prefixItem);
+
+    return new InfiniteStaticSequence(newItems);
+  }
+
+  public override GSObject OperateGeneratorSequence(GeneratorSequence other, Add op)
+  {
+    List<GSObject> newItems = this.items.ToList();
+
+    foreach (var prefixItem in other.GetPrefixValues())
+      newItems.Add(prefixItem);
+
+    return new GeneratorSequence(other.generator, newItems);
+  }
 }

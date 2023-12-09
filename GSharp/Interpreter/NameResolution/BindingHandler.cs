@@ -4,10 +4,9 @@ using System.Collections.Generic;
 
 namespace GSharp.Interpreter;
 
-// <summary>
-// Class responsible for handling global and local bindings.
-// </summary>
-
+/// <summary>
+/// Class responsible for handling global and local bindings.
+/// </summary>
 internal class BindingHandler : IBindingHandler
 {
   // map from referring expression to global binding (var or fun)

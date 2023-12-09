@@ -14,11 +14,13 @@ internal class GSFunction : GSObject, ICallable, IFunction
 {
   private readonly Function declaration;
   private readonly IEnvironment closure;
+  public Stack<string> importStack;
 
-  internal GSFunction(Function declaration, IEnvironment closure)
+  internal GSFunction(Function declaration, IEnvironment closure, Stack<string> importStack)
   {
     this.declaration = declaration;
     this.closure = closure;
+    this.importStack = importStack;
   }
 
   public GSObject Call(IInterpreter interpreter, List<GSObject> arguments)
@@ -27,6 +29,11 @@ internal class GSFunction : GSObject, ICallable, IFunction
 
     for (int i = 0; i < declaration.Parameters.Count; i++)
     {
+      if (declaration.Parameters[i].typeName is not null && !arguments[i].SameTypeAs(declaration.Parameters[i].typeName))
+      {
+        throw new RuntimeError(declaration.Token, $"Function takes `{declaration.Parameters[i].typeName}` as its #{i + 1} parameter, `{arguments[i].GetType()}` passed instead", importStack);
+      }
+
       environment.Define(declaration.Parameters[i].Name, arguments[i]);
     }
 
@@ -37,6 +44,11 @@ internal class GSFunction : GSObject, ICallable, IFunction
     }
     catch (Exceptions.Return returnValue)
     {
+      if (declaration.ReturnTypeName is not null && returnValue.Value.SameTypeAs(declaration.ReturnTypeName))
+      {
+        throw new RuntimeError(declaration.Token, $"Function returns `{declaration.ReturnTypeName}`, `{returnValue.Value}` passed instead", importStack);
+      }
+
       return returnValue.Value;
     }
   }
@@ -170,6 +182,6 @@ internal class GSFunction : GSObject, ICallable, IFunction
 
   public override bool SameTypeAs(GSType gst)
   {
-      throw new NotImplementedException();
+    throw new NotImplementedException();
   }
 }
