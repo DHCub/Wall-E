@@ -14,12 +14,12 @@ public abstract class GSObject : IOperate<Add>,
                                 IOperate<Power>,
                                 IOperate<LessTh>
 {
-    public abstract override string ToString();
-    public abstract bool Equals(GSObject obj);
-    public abstract string GetTypeName();
-    public abstract bool GetTruthValue();
-    public abstract bool SameTypeAs(GSObject gso);
-    public abstract bool SameTypeAs(GSType gst);
+  public abstract override string ToString();
+  public abstract bool Equals(GSObject obj);
+  public abstract string GetTypeName();
+  public abstract bool GetTruthValue();
+  public abstract bool SameTypeAs(GSObject gso);
+  public abstract bool SameTypeAs(GSType gst);
 
   protected static string NoOrderRelation(string T1, string T2)
       => $"No order relation between {T1} and {T2}";
@@ -63,13 +63,13 @@ public abstract class GSObject : IOperate<Add>,
 
   #region Errors
 
-    public GSObject UnsupportedOperError(GSObject other, Add OP) => throw new RuntimeError(null, TriedToOperate("Add", this.GetTypeName(), other.GetTypeName()), null);
-    public GSObject UnsupportedOperError(GSObject other, Subst OP) => throw new RuntimeError(null, TriedToOperate("Substract", this.GetTypeName(), other.GetTypeName()), null);
-    public GSObject UnsupportedOperError(GSObject other, Mult OP) => throw new RuntimeError(null, TriedToOperate("Multiply", this.GetTypeName(), other.GetTypeName()), null);
-    public GSObject UnsupportedOperError(GSObject other, Div OP) => throw new RuntimeError(null, TriedToOperate("Divide", this.GetTypeName(), other.GetTypeName()), null);
-    public GSObject UnsupportedOperError(GSObject other, Mod OP) => throw new RuntimeError(null, TriedToFindModuloOfT1OverT2(this.GetTypeName(), other.GetTypeName()), null);
-    public GSObject UnsupportedOperError(GSObject other, Power OP) => throw new RuntimeError(null, TriedToElevate(this.GetTypeName(), other.GetTypeName()), null);
-    public GSObject UnsupportedOperError(GSObject other, LessTh OP) => throw new RuntimeError(null, NoOrderRelation(this.GetTypeName(), other.GetTypeName()), null);
+  public GSObject UnsupportedOperError(GSObject other, Add OP) => throw new RuntimeError(null, TriedToOperate("Add", this.GetTypeName(), other.GetTypeName()), null);
+  public GSObject UnsupportedOperError(GSObject other, Subst OP) => throw new RuntimeError(null, TriedToOperate("Substract", this.GetTypeName(), other.GetTypeName()), null);
+  public GSObject UnsupportedOperError(GSObject other, Mult OP) => throw new RuntimeError(null, TriedToOperate("Multiply", this.GetTypeName(), other.GetTypeName()), null);
+  public GSObject UnsupportedOperError(GSObject other, Div OP) => throw new RuntimeError(null, TriedToOperate("Divide", this.GetTypeName(), other.GetTypeName()), null);
+  public GSObject UnsupportedOperError(GSObject other, Mod OP) => throw new RuntimeError(null, TriedToFindModuloOfT1OverT2(this.GetTypeName(), other.GetTypeName()), null);
+  public GSObject UnsupportedOperError(GSObject other, Power OP) => throw new RuntimeError(null, TriedToElevate(this.GetTypeName(), other.GetTypeName()), null);
+  public GSObject UnsupportedOperError(GSObject other, LessTh OP) => throw new RuntimeError(null, NoOrderRelation(this.GetTypeName(), other.GetTypeName()), null);
 
   #endregion
 
@@ -158,28 +158,7 @@ public abstract class GSObject : IOperate<Add>,
       if (Functions.EqualApprox(d, double.Floor(d))) return (true, (int)double.Floor(d));
       if (Functions.EqualApprox(d, double.Ceiling(d))) return (true, (int)double.Ceiling(d));
 
-            return (false, default);
-        }
-
-        if (this is Scalar thisScalar)
-        {
-            if (Functions.EqualApprox(other.value, 0)) return new Scalar(1);
-            if (Functions.EqualApprox(thisScalar.value, 0))
-            {
-                if (Functions.GreaterThanApprox(other.value, 0)) return new Scalar(0);
-                throw new RuntimeError(null, "Tried to elevate 0 to a negative exponent", null);
-            }
-            if (Functions.LessThanApprox(thisScalar.value, 0))
-            {
-                var (isInteger, val) = GetInteger(other.value);
-                if (!isInteger) throw new RuntimeError(null, "Tried to elevate a negative number to a non-integer exponent", null);
-                return new Scalar(Math.Pow(thisScalar.value, val));
-            }
-
-            return new Scalar(Math.Pow(thisScalar, other));
-        }
-
-        return UnsupportedOperError(other, op);
+      return (false, default);
     }
 
     if (this is Scalar thisScalar)
@@ -188,12 +167,12 @@ public abstract class GSObject : IOperate<Add>,
       if (Functions.EqualApprox(thisScalar.value, 0))
       {
         if (Functions.GreaterThanApprox(other.value, 0)) return new Scalar(0);
-        throw new RuntimeError(null, "Tried to elevate 0 to a negative exponent");
+        throw new RuntimeError(null, "Tried to elevate 0 to a negative exponent", null);
       }
       if (Functions.LessThanApprox(thisScalar.value, 0))
       {
         var (isInteger, val) = GetInteger(other.value);
-        if (!isInteger) throw new RuntimeError(null, "Tried to elevate a negative number to a non-integer exponent");
+        if (!isInteger) throw new RuntimeError(null, "Tried to elevate a negative number to a non-integer exponent", null);
         return new Scalar(Math.Pow(thisScalar.value, val));
       }
 
