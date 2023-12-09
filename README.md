@@ -24,6 +24,8 @@ Después de tener instalado lo anterior en su computadora debe ser capaz de ejec
 dotnet run & godot-engine
 ```
 
+Para la evaluación del proyecto también se le puede proveer al profesor un ejecutable de la aplicación para Mac, Windows o Linux, para ello contáctenos.
+
 ## Funcionalidades de GSharp
 
 Un programa en G# es un conjunto de instrucciones. El conjunto de instrucciones vacío es un programa válido y no hace nada. Las instrucciones de entrada permiten declarar argumentos que serán provistos por la aplicación.
