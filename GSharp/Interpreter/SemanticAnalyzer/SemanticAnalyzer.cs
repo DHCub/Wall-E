@@ -308,7 +308,11 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
       {
         if (stmt is Statement.Return ret)
         {
-          retType = TypeCheck(ret);
+          var practicalRetType = TypeCheck(ret);
+          if (!practicalRetType.SameTypeAs(retType)) 
+          {
+            errorHandler(new(function.Token, $"Function returns {practicalRetType}, but {retType} is specified as expected return type", importStack));
+          }
           break;
         }
         else TypeCheck(stmt);
