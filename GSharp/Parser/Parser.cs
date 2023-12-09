@@ -183,20 +183,21 @@ public class Parser
   {
     TypeName? getTypeNameOrError(Token typeSpecifier)
     {
-      return typeSpecifier.lexeme switch{
-          "point" => TypeName.Point,
-          "line" => TypeName.Line,
-          "ray" => TypeName.Ray,
-          "segment" => TypeName.Segment,
-          "circle" => TypeName.Circle,
-          "arc" => TypeName.Arc,
-          
-          "scalar" => TypeName.Scalar,
-          "measure" => TypeName.Measure,
-          "string" => TypeName.String,
-          
-          _ => throw Error(typeSpecifier, "Expecting type name")
-        };
+      return typeSpecifier.lexeme switch
+      {
+        "point" => TypeName.Point,
+        "line" => TypeName.Line,
+        "ray" => TypeName.Ray,
+        "segment" => TypeName.Segment,
+        "circle" => TypeName.Circle,
+        "arc" => TypeName.Arc,
+
+        "scalar" => TypeName.Scalar,
+        "measure" => TypeName.Measure,
+        "string" => TypeName.String,
+
+        _ => throw Error(typeSpecifier, "Expecting type name")
+      };
     }
 
     Token name = Consume(IDENTIFIER, "Expected " + kind + " name.");
@@ -229,12 +230,12 @@ public class Parser
         {
           if (Match(IDENTIFIER) || Match(POINT) || Match(LINE) || Match(RAY) || Match(SEGMENT) || Match(CIRCLE) || Match(ARC))
             parameterTypeSpecifier = Previous();
-    
+
           else throw Error(Peek(), "Expecting type name", null);
-          
+
           typeName = getTypeNameOrError(parameterTypeSpecifier);
         }
-        
+
         parameters.Add(new Parameter(parameterName, new TypeReference(parameterTypeSpecifier), typeName));
       } while (Match(COMMA));
     }
@@ -248,19 +249,19 @@ public class Parser
     {
       if (Match(IDENTIFIER) || Match(POINT) || Match(LINE) || Match(RAY) || Match(SEGMENT) || Match(CIRCLE) || Match(ARC))
         returnTypeSpecifier = Previous();
-    
-      else throw Error(Peek(), "Expecting type name", null); 
+
+      else throw Error(Peek(), "Expecting type name", null);
       returnTypeName = getTypeNameOrError(returnTypeSpecifier);
     }
 
     Consume(EQUAL, "Expected '=' before function's body.");
 
     List<Stmt> body = new List<Stmt>();
-    
+
     Stmt returnValue = ReturnStatement();
-    
+
     body.Add(returnValue);
-    
+
     Consume(SEMICOLON, "Expected ';' after function declaration.");
     return new Function(name, parameters, body, new TypeReference(returnTypeSpecifier), returnTypeName);
   }
@@ -274,7 +275,7 @@ public class Parser
     {
       nameId = Consume(STRING, "Expected string.");
     }
-    
+
     Consume(SEMICOLON, "Expected 'label' after draw command.");
     return new Draw(command, elements, nameId);
   }
@@ -364,7 +365,7 @@ public class Parser
     Consume(EQUAL, "Expected '=' after constant name.");
     Expr initializer = Expression();
     Consume(SEMICOLON, "Expected ';' after constant declaration.");
-    
+
     return new ConstantStmt(constNames, initializer);
   }
 
@@ -380,16 +381,44 @@ public class Parser
           Error(Peek(), "Can't have more than 1024 items.");
         }
 
-        if (CheckNext(DOTS))
+        if (current + 2 < tokens.Count && Check(MINUS) && CheckNext(NUMBER) && tokens[current + 2].type == DOTS)
+        {
+          Consume(MINUS, "Expected '-' by condition");
+          Token left = Consume(NUMBER, "Range limit must be a integer constant.");
+          Token dots = Consume(DOTS, "Expected '...' after left limit of range.");
+
+          Token right = null; bool rightNeg = false;
+          if (Check(MINUS) && CheckNext(NUMBER))
+          {
+            rightNeg = true;
+            Consume(MINUS, "Expected '-' by condition");
+            right = Consume(NUMBER, "Range limit must be a integer constant.");
+          }
+          else if (Check(NUMBER))
+          {
+            right = Consume(NUMBER, "Range limit must be a integer constant.");
+          }
+
+          items.Add(new IntRange(left, dots, right, true, rightNeg));
+        }
+        else if (Check(NUMBER) && CheckNext(DOTS))
         {
           Token left = Consume(NUMBER, "Range limit must be a integer constant.");
           Token dots = Consume(DOTS, "Expected '...' after left limit of range.");
 
-          Token right = null;
-          if (Check(NUMBER))
+          Token right = null; bool rightNeg = false;
+          if (Check(MINUS) && CheckNext(NUMBER))
+          {
+            rightNeg = true;
+            Consume(MINUS, "Expected '-' by condition");
             right = Consume(NUMBER, "Range limit must be a integer constant.");
+          }
+          else if (Check(NUMBER))
+          {
+            right = Consume(NUMBER, "Range limit must be a integer constant.");
+          }
 
-          items.Add(new IntRange(left, dots, right));
+          items.Add(new IntRange(left, dots, right, true, rightNeg));
         }
         else
         {
@@ -415,7 +444,7 @@ public class Parser
     }
 
     Stmt returnValue = ReturnStatement();
-    
+
     body.Add(returnValue);
 
     return new LetIn(Let, body);
@@ -532,7 +561,7 @@ public class Parser
         }
         else if (rightLiteral.Value is null)
         {
-          Error(Peek(), "Unary minus operator does not suppor null operand.");
+          Error(Peek(), "Unary minus operator does not support null operand.");
           return new Literal(null);
         }
         else
@@ -749,6 +778,11 @@ public class Parser
     // return the token right after the current position
 
     return tokens[current + 1];
+  }
+
+  private Token PeekNextNext()
+  {
+    return tokens[current + 2];
   }
 
   private Token Previous()

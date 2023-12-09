@@ -357,7 +357,7 @@ public class Scanner
   }
 
   private void AddToken(Token token)
-  {
+  {    
     tokens.Add(token);
   }
 
