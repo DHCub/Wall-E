@@ -158,5 +158,5 @@ Desde un programa de puede importar las instrucciones declaradas en otros ficher
 import “NombreDeFichero.geo”
 ```
 
-Este tipo de instrucción deberá aparecer al inicio del programa únicamente. Si una biblioteca importada tiene definiciones repetidas, se debe producir un error de compilación. Si se importan dos veces un mismo fichero, este deberá ser incluido una única vez (la primera).
+Este tipo de instrucción puede aparecer en cualquier lugar del programa, en caso de que hayan errores en dicha biblioteca, se notificará al usuario con un rastro de las importaciones para que pueda ver dónde fue. Si una biblioteca importada tiene definiciones repetidas, se produce un error de compilación. Si se importan dos veces un mismo fichero, este deberá ser incluido una única vez (la primera).
 
