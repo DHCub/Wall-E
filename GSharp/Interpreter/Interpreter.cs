@@ -617,7 +617,6 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
     }
   }
 
-
   public GSObject VisitConditionalExpr(Conditional expr)
   {
     bool condition = Evaluate(expr.Condition)!.GetTruthValue();
@@ -642,6 +641,8 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
     if (expr.Right is null)
     {
       int left = int.Parse(expr.Left.lexeme);
+      if (expr.LeftNegative) left = -left;
+
       return new GeneratorSequence(new IntRangeGenerator(left));
     }
     else
@@ -649,6 +650,15 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
       List<GSObject> rangeInt = new();
       int left = int.Parse(expr.Left.lexeme);
       int right = int.Parse(expr.Right.lexeme);
+
+      if (expr.LeftNegative) left = -left;
+      if (expr.RightNegative) right = -right;
+
+      if (left > right)
+      {
+        throw new RuntimeError(expr.Token, $"Invalid range: {left} expected to be less or equal to {right}", importStack);
+      }
+
       for (int i = left; i <= right; i++)
       {
         rangeInt.Add(new Scalar(i));
@@ -707,12 +717,24 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
           {
             IsFinite = false;
             int left = int.Parse(range.Left.lexeme);
+
+            if (range.LeftNegative) left = -left;
+
             genSequence = new GeneratorSequence(new IntRangeGenerator(left), prefix);
           }
           else
           {
             int left = int.Parse(range.Left.lexeme);
             int right = int.Parse(range.Right.lexeme);
+
+            if (range.LeftNegative) left = -left;
+            if (range.RightNegative) right = -right;
+
+            if (left > right)
+            {
+              throw new RuntimeError(expr.Token, $"Invalid range: {left} expected to be less or equal to {right}", importStack);
+            }
+
             for (int v = left; v <= right; v++)
             {
               prefix.Add(new Scalar(v));
