@@ -10,4 +10,7 @@ public class ScanError : Exception
   {
     this.line = line;
   }
+
+  public override string ToString()
+    => "! SCAN ERROR: " + "at line " + line + ": " + base.Message;
 }

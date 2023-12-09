@@ -501,8 +501,23 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
     var L = double.Parse((string)intRange.Left.literal);
     if (!double.IsInteger(L))
       errorHandler(new(intRange.Left, "Left" + ERROR, importStack));
-    if (intRange.Right != null && !double.IsInteger(double.Parse((string)intRange.Right.literal)))
-      errorHandler(new(intRange.Left, "Right" + ERROR, importStack));
+    
+    if (intRange.Right != null)
+    {
+      var R = double.Parse((string)intRange.Right.literal);
+      
+      if (!double.IsInteger(R))
+        errorHandler(new(intRange.Right, "Right" + ERROR, importStack));
+
+      if (intRange.LeftNegative) L = -L;
+      if (intRange.RightNegative) R = -R;
+      if (L > R)
+        errorHandler(new(
+          intRange.Dots, 
+          $"Invalid range value in left {L} expected to be less or equal to value in right {R}", 
+          importStack
+        ));
+    }
 
     return new SequenceType(TypeName.Scalar);
   }

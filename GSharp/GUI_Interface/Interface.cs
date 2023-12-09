@@ -89,7 +89,8 @@ public class GUIInterface
 
     void ScanError(ScanError scanError)
     {
-      ReportError(scanError.line, string.Empty, scanError.Message);
+      // ReportError(scanError.line, string.Empty, scanError.Message);
+      errorHandler(scanError.ToString());
     }
 
     void RuntimeError(RuntimeError error)
@@ -97,31 +98,16 @@ public class GUIInterface
       errorHandler(error.ToString());
     }
 
-    void Error(Token token, string message)
-    {
-      if (token.type == TokenType.EOF)
-      {
-        ReportError(token.line, " at end", message);
-      }
-      else
-      {
-        ReportError(token.line, " at '" + token.lexeme + "'", message);
-      }
-    }
-
-    void ReportError(int line, string where, string message)
-    {
-      errorHandler($"[line {line}] Error{where}: {message}");
-    }
-
     void ParseError(ParseError parseError)
     {
-      Error(parseError.token, parseError.Message);
+      // Error(parseError.token, parseError.Message);
+      errorHandler(parseError.ToString());
     }
 
     void NameResolutionError(NameResolutionError nameResolutionError)
     {
-      Error(nameResolutionError.Token, nameResolutionError.Message);
+      // Error(nameResolutionError.Token, nameResolutionError.Message);
+      errorHandler(nameResolutionError.ToString());
     }
 
     void SemanticAnalyzerError(SemanticError semanticError)
