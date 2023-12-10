@@ -5,10 +5,10 @@ public class Unary : Expr, IToken
   public readonly Token Oper;
   public readonly Expr Right;
 
-  public Unary(Token Oper, Expr Right)
+  public Unary(Token oper, Expr right)
   {
-    this.Oper = Oper;
-    this.Right = Right;
+    this.Oper = oper;
+    this.Right = right;
   }
 
   public override R Accept<R>(IVisitor<R> visitor)

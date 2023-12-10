@@ -6,11 +6,11 @@ public class Binary : Expr, IToken
   public readonly Token Oper;
   public readonly Expr Right;
 
-  public Binary(Expr Left, Token Oper, Expr Right)
+  public Binary(Expr left, Token oper, Expr right)
   {
-    this.Left = Left;
-    this.Oper = Oper;
-    this.Right = Right;
+    this.Left = left;
+    this.Oper = oper;
+    this.Right = right;
   }
 
   public override R Accept<R>(IVisitor<R> visitor)

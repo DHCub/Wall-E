@@ -15,6 +15,7 @@ public abstract class Expr
     R VisitBinaryExpr(Binary expr);
     R VisitCallExpr(Call expr);
     R VisitConditionalExpr(Conditional expr);
+    R VisitIndexExpr(Index expr);
     R VisitEmptyExpr(Empty expr);
     R VisitGroupingExpr(Grouping expr);
     R VisitIntRangeExpr(IntRange expr);

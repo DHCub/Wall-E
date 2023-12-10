@@ -6,11 +6,11 @@ public class Logical : Expr, IToken
   public readonly Token Oper;
   public readonly Expr Right;
 
-  public Logical(Expr Left, Token Oper, Expr Right)
+  public Logical(Expr left, Token oper, Expr right)
   {
-    this.Left = Left;
-    this.Oper = Oper;
-    this.Right = Right;
+    this.Left = left;
+    this.Oper = oper;
+    this.Right = right;
   }
 
   public override R Accept<R>(IVisitor<R> visitor)

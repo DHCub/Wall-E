@@ -4,9 +4,9 @@ public class Variable : Expr, IToken
 {
   public readonly Token Name;
 
-  public Variable(Token Name)
+  public Variable(Token name)
   {
-    this.Name = Name;
+    this.Name = name;
   }
 
   public override R Accept<R>(IVisitor<R> visitor)

@@ -7,10 +7,10 @@ public class Sequence : Expr, IToken
   public readonly Token Brace;
   public readonly List<Expr> Items;
 
-  public Sequence(Token Brace, List<Expr> Items)
+  public Sequence(Token brace, List<Expr> items)
   {
-    this.Items = Items;
-    this.Brace = Brace;
+    this.Items = items;
+    this.Brace = brace;
   }
 
   public override R Accept<R>(IVisitor<R> visitor)
