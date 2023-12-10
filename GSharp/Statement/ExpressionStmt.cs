@@ -6,9 +6,9 @@ public class ExpressionStmt : Stmt
 {
   public readonly Expr Expression;
 
-  public ExpressionStmt(Expr Expression)
+  public ExpressionStmt(Expr expression)
   {
-    this.Expression = Expression;
+    this.Expression = expression;
   }
 
   public override R Accept<R>(IVisitor<R> visitor)

@@ -8,11 +8,11 @@ public class Draw : Stmt, IToken
   public readonly Expr Elements;
   public readonly Token Label;
 
-  public Draw(Token Command, Expr Elements, Token Label = null)
+  public Draw(Token command, Expr elements, Token label = null)
   {
-    this.Command = Command;
-    this.Elements = Elements;
-    this.Label = Label;
+    this.Command = command;
+    this.Elements = elements;
+    this.Label = label;
   }
 
   public override R Accept<R>(IVisitor<R> visitor)

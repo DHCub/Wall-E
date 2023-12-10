@@ -8,11 +8,11 @@ public class Print : Stmt, IToken
   public readonly Expr Expression;
   public readonly Token? Label;
 
-  public Print(Token Command, Expr Expression, Token? Label = null)
+  public Print(Token command, Expr expression, Token? label = null)
   {
-    this.Command = Command;
-    this.Expression = Expression;
-    this.Label = Label;
+    this.Command = command;
+    this.Expression = expression;
+    this.Label = label;
   }
 
   public override R Accept<R>(IVisitor<R> visitor)

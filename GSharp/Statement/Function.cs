@@ -14,13 +14,13 @@ public class Function : Stmt, IToken
   public readonly ITypeReference ReturnTypeReference;
   public readonly TypeName? ReturnTypeName;
 
-  public Function(Token Name, IEnumerable<Parameter> Parameters, IEnumerable<Stmt> Body, TypeReference ReturnTypeReference, TypeName? ReturnTypeName)
+  public Function(Token name, IEnumerable<Parameter> parameters, IEnumerable<Stmt> body, TypeReference returnTypeReference, TypeName? returnTypeName)
   {
-    this.Name = Name;
-    this.Parameters = Parameters.ToImmutableList();
-    this.Body = Body.ToImmutableList();
-    this.ReturnTypeReference = ReturnTypeReference;
-    this.ReturnTypeName = ReturnTypeName;
+    this.Name = name;
+    this.Parameters = parameters.ToImmutableList();
+    this.Body = body.ToImmutableList();
+    this.ReturnTypeReference = returnTypeReference;
+    this.ReturnTypeName = returnTypeName;
   }
 
   public override R Accept<R>(IVisitor<R> visitor)
