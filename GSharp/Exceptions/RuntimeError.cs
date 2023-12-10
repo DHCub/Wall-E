@@ -32,24 +32,7 @@ public class RuntimeError : Exception
     
     answ.AddRange(this.Message);
 
-    if (ImportTrace != null && ImportTrace.Count > 0)
-    {
-      bool first = true;
-      foreach(var file in ImportTrace)
-      {
-        if (first)
-        {
-          answ.AddRange("\nAt file: \n");
-          answ.AddRange(file);
-          first = false;
-        }
-        else
-        {
-          answ.AddRange(", Imported from File:\n");
-          answ.AddRange(file); 
-        }
-      }
-    }
+    answ.AddRange(ImportTraceBuilder.GetImportTrace(ImportTrace));
 
     return new string(answ.ToArray());
   }

@@ -37,7 +37,7 @@ public class Parser
   /// internal state after parsing a given program. It is also used for interpreting
   /// the statements.
   /// </summary>
-  public static ScanAndParseResult ScanAndParse(string source, ScanErrorHandler scanErrorHandler, ParseErrorHandler parseErrorHandler)
+  public static ScanAndParseResult ScanAndParse(string source, ScanErrorHandler scanErrorHandler, ParseErrorHandler parseErrorHandler, Stack<string> importTrace)
   {
     // ... 
     // scanning phase
@@ -48,7 +48,7 @@ public class Parser
     {
       hasScanErrors = true;
       scanErrorHandler(scanError);
-    });
+    }, importTrace);
 
     var tokens = scanner.ScanTokens();
 
@@ -68,7 +68,7 @@ public class Parser
     {
       hasParseErrors = true;
       parseErrorHandler(parseError);
-    });
+    }, importTrace);
 
     object syntax = parser.ParseStmts();
 
@@ -91,11 +91,13 @@ public class Parser
   }
 
   private int current;
+  private Stack<string> importTrace;
 
-  public Parser(List<Token> tokens, ParseErrorHandler parseErrorHandler)
+  public Parser(List<Token> tokens, ParseErrorHandler parseErrorHandler, Stack<string> importTrace)
   {
     this.tokens = tokens;
     this.parseErrorHandler = parseErrorHandler;
+    this.importTrace = importTrace;
   }
 
   public IList<Stmt> ParseStmts()
@@ -794,7 +796,7 @@ public class Parser
 
   private InternalParseError Error(Token token, string message, ParseErrorType? parseErrorType = null)
   {
-    parseErrorHandler(new ParseError(message, token, parseErrorType));
+    parseErrorHandler(new ParseError(message, token, importTrace, parseErrorType));
 
     return new InternalParseError(parseErrorType);
   }
