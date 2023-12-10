@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using GSharp.Expression;
 using GSharp.Statement;
@@ -30,6 +31,20 @@ public abstract class VisitorBase : Expr.IVisitor<VoidObject>, Stmt.IVisitor<Voi
   public void Visit(Expr expr)
   {
     expr.Accept(this);
+  }
+
+  public virtual VoidObject VisitAssignExpr(Assign expr)
+  {
+    Visit(expr.Value);
+
+    return VoidObject.Void;
+  }
+
+  public virtual VoidObject VisitBlockStmt(Block stmt)
+  {
+    Visit(stmt.Statements);
+
+    return VoidObject.Void;
   }
 
   public virtual VoidObject VisitBinaryExpr(Binary expr)
@@ -114,6 +129,14 @@ public abstract class VisitorBase : Expr.IVisitor<VoidObject>, Stmt.IVisitor<Voi
     return VoidObject.Void;
   }
 
+  public virtual VoidObject VisitIndexExpr(Index expr)
+  {
+    Visit(expr.Indexee);
+    Visit(expr.Argument);
+
+    return VoidObject.Void;
+  }
+
   public virtual VoidObject VisitLetInExpr(LetIn expr)
   {
     Visit(expr.Stmts);
@@ -156,9 +179,16 @@ public abstract class VisitorBase : Expr.IVisitor<VoidObject>, Stmt.IVisitor<Voi
     return VoidObject.Void;
   }
 
-  public virtual VoidObject VisitUnaryExpr(Unary expr)
+  public virtual VoidObject VisitUnaryPrefixExpr(UnaryPrefix expr)
   {
     Visit(expr.Right);
+
+    return VoidObject.Void;
+  }
+
+  public virtual VoidObject VisitUnaryPostfixExpr(UnaryPostfix expr)
+  {
+    Visit(expr.Left);
 
     return VoidObject.Void;
   }
@@ -189,6 +219,14 @@ public abstract class VisitorBase : Expr.IVisitor<VoidObject>, Stmt.IVisitor<Voi
     {
       Visit(stmt.Initializer);
     }
+
+    return VoidObject.Void;
+  }
+
+  public virtual VoidObject VisitWhileStmt(While stmt)
+  {
+    Visit(stmt.Condition);
+    Visit(stmt.Body);
 
     return VoidObject.Void;
   }

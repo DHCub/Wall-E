@@ -4,6 +4,7 @@ public abstract class Stmt
 {
   public interface IVisitor<R>
   {
+    R VisitBlockStmt(Block stmt);
     R VisitColorStmt(ColorStmt stmt);
     R VisitConstantStmt(ConstantStmt stmt);
     R VisitDrawStmt(Draw stmt);
