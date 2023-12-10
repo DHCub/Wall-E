@@ -23,7 +23,8 @@ public abstract class Expr
     R VisitLiteralExpr(Literal expr);
     R VisitLogicalExpr(Logical expr);
     R VisitSequenceExpr(Sequence expr);
-    R VisitUnaryExpr(Unary expr);
+    R VisitUnaryPrefixExpr(UnaryPrefix expr);
+    R VisitUnaryPostfixExpr(UnaryPostfix expr);
     R VisitUndefinedExpr(Undefined expr);
     R VisitVariableExpr(Variable expr);
   }

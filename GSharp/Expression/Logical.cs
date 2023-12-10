@@ -18,5 +18,10 @@ public class Logical : Expr, IToken
     return visitor.VisitLogicalExpr(this);
   }
 
+  public override string ToString()
+  {
+    return $"{Left} {Oper} {Right}";
+  }
+
   public Token Token => Oper;
 }
