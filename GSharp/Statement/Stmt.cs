@@ -14,6 +14,7 @@ public abstract class Stmt
     R VisitRestoreStmt(Restore stmt);
     R VisitReturnStmt(Return stmt);
     R VisitVarStmt(Var stmt);
+    R VisitWhileStmt(While stmt);
   }
 
   public abstract R Accept<R>(IVisitor<R> visitor);
