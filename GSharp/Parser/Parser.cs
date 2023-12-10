@@ -14,7 +14,6 @@ namespace GSharp.Parser;
 // <summary>
 // Parses GSharp code to either a list of statements.
 // </summary>
-
 public class Parser
 {
   private class InternalParseError : Exception

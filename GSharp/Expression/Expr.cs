@@ -11,6 +11,7 @@ public abstract class Expr
 
   public interface IVisitor<R>
   {
+    R VisitAssignExpr(Assign expr);
     R VisitBinaryExpr(Binary expr);
     R VisitCallExpr(Call expr);
     R VisitConditionalExpr(Conditional expr);
