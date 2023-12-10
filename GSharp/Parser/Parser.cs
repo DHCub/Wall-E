@@ -922,11 +922,6 @@ public class Parser
     return tokens[current + 1];
   }
 
-  private Token PeekNextNext()
-  {
-    return tokens[current + 2];
-  }
-
   private Token Previous()
   {
     // returns the token right before the current position
