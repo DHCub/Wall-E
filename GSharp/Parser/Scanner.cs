@@ -199,7 +199,7 @@ public class Scanner
         AddToken(SEMICOLON);
         break;
       case ':':
-        AddToken(TWO_DOTS);
+        AddToken(Match('=') ? ASSIGN : TWO_DOTS);
         break;
 
       case '(':

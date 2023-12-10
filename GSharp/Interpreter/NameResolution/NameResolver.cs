@@ -340,9 +340,7 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
 
   public VoidObject VisitLetInExpr(LetIn expr)
   {
-    BeginScope();
-    Resolve(expr.Stmts);
-    EndScope();
+    ResolveLetIn(expr, FunctionType.LETIN);
 
     return VoidObject.Void;
   }
@@ -433,6 +431,24 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
     currentFunction = enclosingFunction;
   }
 
+  private void ResolveLetIn(LetIn letIn, FunctionType type)
+  {
+    FunctionType enclosingFunction = currentFunction;
+    currentFunction = type;
+
+    BeginScope();
+
+    {
+      BeginScope();
+      Resolve(letIn.Stmts);
+      EndScope();
+    }
+
+    EndScope();
+
+    currentFunction = enclosingFunction;
+  }
+
   public VoidObject VisitImportStmt(Import stmt)
   {
     // in future check if the code to import is in a valid path
@@ -482,15 +498,16 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
 
   public VoidObject VisitWhileStmt(While stmt)
   {
-    Resolve(stmt.Condition);
-    Resolve(stmt.Body);
-
     return VoidObject.Void;
+    // Resolve(stmt.Condition);
+    // Resolve(stmt.Body);
+
   }
 
   private enum FunctionType
   {
     NONE,
-    FUNCTION
+    FUNCTION,
+    LETIN,
   }
 }

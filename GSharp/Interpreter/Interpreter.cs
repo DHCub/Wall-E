@@ -599,6 +599,10 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
           return IOperate<Add>.Operate(left, right);
         case MINUS:
           return IOperate<Subst>.Operate(left, right);
+        case PLUS_EQUAL:
+          return IOperate<Add>.Operate(left, right);
+        case MINUS_EQUAL:
+          return IOperate<Subst>.Operate(left, right);
         case MUL:
           return IOperate<Mult>.Operate(left, right);
         case DIV:

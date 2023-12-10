@@ -184,6 +184,14 @@ public class Parser
     {
       initializer = VarDeclaration(Previous());
     }
+    else if (Match(POINT_SEQUENCE, LINE_SEQUENCE, SEGMENT_SEQUENCE, RAY_SEQUENCE, CIRCLE_SEQUENCE, ARC_SEQUENCE))
+    {
+      initializer = VarDeclaration(Previous());
+    }
+    else if (IsConstant() && Match(IDENTIFIER))
+    {
+      initializer = ConstDeclaration();
+    }
     else
     {
       initializer = ExpressionStatement();
@@ -219,7 +227,7 @@ public class Parser
 
     body = new While(condition, body);
 
-    if (initializer is not null)
+    if (initializer != null)
     {
       body = new Block(new List<Stmt> { initializer, body });
     }
@@ -882,6 +890,17 @@ public class Parser
 
     if (Check(IDENTIFIER) && CheckNext(LEFT_PARENTESIS))
     {
+      return false;
+    }
+
+    for (int i = current; tokens[i].type != EOF; i++)
+    {
+      if (tokens[i].type == IDENTIFIER || tokens[i].type == COMMA)
+        continue;
+
+      if (tokens[i].type == EQUAL)
+        break;
+
       return false;
     }
 
