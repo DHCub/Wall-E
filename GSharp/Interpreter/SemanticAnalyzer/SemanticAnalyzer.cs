@@ -304,12 +304,12 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
       var FunSymbol = new FunSymbol(name, Parameters, retType);
       functionsContext.Define(name, FunSymbol);
 
-      foreach(var stmt in function.Body)
+      foreach (var stmt in function.Body)
       {
         if (stmt is Statement.Return ret)
         {
           var practicalRetType = TypeCheck(ret);
-          if (!practicalRetType.SameTypeAs(retType)) 
+          if (!practicalRetType.SameTypeAs(retType))
           {
             errorHandler(new(function.Token, $"Function returns {practicalRetType}, but {retType} is specified as expected return type", importTrace));
           }
@@ -354,17 +354,17 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
 
     if (stmts == null)
       errorHandler(new(import.Command, "File " + (string)import.DirName.literal + " not found", importTrace));
-    else 
+    else
     {
       importTrace.Push(dir);
-      foreach(var stmt in stmts)
+      foreach (var stmt in stmts)
       {
         TypeCheck(stmt);
       }
       importTrace.Pop();
     }
 
-    
+
 
     return new UndefinedType();
   }
@@ -412,7 +412,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
   public GSType VisitReturnStmt(GSharp.Statement.Return @return)
   {
     if (@return.Value != null) return TypeCheck(@return.Value);
-    
+
     throw new Exception("RETURN STATEMENT WITH NULL VALUE");
   }
 
@@ -471,7 +471,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
       var argType = TypeCheck(call.Arguments[i]);
 
       if (!paramType.SameTypeAs(argType))
-        errorHandler(new(nameTok, $"Function {name} takes {paramType} as its #{i+1} parameter, {argType} passed instead", importTrace));
+        errorHandler(new(nameTok, $"Function {name} takes {paramType} as its #{i + 1} parameter, {argType} passed instead", importTrace));
     }
 
     return FunSymbol.ReturnType;
@@ -508,11 +508,11 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
     var L = double.Parse((string)intRange.Left.literal);
     if (!double.IsInteger(L))
       errorHandler(new(intRange.Left, "Left" + ERROR, importTrace));
-    
+
     if (intRange.Right != null)
     {
       var R = double.Parse((string)intRange.Right.literal);
-      
+
       if (!double.IsInteger(R))
         errorHandler(new(intRange.Right, "Right" + ERROR, importTrace));
 
@@ -520,8 +520,8 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
       if (intRange.RightNegative) R = -R;
       if (L > R)
         errorHandler(new(
-          intRange.Dots, 
-          $"Invalid range value in left {L} expected to be less or equal to value in right {R}", 
+          intRange.Dots,
+          $"Invalid range value in left {L} expected to be less or equal to value in right {R}",
           importTrace
         ));
     }
@@ -540,7 +540,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
     {
       if (letIn.Stmts[i] is Statement.Return retStmt)
       {
-        retType = TypeCheck(retStmt.Value); 
+        retType = TypeCheck(retStmt.Value);
       }
       else TypeCheck(letIn.Stmts[i]);
     }
@@ -558,7 +558,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
     if (literal.Value is INumericLiteral) return new SimpleType(TypeName.Scalar);
     else if (literal.Value is string) return new SimpleType(TypeName.String);
     else if (literal.Value is bool) return new SimpleType(TypeName.Scalar);
-    
+
     throw new NotImplementedException("UNSUPPORTED LITERAL TYPE");
   }
 
@@ -574,13 +574,13 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
   {
     SequenceType seqT = new();
 
-    foreach(var item in sequence.Items)
+    foreach (var item in sequence.Items)
     {
       var type = TypeCheck(item);
-      
-      if(item is IntRange)
+
+      if (item is IntRange)
         type = new SimpleType(TypeName.Scalar);
-      
+
       var (accepted, errorMessage) = seqT.AcceptNewType(type);
 
       if (!accepted)
@@ -590,7 +590,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
     return seqT;
   }
 
-  public GSType VisitUnaryExpr(Unary unary)
+  public GSType VisitUnaryPrefixExpr(UnaryPrefix unary)
   {
     var left = TypeCheck(unary.Right);
 
@@ -601,7 +601,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
         errorHandler(new(unary.Token, $"Cannot apply minus unary operand to " + left.ToString(), importTrace));
       return type;
     }
-    
+
     else if (unary.Token.type == TokenType.NOT)
       return new SimpleType(TypeName.Scalar);
 
@@ -626,7 +626,32 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
       return new UndefinedType();
     }
 
-    return symbol.Type;  
+    return symbol.Type;
   }
 
+  public GSType VisitBlockStmt(Block stmt)
+  {
+    return new UndefinedType();
+  }
+
+  public GSType VisitWhileStmt(While stmt)
+  {
+    return new UndefinedType();
+  }
+
+  public GSType VisitAssignExpr(Assign expr)
+  {
+    return new UndefinedType();
+  }
+
+  public GSType VisitIndexExpr(global::Index expr)
+  {
+    return new UndefinedType();
+  }
+
+
+  public GSType VisitUnaryPostfixExpr(UnaryPostfix expr)
+  {
+    return new UndefinedType();
+  }
 }

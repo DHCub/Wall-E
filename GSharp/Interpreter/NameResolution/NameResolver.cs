@@ -197,6 +197,14 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
     }
   }
 
+  public VoidObject VisitAssignExpr(Assign expr)
+  {
+    Resolve(expr.Value);
+    ResolveLocalOrGlobal(expr, expr.Name);
+
+    return VoidObject.Void;
+  }
+
   public VoidObject VisitEmptyExpr(Empty expr)
   {
     return VoidObject.Void;
@@ -227,6 +235,19 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
     return VoidObject.Void;
   }
 
+  public VoidObject VisitIndexExpr(Index expr)
+  {
+    Resolve(expr.Indexee);
+    Resolve(expr.Argument);
+
+    if (expr.Indexee is Variable variableExpr)
+    {
+      ResolveLocalOrGlobal(expr, variableExpr.Name);
+    }
+
+    return VoidObject.Void;
+  }
+
   public VoidObject VisitGroupingExpr(Grouping expr)
   {
     Resolve(expr.Expression);
@@ -247,9 +268,17 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
     return VoidObject.Void;
   }
 
-  public VoidObject VisitUnaryExpr(Unary expr)
+  public VoidObject VisitUnaryPrefixExpr(UnaryPrefix expr)
   {
     Resolve(expr.Right);
+
+    return VoidObject.Void;
+  }
+
+  public VoidObject VisitUnaryPostfixExpr(UnaryPostfix expr)
+  {
+    Resolve(expr.Left);
+    ResolveLocalOrGlobal(expr, expr.Name);
 
     return VoidObject.Void;
   }
@@ -263,6 +292,15 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
     }
 
     ResolveLocalOrGlobal(expr, expr.Name);
+
+    return VoidObject.Void;
+  }
+
+  public VoidObject VisitBlockStmt(Block stmt)
+  {
+    BeginScope();
+    Resolve(stmt.Statements);
+    EndScope();
 
     return VoidObject.Void;
   }
@@ -438,6 +476,14 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
     }
 
     Define(stmt.Name, stmt.TypeReference ?? new TypeReference(stmt.Name));
+
+    return VoidObject.Void;
+  }
+
+  public VoidObject VisitWhileStmt(While stmt)
+  {
+    Resolve(stmt.Condition);
+    Resolve(stmt.Body);
 
     return VoidObject.Void;
   }
