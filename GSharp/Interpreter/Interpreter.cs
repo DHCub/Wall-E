@@ -384,7 +384,6 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
       e.AddImportTrace(importTrace);
       throw e;
     }
-
   }
 
   public GSObject VisitUnaryPrefixExpr(UnaryPrefix expr)
