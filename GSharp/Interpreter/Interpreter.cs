@@ -351,14 +351,14 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
       {
         if (binding is IDistanceBinding distanceBinding)
         {
-          GSObject curValue = currentEnvironment.GetAt(distanceBinding.Distance - 1, expr.Name.lexeme);
+          GSObject curValue = currentEnvironment.GetAt(distanceBinding.Distance, expr.Name.lexeme);
 
           if (!curValue.SameTypeAs(value))
           {
             throw new RuntimeError(expr.Name, $"Expected value of type {curValue.GetTypeName()}", importTrace);
           }
 
-          currentEnvironment.AssignAt(distanceBinding.Distance - 1, expr.Name, value);
+          currentEnvironment.AssignAt(distanceBinding.Distance, expr.Name, value);
         }
         else
         {
@@ -449,7 +449,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
       {
         if (binding is IDistanceBinding distanceBinding)
         {
-          currentEnvironment.AssignAt(distanceBinding.Distance - 1, expr.Name, value);
+          currentEnvironment.AssignAt(distanceBinding.Distance, expr.Name, value);
         }
         else
         {
