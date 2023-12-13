@@ -420,11 +420,7 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
       Define(param.Name, new TypeReference(param.TypeSpecifier));
     }
 
-    {
-      BeginScope();
-      Resolve(function.Body);
-      EndScope();
-    }
+    Resolve(function.Body);
 
     EndScope();
 
@@ -438,11 +434,7 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
 
     BeginScope();
 
-    {
-      BeginScope();
-      Resolve(letIn.Stmts);
-      EndScope();
-    }
+    Resolve(letIn.Stmts);
 
     EndScope();
 
@@ -498,10 +490,10 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
 
   public VoidObject VisitWhileStmt(While stmt)
   {
-    return VoidObject.Void;
-    // Resolve(stmt.Condition);
-    // Resolve(stmt.Body);
+    Resolve(stmt.Condition);
+    Resolve(stmt.Body);
 
+    return VoidObject.Void;
   }
 
   private enum FunctionType
