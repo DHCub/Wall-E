@@ -351,7 +351,14 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
       {
         if (binding is IDistanceBinding distanceBinding)
         {
-          currentEnvironment.AssignAt(distanceBinding.Distance, expr.Name, value);
+          GSObject curValue = currentEnvironment.GetAt(distanceBinding.Distance - 1, expr.Name.lexeme);
+
+          if (!curValue.SameTypeAs(value))
+          {
+            throw new RuntimeError(expr.Name, $"Expected value of type {curValue.GetTypeName()}", importTrace);
+          }
+
+          currentEnvironment.AssignAt(distanceBinding.Distance - 1, expr.Name, value);
         }
         else
         {
@@ -360,6 +367,13 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
       }
       else
       {
+        GSObject curValue = globals.Get(expr.Name);
+
+        if (!curValue.SameTypeAs(value))
+        {
+          throw new RuntimeError(expr.Name, $"Expected value of type {curValue.GetTypeName()}", importTrace);
+        }
+
         globals.Assign(expr.Name, value);
       }
 
@@ -436,7 +450,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
       {
         if (binding is IDistanceBinding distanceBinding)
         {
-          currentEnvironment.AssignAt(distanceBinding.Distance, expr.Name, value);
+          currentEnvironment.AssignAt(distanceBinding.Distance - 1, expr.Name, value);
         }
         else
         {
@@ -973,7 +987,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
       {
         throw new RuntimeError(stmt.Token, "Cannot assign some constants to unique value.", importTrace);
       }
-      
+
       try { currentEnvironment.Define(stmt.Names[0], value); }
       catch (RuntimeError e) { e.AddImportTrace(importTrace); throw e; }
     }
