@@ -11,9 +11,11 @@ public abstract class Expr
 
   public interface IVisitor<R>
   {
+    R VisitAssignExpr(Assign expr);
     R VisitBinaryExpr(Binary expr);
     R VisitCallExpr(Call expr);
     R VisitConditionalExpr(Conditional expr);
+    R VisitIndexExpr(Index expr);
     R VisitEmptyExpr(Empty expr);
     R VisitGroupingExpr(Grouping expr);
     R VisitIntRangeExpr(IntRange expr);
@@ -21,7 +23,8 @@ public abstract class Expr
     R VisitLiteralExpr(Literal expr);
     R VisitLogicalExpr(Logical expr);
     R VisitSequenceExpr(Sequence expr);
-    R VisitUnaryExpr(Unary expr);
+    R VisitUnaryPrefixExpr(UnaryPrefix expr);
+    R VisitUnaryPostfixExpr(UnaryPostfix expr);
     R VisitUndefinedExpr(Undefined expr);
     R VisitVariableExpr(Variable expr);
   }

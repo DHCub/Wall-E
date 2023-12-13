@@ -16,8 +16,6 @@ internal class FunctionBindingFactory : IBindingFactory
     this.Fun = function;
   }
 
-  public Binding CreateBinding(int distance, Expr referringExpr)
-  {
-    return new FunctionBinding(Fun, TypeReference, distance, referringExpr);
-  }
+  public Binding CreateBinding(int distance, Expr referringExpr) =>
+    new FunctionBinding(Fun, TypeReference, distance, referringExpr);
 }

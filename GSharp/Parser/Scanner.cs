@@ -27,6 +27,8 @@ public class Scanner
     {"else", ELSE},
     {"false", FALSE},
     {"true", TRUE},
+    {"while", WHILE},
+    {"for", FOR},
 
     {"and", AND},
     {"or", OR},
@@ -135,10 +137,32 @@ public class Scanner
         break;
 
       case '+':
-        AddToken(PLUS);
+        if (Match('+'))
+        {
+          AddToken(PLUS_PLUS);
+        }
+        else if (Match('='))
+        {
+          AddToken(PLUS_EQUAL);
+        }
+        else
+        {
+          AddToken(PLUS);
+        }
         break;
       case '-':
-        AddToken(MINUS);
+        if (Match('-'))
+        {
+          AddToken(MINUS_MINUS);
+        }
+        else if (Match('='))
+        {
+          AddToken(MINUS_EQUAL);
+        }
+        else
+        {
+          AddToken(MINUS);
+        }
         break;
       case '%':
         AddToken(MOD);
@@ -175,7 +199,7 @@ public class Scanner
         AddToken(SEMICOLON);
         break;
       case ':':
-        AddToken(TWO_DOTS);
+        AddToken(Match('=') ? ASSIGN : TWO_DOTS);
         break;
 
       case '(':
@@ -189,6 +213,12 @@ public class Scanner
         break;
       case '}':
         AddToken(RIGHT_BRACE);
+        break;
+      case '[':
+        AddToken(LEFT_SQUARE_BRACKET);
+        break;
+      case ']':
+        AddToken(RIGHT_SQUARE_BRACKET);
         break;
 
       case '=':
@@ -359,7 +389,7 @@ public class Scanner
   }
 
   private void AddToken(Token token)
-  {    
+  {
     tokens.Add(token);
   }
 

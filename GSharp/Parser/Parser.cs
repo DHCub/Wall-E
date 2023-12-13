@@ -14,7 +14,6 @@ namespace GSharp.Parser;
 // <summary>
 // Parses GSharp code to either a list of statements.
 // </summary>
-
 public class Parser
 {
   private class InternalParseError : Exception
@@ -154,6 +153,8 @@ public class Parser
 
   private Stmt Statement()
   {
+    if (Match(FOR)) return ForStatement();
+    if (Match(WHILE)) return WhileStatement();
     if (Match(DRAW)) return DrawStatement(Previous());
     if (Match(COLOR)) return ColorStatement(Previous());
     if (Match(RESTORE)) return RestoreStatement(Previous());
@@ -168,6 +169,80 @@ public class Parser
     Expr expr = Expression();
     Consume(SEMICOLON, "Expected ';' after expression.", MISSING_SEMICOLON);
     return new ExpressionStmt(expr);
+  }
+
+  private Stmt ForStatement()
+  {
+    Consume(LEFT_PARENTESIS, "Expected '(' after 'for'.");
+
+    Stmt initializer;
+    if (Match(SEMICOLON))
+    {
+      initializer = null;
+    }
+    else if (Match(POINT, LINE, SEGMENT, RAY, CIRCLE, ARC))
+    {
+      initializer = VarDeclaration(Previous());
+    }
+    else if (Match(POINT_SEQUENCE, LINE_SEQUENCE, SEGMENT_SEQUENCE, RAY_SEQUENCE, CIRCLE_SEQUENCE, ARC_SEQUENCE))
+    {
+      initializer = VarDeclaration(Previous());
+    }
+    else if (IsConstant() && Match(IDENTIFIER))
+    {
+      initializer = ConstDeclaration();
+    }
+    else
+    {
+      initializer = ExpressionStatement();
+    }
+
+    Expr condition = null;
+    if (!Check(SEMICOLON))
+    {
+      condition = Expression();
+    }
+
+    Consume(SEMICOLON, "Expected ';' after loop condition.");
+
+    Expr increment = null;
+    if (!Check(RIGHT_PARENTESIS))
+    {
+      increment = Expression();
+    }
+
+    Consume(RIGHT_PARENTESIS, "Expected ')' after for clauses.");
+
+    Stmt body = ExpressionStatement();
+
+    if (increment != null)
+    {
+      body = new Block(new List<Stmt>{
+        body,
+        new ExpressionStmt(increment)
+      });
+    }
+
+    condition ??= new Literal(true);
+
+    body = new While(condition, body);
+
+    if (initializer != null)
+    {
+      body = new Block(new List<Stmt> { initializer, body });
+    }
+
+    return body;
+  }
+
+  private Stmt WhileStatement()
+  {
+    Consume(LEFT_PARENTESIS, "Expected '(' after 'while'.");
+    Expr condition = Expression();
+    Consume(RIGHT_PARENTESIS, "Expected ')' after condition.");
+    Stmt body = ExpressionStatement();
+
+    return new While(condition, body);
   }
 
   private Expr IfExpression(Token ifTk)
@@ -439,7 +514,7 @@ public class Parser
 
     List<Stmt> body = new List<Stmt>();
 
-    var instructions = Block();
+    var instructions = LetInBlock();
     foreach (var instruction in instructions)
     {
       body.Add(instruction);
@@ -452,7 +527,7 @@ public class Parser
     return new LetIn(Let, body);
   }
 
-  private List<Stmt> Block()
+  private List<Stmt> LetInBlock()
   {
     var statements = new List<Stmt>();
     while (!Check(IN) && !IsAtEnd())
@@ -465,11 +540,64 @@ public class Parser
 
   private Expr Assignment()
   {
+    Expr expr = UnaryPostfix();
+
+    if (Match(ASSIGN))
+    {
+      Token assignEquals = Previous();
+      Expr value = Assignment();
+
+      if (expr is Variable variable)
+      {
+        return new Assign(variable, value);
+      }
+
+      Error(assignEquals, "Invalid assignment target.");
+    }
+    else if (Match(PLUS_EQUAL, MINUS_EQUAL))
+    {
+      Token token = Previous();
+      Expr value = Term();
+
+      if (expr is Variable variable)
+      {
+        Expr newValue = new Binary(variable, token, value);
+
+        return new Assign(variable, newValue);
+      }
+
+      Error(token, "Invalid assignment target.");
+    }
+
+    return expr;
+  }
+
+  private Expr UnaryPostfix()
+  {
     Expr expr = Or();
 
-    // assignments are not support in this language
-    // but if can be supported in any moment you should
-    // implement here!
+    if (Match(PLUS_PLUS))
+    {
+      Token increment = Previous();
+
+      if (expr is Variable variable)
+      {
+        return new UnaryPostfix(variable, variable.Name, increment);
+      }
+
+      Error(increment, $"Can only increment variables, not {expr}");
+    }
+    else if (Match(MINUS_MINUS))
+    {
+      Token decrement = Previous();
+
+      if (expr is Variable variable)
+      {
+        return new UnaryPostfix(variable, variable.Name, decrement);
+      }
+
+      Error(decrement, $"Can only decrement variables, not {expr}");
+    }
 
     return expr;
   }
@@ -536,22 +664,23 @@ public class Parser
 
   private Expr Factor()
   {
-    Expr expr = Unary();
+    Expr expr = UnaryPrefix();
     while (Match(DIV, MUL, MOD, POWER))
     {
       Token oper = Previous();
-      Expr right = Unary();
+      Expr right = UnaryPrefix();
       expr = new Binary(expr, oper, right);
     }
     return expr;
   }
 
-  private Expr Unary()
+
+  private Expr UnaryPrefix()
   {
     if (Match(NOT, MINUS))
     {
       Token oper = Previous();
-      Expr right = Unary();
+      Expr right = UnaryPrefix();
 
       // we detect MINUS + NUMBER here and convert it to a single Literal()
       // instead of retaining it as a unary prefix expression
@@ -573,11 +702,34 @@ public class Parser
       }
       else
       {
-        return new Unary(oper, right);
+        return new UnaryPrefix(oper, right);
       }
     }
 
-    return Call();
+    return IndexingOrCall();
+  }
+
+  private Expr IndexingOrCall()
+  {
+    Expr expr = Primary();
+
+    while (true)
+    {
+      if (Match(LEFT_PARENTESIS))
+      {
+        expr = FinishCall(expr);
+      }
+      else if (Match(LEFT_SQUARE_BRACKET))
+      {
+        expr = FinishIndex(expr);
+      }
+      else
+      {
+        break;
+      }
+    }
+
+    return expr;
   }
 
   private Expr FinishCall(Expr calle)
@@ -600,16 +752,12 @@ public class Parser
     return new Call(calle, paren, arguments);
   }
 
-  private Expr Call()
+  private Expr FinishIndex(Expr indexee)
   {
-    Expr expr = Primary();
+    Expr argument = Expression();
+    Token closingBracket = Consume(RIGHT_SQUARE_BRACKET, "Expected ']' after index argument.");
 
-    if (Match(LEFT_PARENTESIS))
-    {
-      expr = FinishCall(expr);
-    }
-
-    return expr;
+    return new Index(indexee, closingBracket, argument);
   }
 
   private Expr Primary()
@@ -745,6 +893,17 @@ public class Parser
       return false;
     }
 
+    for (int i = current; tokens[i].type != EOF; i++)
+    {
+      if (tokens[i].type == IDENTIFIER || tokens[i].type == COMMA)
+        continue;
+
+      if (tokens[i].type == EQUAL)
+        break;
+
+      return false;
+    }
+
     return Check(IDENTIFIER);
   }
 
@@ -767,7 +926,7 @@ public class Parser
   {
     return Peek().type == EOF;
   }
-   
+
   private Token Peek()
   {
     // returns the token at the current position
@@ -780,11 +939,6 @@ public class Parser
     // return the token right after the current position
 
     return tokens[current + 1];
-  }
-
-  private Token PeekNextNext()
-  {
-    return tokens[current + 2];
   }
 
   private Token Previous()

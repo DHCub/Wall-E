@@ -4,9 +4,9 @@ public class Literal : Expr
 {
   public readonly object? Value;
 
-  public Literal(object Value)
+  public Literal(object value)
   {
-    this.Value = Value;
+    this.Value = value;
   }
 
   public override R Accept<R>(IVisitor<R> visitor)

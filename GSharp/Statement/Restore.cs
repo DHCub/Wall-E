@@ -4,9 +4,9 @@ public class Restore : Stmt, IToken
 {
   public readonly Token Command;
 
-  public Restore(Token Command)
+  public Restore(Token command)
   {
-    this.Command = Command;
+    this.Command = command;
   }
 
   public override R Accept<R>(IVisitor<R> visitor)

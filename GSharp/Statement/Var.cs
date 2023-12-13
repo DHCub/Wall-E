@@ -8,11 +8,11 @@ public class Var : Stmt, IToken
   public readonly Expr Initializer;
   public readonly ITypeReference TypeReference;
 
-  public Var(Token Name, Expr Initializer, TypeReference TypeReference)
+  public Var(Token name, Expr initializer, TypeReference typeReference)
   {
-    this.Name = Name;
-    this.Initializer = Initializer;
-    this.TypeReference = TypeReference;
+    this.Name = name;
+    this.Initializer = initializer;
+    this.TypeReference = typeReference;
   }
 
   public override R Accept<R>(IVisitor<R> visitor)

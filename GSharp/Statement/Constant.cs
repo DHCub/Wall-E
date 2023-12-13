@@ -9,10 +9,10 @@ public class ConstantStmt : Stmt, IToken
   public readonly List<Token> Names;
   public readonly Expr Initializer;
 
-  public ConstantStmt(List<Token> Names, Expr Initializer)
+  public ConstantStmt(List<Token> names, Expr initializer)
   {
-    this.Names = Names;
-    this.Initializer = Initializer;
+    this.Names = names;
+    this.Initializer = initializer;
   }
 
   public override R Accept<R>(IVisitor<R> visitor)

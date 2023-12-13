@@ -1,19 +1,19 @@
 namespace GSharp.Expression;
 
-public class Unary : Expr, IToken
+public class UnaryPrefix : Expr, IToken
 {
   public readonly Token Oper;
   public readonly Expr Right;
 
-  public Unary(Token Oper, Expr Right)
+  public UnaryPrefix(Token oper, Expr right)
   {
-    this.Oper = Oper;
-    this.Right = Right;
+    this.Oper = oper;
+    this.Right = right;
   }
 
   public override R Accept<R>(IVisitor<R> visitor)
   {
-    return visitor.VisitUnaryExpr(this);
+    return visitor.VisitUnaryPrefixExpr(this);
   }
 
   public Token Token => Oper;

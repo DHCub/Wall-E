@@ -7,18 +7,30 @@ public class IntRange : Expr, IToken
   public readonly Token Right;
   public readonly bool LeftNegative, RightNegative;
 
-  public IntRange(Token Left, Token Dots, Token Right, bool LeftNegative = false, bool RightNegative = false)
+  public IntRange(Token left, Token dots, Token right, bool leftNegative = false, bool rightNegative = false)
   {
-    this.Left = Left;
-    this.Dots = Dots;
-    this.Right = Right;
-    this.LeftNegative = LeftNegative;
-    this.RightNegative = RightNegative;
+    this.Left = left;
+    this.Dots = dots;
+    this.Right = right;
+    this.LeftNegative = leftNegative;
+    this.RightNegative = rightNegative;
   }
 
   public override R Accept<R>(IVisitor<R> visitor)
   {
     return visitor.VisitIntRangeExpr(this);
+  }
+
+  public override string ToString()
+  {
+    if (Right is null)
+    {
+      return $"{(LeftNegative ? "-" : "") + Left.lexeme} ... oo";
+    }
+    else
+    {
+      return $"{(LeftNegative ? "-" : "") + Left.lexeme} ... {(RightNegative ? "-" : "") + Right.lexeme}";
+    }
   }
 
   public Token Token => Dots;

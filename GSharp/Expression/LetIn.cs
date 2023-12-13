@@ -8,10 +8,10 @@ public class LetIn : Expr, IToken
   public readonly Token Let;
   public readonly List<Stmt> Stmts;
 
-  public LetIn(Token Let, List<Stmt> Stmts)
+  public LetIn(Token let, List<Stmt> stmts)
   {
-    this.Stmts = Stmts;
-    this.Let = Let;
+    this.Stmts = stmts;
+    this.Let = let;
   }
 
   public override R Accept<R>(IVisitor<R> visitor)

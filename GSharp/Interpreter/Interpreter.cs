@@ -15,6 +15,7 @@ using static GSharp.TokenType;
 using GSharp.GUIInterface;
 using GSharp;
 using System.Net.Mail;
+using GSharp.Types;
 
 namespace GSharp.Interpreter;
 
@@ -141,7 +142,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
         semanticErrorHandler(semanticAnalizerError);
       }, newImportHandler);
 
-      try{ semanticAnalyzer.Analyze(); }
+      try { semanticAnalyzer.Analyze(); }
       catch (RuntimeError) { return null; }
 
       if (typeValidationFailed)
@@ -340,7 +341,52 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
     }
   }
 
-  public GSObject VisitUnaryExpr(Unary expr)
+  public GSObject VisitAssignExpr(Assign expr)
+  {
+    GSObject value = Evaluate(expr.Value);
+
+    try
+    {
+      if (BindingHandler.GetLocalBinding(expr, out Binding? binding))
+      {
+        if (binding is IDistanceBinding distanceBinding)
+        {
+          GSObject curValue = currentEnvironment.GetAt(distanceBinding.Distance, expr.Name.lexeme);
+
+          if (!curValue.SameTypeAs(value))
+          {
+            throw new RuntimeError(expr.Name, $"Expected value of type {curValue.GetTypeName()}", importTrace);
+          }
+
+          currentEnvironment.AssignAt(distanceBinding.Distance, expr.Name, value);
+        }
+        else
+        {
+          throw new RuntimeError(expr.Name, $"Unsupported variable assignment encountered for non-distance-aware binding '{binding}'.", importTrace);
+        }
+      }
+      else
+      {
+        GSObject curValue = globals.Get(expr.Name);
+
+        if (!curValue.SameTypeAs(value))
+        {
+          throw new RuntimeError(expr.Name, $"Expected value of type {curValue.GetTypeName()}", importTrace);
+        }
+
+        globals.Assign(expr.Name, value);
+      }
+
+      return value;
+    }
+    catch (RuntimeError e)
+    {
+      e.AddImportTrace(importTrace);
+      throw e;
+    }
+  }
+
+  public GSObject VisitUnaryPrefixExpr(UnaryPrefix expr)
   {
     GSObject right = Evaluate(expr.Right);
 
@@ -363,6 +409,67 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
     }
   }
 
+  public GSObject VisitUnaryPostfixExpr(UnaryPostfix expr)
+  {
+    GSObject left = Evaluate(expr.Left);
+
+    try
+    {
+      if (!left.SameTypeAs(new Scalar(0)))
+      {
+        switch (expr.Oper.type)
+        {
+          case PLUS_PLUS:
+            throw new RuntimeError(expr.Oper, $"++ can only be used to increment scalars, not {left.GetTypeName()}", importTrace);
+          case MINUS_MINUS:
+            throw new RuntimeError(expr.Oper, $"-- can only be used to decrement scalars, not {left.GetTypeName()}", importTrace);
+          default:
+            throw new RuntimeError(expr.Oper, $"Unsupported operator encountered: {expr.Oper.type}", importTrace);
+        }
+      }
+
+      var variable = (Variable)expr.Left;
+
+      GSObject value;
+      switch (left)
+      {
+        case Scalar prevScalarValue:
+          value = expr.Oper.type switch
+          {
+            PLUS_PLUS => IOperate<Add>.Operate(prevScalarValue, new Scalar(1)),
+            MINUS_MINUS => IOperate<Subst>.Operate(prevScalarValue, new Scalar(1)),
+            _ => throw new RuntimeError(expr.Oper, $"Unsupported operator encountered: {expr.Oper.type}", importTrace)
+          };
+          break;
+        default:
+          throw new RuntimeError(expr.Oper, $"Internal runtime: Unsupported type {left} encountered with {expr.Oper.type} operator.", importTrace);
+      }
+
+      if (BindingHandler.GetLocalBinding(expr, out Binding? binding))
+      {
+        if (binding is IDistanceBinding distanceBinding)
+        {
+          currentEnvironment.AssignAt(distanceBinding.Distance, expr.Name, value);
+        }
+        else
+        {
+          throw new RuntimeError(expr.Oper, $"Unsupported operator '{expr.Oper.type}' encountered for non-distance-aware binding '{binding}'.", importTrace);
+        }
+      }
+      else
+      {
+        globals.Assign(variable.Name, value);
+      }
+
+      return left!;
+    }
+    catch (RuntimeError e)
+    {
+      e.AddImportTrace(importTrace);
+      throw e;
+    }
+  }
+
   public GSObject VisitVariableExpr(Variable expr)
   {
     return LookUpVariable(expr.Name, expr);
@@ -374,7 +481,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
     {
       if (localBinding is IDistanceBinding distanceBinding)
       {
-        return currentEnvironment.GetAt(distanceBinding.Distance - 1, name.lexeme);
+        return currentEnvironment.GetAt(distanceBinding.Distance, name.lexeme);
       }
       else
       {
@@ -390,6 +497,46 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
   public GSObject VisitGroupingExpr(Grouping expr)
   {
     return Evaluate(expr.Expression);
+  }
+
+  public GSObject VisitIndexExpr(Index expr)
+  {
+    GSObject indexee = Evaluate(expr.Indexee);
+
+    try
+    {
+      if (indexee.SameTypeAs(new Objects.Undefined()))
+      {
+        throw new RuntimeError(expr.ClosingBracket, $"'undefined' reference cannot be indexed.", importTrace);
+      }
+
+      GSObject argument = Evaluate(expr.Argument);
+
+      if (!argument.SameTypeAs(new Scalar(0)))
+      {
+        throw new RuntimeError(expr.ClosingBracket, $"Cannot index by '{argument.GetTypeName()}' key.", importTrace);
+      }
+
+      Scalar index = (Scalar)argument;
+
+      if (indexee is Objects.Collections.Sequence seq)
+      {
+        return seq[(int)index.value];
+      }
+      else if (indexee is Objects.String str)
+      {
+        return new Objects.String(str.value[(int)index.value].ToString());
+      }
+      else
+      {
+        throw new RuntimeError(expr.ClosingBracket, $"Indexing {indexee.GetTypeName()} by {argument.GetTypeName()} is not supported.", importTrace);
+      }
+    }
+    catch (RuntimeError e)
+    {
+      e.AddImportTrace(importTrace);
+      throw e;
+    }
   }
 
   private GSObject Evaluate(Expr expr)
@@ -464,6 +611,10 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
         case PLUS:
           return IOperate<Add>.Operate(left, right);
         case MINUS:
+          return IOperate<Subst>.Operate(left, right);
+        case PLUS_EQUAL:
+          return IOperate<Add>.Operate(left, right);
+        case MINUS_EQUAL:
           return IOperate<Subst>.Operate(left, right);
         case MUL:
           return IOperate<Mult>.Operate(left, right);
@@ -790,6 +941,22 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
   public GSObject VisitUndefinedExpr(Expression.Undefined expr)
   {
     return new Objects.Undefined();
+  }
+
+  public VoidObject VisitBlockStmt(Block stmt)
+  {
+    ExecuteBlock(stmt.Statements, new GSharpEnvironment(currentEnvironment));
+    return VoidObject.Void;
+  }
+
+  public VoidObject VisitWhileStmt(While stmt)
+  {
+    while (Evaluate(stmt.Condition)!.GetTruthValue())
+    {
+      Execute(stmt.Body);
+    }
+
+    return VoidObject.Void;
   }
 
   public VoidObject VisitColorStmt(ColorStmt stmt)
