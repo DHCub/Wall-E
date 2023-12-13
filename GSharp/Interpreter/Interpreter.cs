@@ -938,7 +938,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
   public VoidObject VisitWhileStmt(While stmt)
   {
-    while (Evaluate(stmt.Condition).GetTruthValue())
+    while (Evaluate(stmt.Condition)!.GetTruthValue())
     {
       Execute(stmt.Body);
     }
@@ -973,7 +973,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
       {
         throw new RuntimeError(stmt.Token, "Cannot assign some constants to unique value.", importTrace);
       }
-
+      
       try { currentEnvironment.Define(stmt.Names[0], value); }
       catch (RuntimeError e) { e.AddImportTrace(importTrace); throw e; }
     }

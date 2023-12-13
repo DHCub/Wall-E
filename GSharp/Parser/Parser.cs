@@ -213,7 +213,7 @@ public class Parser
 
     Consume(RIGHT_PARENTESIS, "Expected ')' after for clauses.");
 
-    Stmt body = Statement();
+    Stmt body = ExpressionStatement();
 
     if (increment != null)
     {
@@ -240,7 +240,7 @@ public class Parser
     Consume(LEFT_PARENTESIS, "Expected '(' after 'while'.");
     Expr condition = Expression();
     Consume(RIGHT_PARENTESIS, "Expected ')' after condition.");
-    Stmt body = Statement();
+    Stmt body = ExpressionStatement();
 
     return new While(condition, body);
   }
