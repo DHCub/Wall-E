@@ -490,10 +490,10 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
 
   public VoidObject VisitWhileStmt(While stmt)
   {
-    return VoidObject.Void;
-    // Resolve(stmt.Condition);
-    // Resolve(stmt.Body);
+    Resolve(stmt.Condition);
+    Resolve(stmt.Body);
 
+    return VoidObject.Void;
   }
 
   private enum FunctionType
