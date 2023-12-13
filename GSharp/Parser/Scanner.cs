@@ -28,6 +28,7 @@ public class Scanner
     {"false", FALSE},
     {"true", TRUE},
     {"while", WHILE},
+    {"for", FOR},
 
     {"and", AND},
     {"or", OR},
