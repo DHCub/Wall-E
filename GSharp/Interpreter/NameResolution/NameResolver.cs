@@ -420,11 +420,7 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
       Define(param.Name, new TypeReference(param.TypeSpecifier));
     }
 
-    {
-      BeginScope();
-      Resolve(function.Body);
-      EndScope();
-    }
+    Resolve(function.Body);
 
     EndScope();
 
@@ -438,11 +434,7 @@ internal class NameResolver : Expr.IVisitor<VoidObject>, Stmt.IVisitor<VoidObjec
 
     BeginScope();
 
-    {
-      BeginScope();
-      Resolve(letIn.Stmts);
-      EndScope();
-    }
+    Resolve(letIn.Stmts);
 
     EndScope();
 
