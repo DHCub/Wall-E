@@ -432,16 +432,20 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
 
     switch (binary.Oper.type)
     {
-      case TokenType.PLUS: return HandleError(IOperable<Add>.Operable<Add>(LeftT, RightT));
-      case TokenType.MINUS: return HandleError(IOperable<Subst>.Operable<Subst>(LeftT, RightT));
-      case TokenType.MUL: return HandleError(IOperable<Mult>.Operable<Mult>(LeftT, RightT));
-      case TokenType.DIV: return HandleError(IOperable<Div>.Operable<Div>(LeftT, RightT));
-      case TokenType.MOD: return HandleError(IOperable<Mod>.Operable<Mod>(LeftT, RightT));
-      case TokenType.POWER: return HandleError(IOperable<Power>.Operable<Power>(LeftT, RightT));
-      case TokenType.LESS: return HandleError(IOperable<LessTh>.Operable<LessTh>(LeftT, RightT));
-      case TokenType.LESS_EQUAL: return HandleError(IOperable<LessTh>.Operable<LessTh>(LeftT, RightT));
-      case TokenType.GREATER: return HandleError(IOperable<LessTh>.Operable<LessTh>(LeftT, RightT));
-      case TokenType.GREATER_EQUAL: return HandleError(IOperable<LessTh>.Operable<LessTh>(LeftT, RightT));
+      case TokenType.PLUS: 
+      case TokenType.PLUS_EQUAL: 
+        return HandleError(IOperable<Add>.Operable(LeftT, RightT));
+      case TokenType.MINUS:
+      case TokenType.MINUS_EQUAL:
+        return HandleError(IOperable<Subst>.Operable(LeftT, RightT));
+      case TokenType.MUL: return HandleError(IOperable<Mult>.Operable(LeftT, RightT));
+      case TokenType.DIV: return HandleError(IOperable<Div>.Operable(LeftT, RightT));
+      case TokenType.MOD: return HandleError(IOperable<Mod>.Operable(LeftT, RightT));
+      case TokenType.POWER: return HandleError(IOperable<Power>.Operable(LeftT, RightT));
+      case TokenType.LESS: return HandleError(IOperable<LessTh>.Operable(LeftT, RightT));
+      case TokenType.LESS_EQUAL: return HandleError(IOperable<LessTh>.Operable(LeftT, RightT));
+      case TokenType.GREATER: return HandleError(IOperable<LessTh>.Operable(LeftT, RightT));
+      case TokenType.GREATER_EQUAL: return HandleError(IOperable<LessTh>.Operable(LeftT, RightT));
 
       case TokenType.EQUAL_EQUAL:
       case TokenType.NOT_EQUAL:
@@ -596,7 +600,7 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
 
     if (unary.Token.type == TokenType.MINUS)
     {
-      var (type, error) = IOperable<Mult>.Operable<Mult>(new SimpleType(TypeName.Scalar), left);
+      var (type, error) = IOperable<Mult>.Operable(new SimpleType(TypeName.Scalar), left);
       if (error != null)
         errorHandler(new(unary.Token, $"Cannot apply minus unary operand to " + left.ToString(), importTrace));
       return type;
@@ -622,36 +626,84 @@ public class SemanticAnalyzer : Stmt.IVisitor<GSType>, Expr.IVisitor<GSType>
 
     if (symbol == null)
     {
-      errorHandler(new(nameTok, $"Variable {name} is undefined in this Context", importTrace));
+      errorHandler(new(nameTok, VariableUndefinedError(name), importTrace));
       return new UndefinedType();
     }
 
     return symbol.Type;
   }
 
-  public GSType VisitBlockStmt(Block stmt)
+  public GSType VisitBlockStmt(Block block)
   {
-    return new UndefinedType();
+    GSType retType = new UndefinedType();
+    
+    var ogVarContext = variablesContext;
+    variablesContext = new(variablesContext);
+    
+    foreach(var statement in block.Statements)
+    {
+      if (statement is Statement.Return)
+        retType = TypeCheck(statement);
+      else TypeCheck(statement);
+    }
+
+    variablesContext = ogVarContext;
+
+    return retType;
   }
 
   public GSType VisitWhileStmt(While stmt)
   {
+    TypeCheck(stmt.Condition);
+    TypeCheck(stmt.Body);
+
     return new UndefinedType();
   }
 
   public GSType VisitAssignExpr(Assign expr)
   {
-    return new UndefinedType();
+    var nameTok = expr.Variable.Token;
+    var valueType = TypeCheck(expr.Value);
+
+    var (errorCode, curType) = variablesContext.Reassign(nameTok.lexeme, new(valueType, nameTok.lexeme));
+
+    switch (errorCode)
+    {
+      case VariableContext.ReassignErorCode.NoError: return curType;
+      case VariableContext.ReassignErorCode.UndefinedVariable:
+        errorHandler(new(nameTok, VariableUndefinedError(nameTok.lexeme), importTrace));
+        return valueType;
+      case VariableContext.ReassignErorCode.NonMatchingtypes:
+        errorHandler(new(nameTok, $"Cannot assign {valueType} to a {curType} variable", importTrace));
+        return new UndefinedType();
+      default: throw new Exception("UNSUPPORTED REASSIGN ERROR CODE");
+    }
   }
 
   public GSType VisitIndexExpr(global::Index expr)
   {
-    return new UndefinedType();
+    var argType = TypeCheck(expr.Argument);
+    var indexeeType = TypeCheck(expr.Indexee);
+    
+    var (retType, errorMessage) = IOperable<Indexer>.Operable(indexeeType, argType);
+    if (errorMessage != null) errorHandler(new(expr.ClosingBracket, errorMessage, importTrace));
+    
+    return retType;
   }
 
 
   public GSType VisitUnaryPostfixExpr(UnaryPostfix expr)
   {
-    return new UndefinedType();
+    var incrementee = TypeCheck(expr.Left);
+    if (!incrementee.SameTypeAs(TypeName.Scalar))
+    {
+      errorHandler(new(expr.Name, $"Cannot apply unary postfix operator to {incrementee}", importTrace));
+      return new UndefinedType();
+    }
+
+    return TypeName.Scalar;
   }
+
+  private string VariableUndefinedError(string name)
+    => $"Variable {name} is undefined in this Context";
 }

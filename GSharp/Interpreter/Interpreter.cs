@@ -61,6 +61,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
   private readonly Stack<Colors> colors;
 
   private Stack<string> importTrace;
+  private Stack<string> stackTrace;
   private List<string> importedFiles;
 
   public Interpreter(Action<RuntimeError> runtimeErrorHandler, Action<string> standardOutputHandler, Func<string, string> importHandler, Action<Colors, Figure> drawFigure, Action<Colors, Figure, string> drawLabeledFigure, IBindingHandler? bindingHandler = null)
@@ -72,6 +73,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
     this.drawLabeledFigure = drawLabeledFigure;
     this.importHandler = importHandler;
     this.importTrace = new();
+    this.stackTrace = new();
     this.importedFiles = new();
 
     colors = new();
@@ -271,15 +273,15 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
       {
         string message = ex.InnerException?.Message ?? ex.Message;
 
-        throw new RuntimeError(null, message, importTrace);
+        throw new RuntimeError(null, message, stackTrace);
       }
       catch (StackOverflowException ex)
       {
-        throw new RuntimeError(null, ex.Message, importTrace, ex);
+        throw new RuntimeError(null, ex.Message, stackTrace, ex);
       }
       catch (SystemException ex)
       {
-        throw new RuntimeError(null, ex.Message, importTrace, ex);
+        throw new RuntimeError(null, ex.Message, stackTrace, ex);
       }
     }
   }
@@ -337,7 +339,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
     }
     else
     {
-      throw new RuntimeError(expr.Oper, $"Unsupported logical operator: {expr.Oper.type}", importTrace);
+      throw new RuntimeError(expr.Oper, $"Unsupported logical operator: {expr.Oper.type}", stackTrace);
     }
   }
 
@@ -355,14 +357,14 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
           if (!curValue.SameTypeAs(value))
           {
-            throw new RuntimeError(expr.Name, $"Expected value of type {curValue.GetTypeName()}", importTrace);
+            throw new RuntimeError(expr.Name, $"Expected value of type {curValue.GetTypeName()}", stackTrace);
           }
 
           currentEnvironment.AssignAt(distanceBinding.Distance, expr.Name, value);
         }
         else
         {
-          throw new RuntimeError(expr.Name, $"Unsupported variable assignment encountered for non-distance-aware binding '{binding}'.", importTrace);
+          throw new RuntimeError(expr.Name, $"Unsupported variable assignment encountered for non-distance-aware binding '{binding}'.", stackTrace);
         }
       }
       else
@@ -371,7 +373,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
         if (!curValue.SameTypeAs(value))
         {
-          throw new RuntimeError(expr.Name, $"Expected value of type {curValue.GetTypeName()}", importTrace);
+          throw new RuntimeError(expr.Name, $"Expected value of type {curValue.GetTypeName()}", stackTrace);
         }
 
         globals.Assign(expr.Name, value);
@@ -381,7 +383,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
     }
     catch (RuntimeError e)
     {
-      e.AddImportTrace(importTrace);
+      e.AddStackTrace(stackTrace);
       throw e;
     }
   }
@@ -404,7 +406,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
     }
     catch (RuntimeError e)
     {
-      e.AddImportTrace(importTrace);
+      e.AddStackTrace(stackTrace);
       throw e;
     }
   }
@@ -420,11 +422,11 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
         switch (expr.Oper.type)
         {
           case PLUS_PLUS:
-            throw new RuntimeError(expr.Oper, $"++ can only be used to increment scalars, not {left.GetTypeName()}", importTrace);
+            throw new RuntimeError(expr.Oper, $"++ can only be used to increment scalars, not {left.GetTypeName()}", stackTrace);
           case MINUS_MINUS:
-            throw new RuntimeError(expr.Oper, $"-- can only be used to decrement scalars, not {left.GetTypeName()}", importTrace);
+            throw new RuntimeError(expr.Oper, $"-- can only be used to decrement scalars, not {left.GetTypeName()}", stackTrace);
           default:
-            throw new RuntimeError(expr.Oper, $"Unsupported operator encountered: {expr.Oper.type}", importTrace);
+            throw new RuntimeError(expr.Oper, $"Unsupported operator encountered: {expr.Oper.type}", stackTrace);
         }
       }
 
@@ -438,11 +440,11 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
           {
             PLUS_PLUS => IOperate<Add>.Operate(prevScalarValue, new Scalar(1)),
             MINUS_MINUS => IOperate<Subst>.Operate(prevScalarValue, new Scalar(1)),
-            _ => throw new RuntimeError(expr.Oper, $"Unsupported operator encountered: {expr.Oper.type}", importTrace)
+            _ => throw new RuntimeError(expr.Oper, $"Unsupported operator encountered: {expr.Oper.type}", stackTrace)
           };
           break;
         default:
-          throw new RuntimeError(expr.Oper, $"Internal runtime: Unsupported type {left} encountered with {expr.Oper.type} operator.", importTrace);
+          throw new RuntimeError(expr.Oper, $"Internal runtime: Unsupported type {left} encountered with {expr.Oper.type} operator.", stackTrace);
       }
 
       if (BindingHandler.GetLocalBinding(expr, out Binding? binding))
@@ -453,7 +455,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
         }
         else
         {
-          throw new RuntimeError(expr.Oper, $"Unsupported operator '{expr.Oper.type}' encountered for non-distance-aware binding '{binding}'.", importTrace);
+          throw new RuntimeError(expr.Oper, $"Unsupported operator '{expr.Oper.type}' encountered for non-distance-aware binding '{binding}'.", stackTrace);
         }
       }
       else
@@ -465,7 +467,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
     }
     catch (RuntimeError e)
     {
-      e.AddImportTrace(importTrace);
+      e.AddStackTrace(stackTrace);
       throw e;
     }
   }
@@ -485,7 +487,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
       }
       else
       {
-        throw new RuntimeError(name, $"Attempting to lookup variable for non-distance-aware biding '{localBinding}'", importTrace);
+        throw new RuntimeError(name, $"Attempting to lookup variable for non-distance-aware biding '{localBinding}'", stackTrace);
       }
     }
     else
@@ -503,38 +505,42 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
   {
     GSObject indexee = Evaluate(expr.Indexee);
 
+
     try
     {
-      if (indexee.SameTypeAs(new Objects.Undefined()))
-      {
-        throw new RuntimeError(expr.ClosingBracket, $"'undefined' reference cannot be indexed.", importTrace);
-      }
+      // if (indexee.SameTypeAs(new Objects.Undefined()))
+      // {
+      //   throw new RuntimeError(expr.ClosingBracket, $"'undefined' reference cannot be indexed.", stackTrace);
+      // }
+
+      // GSObject argument = Evaluate(expr.Argument);
+
+      // if (!argument.SameTypeAs(new Scalar(0)))
+      // {
+        // throw new RuntimeError(expr.ClosingBracket, $"Cannot index by '{argument.GetTypeName()}' key.", stackTrace);
+      // }
+
+      // Scalar index = (Scalar)argument;
+
+      // if (indexee is Objects.Collections.Sequence seq)
+      // {
+      //   return seq[(int)index.value];
+      // }
+      // else if (indexee is Objects.String str)
+      // {
+      //   return new Objects.String(str.value[(int)index.value].ToString());
+      // }
+      // else
+      // {
+        // throw new RuntimeError(expr.ClosingBracket, $"Indexing {indexee.GetTypeName()} by {argument.GetTypeName()} is not supported.", stackTrace);
+      // }
 
       GSObject argument = Evaluate(expr.Argument);
-
-      if (!argument.SameTypeAs(new Scalar(0)))
-      {
-        throw new RuntimeError(expr.ClosingBracket, $"Cannot index by '{argument.GetTypeName()}' key.", importTrace);
-      }
-
-      Scalar index = (Scalar)argument;
-
-      if (indexee is Objects.Collections.Sequence seq)
-      {
-        return seq[(int)index.value];
-      }
-      else if (indexee is Objects.String str)
-      {
-        return new Objects.String(str.value[(int)index.value].ToString());
-      }
-      else
-      {
-        throw new RuntimeError(expr.ClosingBracket, $"Indexing {indexee.GetTypeName()} by {argument.GetTypeName()} is not supported.", importTrace);
-      }
+      return IOperate<Indexer>.Operate(indexee, argument);
     }
     catch (RuntimeError e)
     {
-      e.AddImportTrace(importTrace);
+      e.AddStackTrace(stackTrace);
       throw e;
     }
   }
@@ -551,12 +557,12 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
       string message = ex.InnerException?.Message ?? ex.Message;
 
-      throw new RuntimeError(token, message, importTrace, ex);
+      throw new RuntimeError(token, message, stackTrace, ex);
     }
     catch (SystemException ex)
     {
       Token? token = (expr as IToken)?.Token;
-      throw new RuntimeError(token, ex.Message, importTrace, ex);
+      throw new RuntimeError(token, ex.Message, stackTrace, ex);
     }
   }
 
@@ -631,7 +637,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
     }
     catch (RuntimeError e)
     {
-      e.AddImportTrace(importTrace);
+      e.AddStackTrace(stackTrace);
       throw e;
     }
   }
@@ -657,15 +663,17 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
       case ICallable callable:
         if (arguments.Count != callable.Arity())
         {
-          throw new RuntimeError(expr.Paren, "Expected" + callable.Arity() + " argument(s) but got " + arguments.Count + ".", importTrace);
+          throw new RuntimeError(expr.Paren, "Expected" + callable.Arity() + " argument(s) but got " + arguments.Count + ".", stackTrace);
         }
 
         NumberOfCalls++;
+        stackTrace.Push(expr.TokenAwareCalle.Token.lexeme);
 
         try
         {
           var returnValue = callable.Call(this, arguments);
           NumberOfCalls--;
+          stackTrace.Pop();
 
           return returnValue;
         }
@@ -677,11 +685,11 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
         {
           if (expr.Calle is Variable variable)
           {
-            throw new RuntimeError(variable.Name, $"{variable.Name.lexeme}: {e.Message}", importTrace);
+            throw new RuntimeError(variable.Name, $"{variable.Name.lexeme}: {e.Message}", stackTrace);
           }
           else
           {
-            throw new RuntimeError(expr.Paren, e.Message, importTrace);
+            throw new RuntimeError(expr.Paren, e.Message, stackTrace);
           }
         }
       default:
@@ -692,7 +700,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
             return BuiltinHandler(funName.Name.lexeme, arguments, expr);
           }
         }
-        throw new RuntimeError(expr.Paren, $"Can only call functions and native methods, not {calle}", importTrace);
+        throw new RuntimeError(expr.Paren, $"Can only call functions and native methods, not {calle}", stackTrace);
     }
   }
 
@@ -705,55 +713,55 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
         {
           return new Point(((Scalar)arguments[0]).value, ((Scalar)arguments[1]).value);
         }
-        throw new RuntimeError(expr.Token, "Expected scalars as arguments.", importTrace);
+        throw new RuntimeError(expr.Token, "Expected scalars as arguments.", stackTrace);
       case "line":
         if (arguments[0].SameTypeAs(new Point()) && arguments[1].SameTypeAs(new Point()))
         {
           return new Line((Point)arguments[0], (Point)arguments[1]);
         }
-        throw new RuntimeError(expr.Token, "Expected point as arguments.", importTrace);
+        throw new RuntimeError(expr.Token, "Expected point as arguments.", stackTrace);
       case "segment":
         if (arguments[0].SameTypeAs(new Point()) && arguments[1].SameTypeAs(new Point()))
         {
           return new Segment((Point)arguments[0], (Point)arguments[1]);
         }
-        throw new RuntimeError(expr.Token, "Expected point as arguments.", importTrace);
+        throw new RuntimeError(expr.Token, "Expected point as arguments.", stackTrace);
       case "ray":
         if (arguments[0].SameTypeAs(new Point()) && arguments[1].SameTypeAs(new Point()))
         {
           return new Ray((Point)arguments[0], (Point)arguments[1]);
         }
-        throw new RuntimeError(expr.Token, "Expected point as arguments.", importTrace);
+        throw new RuntimeError(expr.Token, "Expected point as arguments.", stackTrace);
       case "arc":
         if (arguments[0].SameTypeAs(new Point()) && arguments[1].SameTypeAs(new Point()) && arguments[2].SameTypeAs(new Point()) && arguments[3].SameTypeAs(new Measure(0.0)))
         {
           return new Arc((Point)arguments[0], (Point)arguments[1], (Point)arguments[2], ((Measure)arguments[3]).value);
         }
-        throw new RuntimeError(expr.Token, "Invalid arguments.", importTrace);
+        throw new RuntimeError(expr.Token, "Invalid arguments.", stackTrace);
       case "circle":
         if (arguments[0].SameTypeAs(new Point()) && arguments[1].SameTypeAs(new Measure(0.0)))
         {
           return new Circle((Point)arguments[0], ((Measure)arguments[1]).value);
         }
-        throw new RuntimeError(expr.Token, "Expected point and measure as arguments.", importTrace);
+        throw new RuntimeError(expr.Token, "Expected point and measure as arguments.", stackTrace);
       case "measure":
         if (arguments[0].SameTypeAs(new Point()) && arguments[1].SameTypeAs(new Point()))
         {
           return new Measure(((Point)arguments[0]).DistanceTo((Point)arguments[1]));
         }
-        throw new RuntimeError(expr.Token, "Expected point as arguments.", importTrace);
+        throw new RuntimeError(expr.Token, "Expected point as arguments.", stackTrace);
       case "intersect":
         if (arguments[0] is Figure fig1 && arguments[1] is Figure fig2)
         {
           return Functions.Intersect(fig1, fig2);
         }
-        throw new RuntimeError(expr.Token, "Expected figures as arguments.", importTrace);
+        throw new RuntimeError(expr.Token, "Expected figures as arguments.", stackTrace);
       case "count":
         if (arguments[0] is Objects.Collections.Sequence seq)
         {
           return seq.GSCount();
         }
-        throw new RuntimeError(expr.Token, "Expected sequence as argument.", importTrace);
+        throw new RuntimeError(expr.Token, "Expected sequence as argument.", stackTrace);
       case "randoms":
         return new GeneratorSequence(new RandomDoubleGenerator());
       case "points":
@@ -761,7 +769,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
         {
           return new GeneratorSequence(new RandomPointInFigureGenerator(fig));
         }
-        throw new RuntimeError(expr.Token, "Expected figure as argument.", importTrace);
+        throw new RuntimeError(expr.Token, "Expected figure as argument.", stackTrace);
       case "samples":
         return new GeneratorSequence(new RandomPointInCanvasGenerator());
       default:
@@ -808,7 +816,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
       if (left > right)
       {
-        throw new RuntimeError(expr.Token, $"Invalid range: {left} expected to be less or equal to {right}", importTrace);
+        throw new RuntimeError(expr.Token, $"Invalid range: {left} expected to be less or equal to {right}", stackTrace);
       }
 
       for (int i = left; i <= right; i++)
@@ -861,7 +869,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
           {
             if (!firstSeqValue.SameTypeAs(new Scalar(0)))
             {
-              throw new RuntimeError(expr.Token, "Sequences values should be of the same type", importTrace);
+              throw new RuntimeError(expr.Token, "Sequences values should be of the same type", stackTrace);
             }
           }
 
@@ -884,7 +892,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
 
             if (left > right)
             {
-              throw new RuntimeError(expr.Token, $"Invalid range: {left} expected to be less or equal to {right}", importTrace);
+              throw new RuntimeError(expr.Token, $"Invalid range: {left} expected to be less or equal to {right}", stackTrace);
             }
 
             for (int v = left; v <= right; v++)
@@ -905,7 +913,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
           {
             if (!firstSeqValue.SameTypeAs(curVal))
             {
-              throw new RuntimeError(expr.Token, "Sequences values should be of the same type", importTrace);
+              throw new RuntimeError(expr.Token, "Sequences values should be of the same type", stackTrace);
             }
           }
 
@@ -924,7 +932,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
         {
           if (!firstSeqValue.SameTypeAs(curVal))
           {
-            throw new RuntimeError(expr.Token, "Sequences values should be of the same type", importTrace);
+            throw new RuntimeError(expr.Token, "Sequences values should be of the same type", stackTrace);
           }
         }
       }
@@ -974,21 +982,21 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
       for (int i = 0; i < cntConsts - 1; i++)
       {
         try { currentEnvironment.Define(stmt.Names[i], valueSeq[i]); }
-        catch (RuntimeError e) { e.AddImportTrace(importTrace); throw e; }
+        catch (RuntimeError e) { e.AddStackTrace(stackTrace); throw e; }
       }
 
       try { currentEnvironment.Define(stmt.Names.Last(), valueSeq.GetRemainder(cntConsts - 1)); }
-      catch (RuntimeError e) { e.AddImportTrace(importTrace); throw e; }
+      catch (RuntimeError e) { e.AddStackTrace(stackTrace); throw e; }
     }
     else
     {
       if (stmt.Names.Count != 1)
       {
-        throw new RuntimeError(stmt.Token, "Cannot assign some constants to unique value.", importTrace);
+        throw new RuntimeError(stmt.Token, "Cannot assign some constants to unique value.", stackTrace);
       }
 
       try { currentEnvironment.Define(stmt.Names[0], value); }
-      catch (RuntimeError e) { e.AddImportTrace(importTrace); throw e; }
+      catch (RuntimeError e) { e.AddStackTrace(stackTrace); throw e; }
     }
 
     return VoidObject.Void;
@@ -1017,10 +1025,10 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
       }
       else if (gso is GSharp.Objects.Collections.Sequence)
       {
-        throw new RuntimeError(stmt.Command, $"Cannot draw Infinite Sequence", importTrace);
+        throw new RuntimeError(stmt.Command, $"Cannot draw Infinite Sequence", stackTrace);
       }
 
-      else throw new RuntimeError(stmt.Command, $"Cannot draw {gso.GetTypeName()}", importTrace);
+      else throw new RuntimeError(stmt.Command, $"Cannot draw {gso.GetTypeName()}", stackTrace);
     }
 
     draw(drawe);
@@ -1038,7 +1046,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
   {
     var function = new GSFunction(stmt, currentEnvironment, importTrace);
     try { currentEnvironment.Define(stmt.Name, function); }
-    catch (RuntimeError e) { e.AddImportTrace(importTrace); throw e; }
+    catch (RuntimeError e) { e.AddStackTrace(stackTrace); throw e; }
     return VoidObject.Void;
   }
 
@@ -1141,7 +1149,7 @@ public class Interpreter : IInterpreter, Expr.IVisitor<GSObject>, Stmt.IVisitor<
     }
 
     try { currentEnvironment.Define(stmt.Name, value); }
-    catch (RuntimeError e) { e.AddImportTrace(importTrace); throw e; }
+    catch (RuntimeError e) { e.AddStackTrace(stackTrace); throw e; }
     return VoidObject.Void;
   }
 }

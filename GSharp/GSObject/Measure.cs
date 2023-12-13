@@ -43,6 +43,7 @@ public class Measure : GSObject
   public override GSObject OperateScalar(Scalar other, Div op) => new Measure(this.value / Math.Floor(other.value));
   public override GSObject OperateScalar(Scalar other, Mod op) => UnsupportedOperError(other, op);
   public override GSObject OperateScalar(Scalar other, LessTh op) => new Scalar(Functions.LessThanApprox(this.value, Math.Abs(other.value)));
+  public override GSObject OperateScalar(Scalar other, Indexer op) => UnsupportedOperError(other, op);
 
 
   public override GSObject OperateMeasure(Measure other, Add op) => new Measure(this.value + other.value);

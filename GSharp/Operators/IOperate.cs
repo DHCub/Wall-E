@@ -10,6 +10,7 @@ public interface IOperate<OP> where OP: Operator
         if (operable2 is Point P) return operable1.OperatePoint(P, null);
         if (operable2 is Line L) return operable1.OperateLine(L, null);
         if (operable2 is Segment S) return operable1.OperateSegment(S, null);
+        if (operable2 is Ray R) return operable1.OperateRay(R, null);
         if (operable2 is Circle C) return operable1.OperateCircle(C, null);
         if (operable2 is Arc A) return operable1.OperateArc(A, null);
         

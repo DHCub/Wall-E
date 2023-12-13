@@ -809,7 +809,7 @@ public class Parser
       return new Empty();
     }
 
-    throw Error(Peek(), "Expected expresion.");
+    throw Error(Peek(), "Expected expression.");
   }
 
   private bool Match(params TokenType[] types)

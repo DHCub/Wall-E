@@ -28,6 +28,7 @@ public class Undefined : GSObject
   public override GSObject OperateScalar(Scalar other, Div op) => UnsupportedOperError(other, op);
   public override GSObject OperateScalar(Scalar other, Mod op) => UnsupportedOperError(other, op);
   public override GSObject OperateScalar(Scalar other, LessTh op) => UnsupportedOperError(other, op);
+  public override GSObject OperateScalar(Scalar other, Indexer op) => UnsupportedOperError(other, op);
 
 
   public override GSObject OperatePoint(Point other, Add op) => UnsupportedOperError(other, op);

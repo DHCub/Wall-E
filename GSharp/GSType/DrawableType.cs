@@ -41,6 +41,9 @@ public class DrawableType : GSType
   public override (GSType, string) OperableScalar(Div op) => (TypeName.Point, null);
   public override (GSType, string) OperableScalar(LessTh op) => UnsupportedOperator(TypeName.Scalar.ToString(), op);
   public override (GSType, string) OperableScalar(Mult op) => (TypeName.Point, null);
+  // we could be indexing a point or a sequence of drawables
+  public override (GSType, string) OperableScalar(Indexer op) => (new UndefinedType(), null);
+
   public override (GSType, string) OperableSequence(SequenceType other, Add op)
   {
     if (!this.SameTypeAs(other)) return (new UndefinedType(), $"Cannot Add Drawable and Sequence of type {other.ToString()}");
@@ -53,4 +56,7 @@ public class DrawableType : GSType
   public override (GSType, string) OperableUndefined(Div op) => (TypeName.Point, null);
   public override (GSType, string) OperableUndefined(Mod op) => UnsupportedOperator(UNDEFINED, op);
   public override (GSType, string) OperableUndefined(LessTh op) => UnsupportedOperator(UNDEFINED, op);
+  // we could be indexing a point or a sequence of drawables
+  public override (GSType, string) OperableUndefined(Indexer op) => (new UndefinedType(), null);
+
 }

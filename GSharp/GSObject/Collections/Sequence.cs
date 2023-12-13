@@ -9,6 +9,7 @@ using System.Linq;
 using GSharp.Objects.Figures;
 using System;
 using GSharp.Types;
+using GSharp.Exceptions;
 
 public abstract class Sequence : GSObject
 {    
@@ -26,6 +27,12 @@ public abstract class Sequence : GSObject
     public override GSObject OperateScalar(Scalar other, Div op) => UnsupportedOperError(other, op);
     public override GSObject OperateScalar(Scalar other, Mod op) => UnsupportedOperError(other, op);
     public override GSObject OperateScalar(Scalar other, LessTh op) => UnsupportedOperError(other, op);
+    public override GSObject OperateScalar(Scalar other, Indexer op)
+    {
+      var (isInteger, i) = Functions.GetInteger(other);
+      if (!isInteger || i < 0) throw new RuntimeError(null, IndexingValueMustBeNonNegativeInteger(other), null);
+      return this[i]; 
+    }
 
   public override GSObject OperateMeasure(Measure other, Add op) => UnsupportedOperError(other, op);
   public override GSObject OperateMeasure(Measure other, Subst op) => UnsupportedOperError(other, op);

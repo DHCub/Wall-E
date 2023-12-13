@@ -31,7 +31,8 @@ public class Ray : GeometricLocation
 
   public override Point Sample()
   {
-    throw new NotImplementedException();
+    var length = rnd.RandDoubleRange(0, Math.Max(Figure.WindowEndX - Figure.WindowStartX, Figure.WindowEndY - Figure.WindowStartY));
+    return this.FirstPoint + length*this.DirectorVector/this.DirectorVector.Norm;
   }
   public override string ToString() => $"Ray: [from: {this.FirstPoint} directorV: {this.DirectorVector}]";
 

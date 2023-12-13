@@ -8,6 +8,13 @@ using System.Collections.Generic;
 
 static class Functions
 {
+  public static (bool isInteger, int val) GetInteger(double d)
+  {
+    if (Functions.EqualApprox(d, double.Floor(d))) return (true, (int)double.Floor(d));
+    if (Functions.EqualApprox(d, double.Ceiling(d))) return (true, (int)double.Ceiling(d));
+
+    return (false, default);
+  }
   public static double Distance(Point PointA, Point PointB)
       => (PointB - PointA).Norm;
 

@@ -46,6 +46,10 @@ public class UndefinedType : GSType
     public override (GSType, string) OperableScalar(LessTh op)
         => (TypeName.Scalar, null);
 
+    public override (GSType, string) OperableScalar(Indexer op)
+        => (this, null);
+
+
     public override (GSType, string) OperableSequence(SequenceType other, Add op)
         => (other.Copy(), null);
     
@@ -63,4 +67,8 @@ public class UndefinedType : GSType
 
     public override (GSType, string) OperableUndefined(LessTh op)
         => (TypeName.Scalar, null);
+
+    public override (GSType, string) OperableUndefined(Indexer op)
+        => (this, null);
+    
 }

@@ -6,21 +6,21 @@ namespace GSharp.Exceptions;
 public class RuntimeError : Exception
 {
   public Token? token { get; }
-  private Stack<string> ImportTrace;
+  private Stack<string> StackTrace;
 
-  public RuntimeError(Token? token, string message, Stack<string> importTrace) : base(message)
+  public RuntimeError(Token? token, string message, Stack<string> stackTrace) : base(message)
   {
     this.token = token;
-    this.ImportTrace = importTrace;
+    this.StackTrace = stackTrace;
   }
 
-  public RuntimeError(Token? token, string message, Stack<string> importTrace, Exception innerException) : base(message, innerException)
+  public RuntimeError(Token? token, string message, Stack<string> stackTrace, Exception innerException) : base(message, innerException)
   {
     this.token = token;
-    this.ImportTrace = importTrace;
+    this.StackTrace = stackTrace;
   }
 
-  public void AddImportTrace(Stack<string> trace) {this.ImportTrace = trace;}
+  public void AddStackTrace(Stack<string> trace) {this.StackTrace = trace;}
   public override string ToString()
   {
     const string RUNTIME_ERROR = "! RUNTIME ERROR: ";
@@ -32,7 +32,7 @@ public class RuntimeError : Exception
     
     answ.AddRange(this.Message);
 
-    answ.AddRange(ImportTraceBuilder.GetImportTrace(ImportTrace));
+    answ.AddRange(StackTraceBuilder.GetStackTrace(StackTrace));
 
     return new string(answ.ToArray());
   }

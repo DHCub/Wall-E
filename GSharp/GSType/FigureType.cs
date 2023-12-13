@@ -26,6 +26,8 @@ public class FigureType : GSType
   public override (GSType, string) OperableScalar(Mult op) => (TypeName.Point, null);
   public override (GSType, string) OperableScalar(Div op) => (TypeName.Point, null);
   public override (GSType, string) OperableScalar(LessTh op) => UnsupportedOperator(FIGURE, op);
+  // if we are indexing a figure, we must be indexing a point, therefore we must be returning a coordinate
+  public override (GSType, string) OperableScalar(Indexer op) => (TypeName.Scalar, null);
 
   public override (GSType, string) OperableSequence(SequenceType other, Add op) => UnsupportedOperator(FIGURE, op);
 
@@ -36,6 +38,9 @@ public class FigureType : GSType
   public override (GSType, string) OperableUndefined(Div op) => (TypeName.Point, null);
   public override (GSType, string) OperableUndefined(Mod op) => UnsupportedOperator(FIGURE, op);
   public override (GSType, string) OperableUndefined(LessTh op) => UnsupportedOperator(FIGURE, op);
+  // if we are indexing a figure, we must be indexing a point, therefore we must be returning a coordinate
+  public override (GSType, string) OperableUndefined(Indexer op) => (TypeName.Scalar, null);
+
 
   public override bool SameTypeAs(DrawableType drawableType) => true;
   public override bool SameTypeAs(FigureType figureType) => true;

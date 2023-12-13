@@ -125,6 +125,11 @@ internal class GSFunction : GSObject, ICallable, IFunction
     throw new NotImplementedException();
   }
 
+  public override GSObject OperateScalar(Scalar other, Indexer op)
+  {
+    throw new NotImplementedException();
+  }
+
   public override GSObject OperateMeasure(Measure other, Add op)
   {
     throw new NotImplementedException();

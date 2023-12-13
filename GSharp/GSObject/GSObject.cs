@@ -12,7 +12,8 @@ public abstract class GSObject : IOperate<Add>,
                                 IOperate<Div>,
                                 IOperate<Mod>,
                                 IOperate<Power>,
-                                IOperate<LessTh>
+                                IOperate<LessTh>,
+                                IOperate<Indexer>
 {
   public abstract override string ToString();
   public abstract bool Equals(GSObject obj);
@@ -42,6 +43,12 @@ public abstract class GSObject : IOperate<Add>,
   protected static string TriedToElevate(string T1, string T2)
       => $"Tried to elevate {T1} to the power of {T2}";
 
+  protected static string CannotIndex(string T1, string T2)
+    => $"Cannot index a {T1} with an indexer of type {T2}";
+
+  protected static string IndexingValueMustBeNonNegativeInteger(Scalar value)
+    => $"Indexer value must be a non-negative Integer, {value.value} passed instead";
+
   #region Type Names
 
   // protected const string POINT = "Point";
@@ -70,6 +77,7 @@ public abstract class GSObject : IOperate<Add>,
   public GSObject UnsupportedOperError(GSObject other, Mod OP) => throw new RuntimeError(null, TriedToFindModuloOfT1OverT2(this.GetTypeName(), other.GetTypeName()), null);
   public GSObject UnsupportedOperError(GSObject other, Power OP) => throw new RuntimeError(null, TriedToElevate(this.GetTypeName(), other.GetTypeName()), null);
   public GSObject UnsupportedOperError(GSObject other, LessTh OP) => throw new RuntimeError(null, NoOrderRelation(this.GetTypeName(), other.GetTypeName()), null);
+  public GSObject UnsupportedOperError(GSObject other, Indexer OP) => throw new RuntimeError(null, CannotIndex(this.GetTypeName(), other.GetTypeName()), null);
 
   #endregion
 
@@ -83,6 +91,7 @@ public abstract class GSObject : IOperate<Add>,
   public GSObject OperatePoint(Point other, Mod op) => UnsupportedOperError(other, op);
   public GSObject OperatePoint(Point other, Power op) => UnsupportedOperError(other, op);
   public GSObject OperatePoint(Point other, LessTh op) => UnsupportedOperError(other, op);
+  public GSObject OperatePoint(Point other, Indexer op) => UnsupportedOperError(other, op);
 
   #endregion
 
@@ -95,6 +104,7 @@ public abstract class GSObject : IOperate<Add>,
   public GSObject OperateLine(Line other, Mod op) => UnsupportedOperError(other, op);
   public GSObject OperateLine(Line other, Power op) => UnsupportedOperError(other, op);
   public GSObject OperateLine(Line other, LessTh op) => UnsupportedOperError(other, op);
+  public GSObject OperateLine(Line other, Indexer op) => UnsupportedOperError(other, op);
 
   #endregion
 
@@ -106,6 +116,7 @@ public abstract class GSObject : IOperate<Add>,
   public GSObject OperateRay(Ray other, Mod op) => UnsupportedOperError(other, op);
   public GSObject OperateRay(Ray other, Power op) => UnsupportedOperError(other, op);
   public GSObject OperateRay(Ray other, LessTh op) => UnsupportedOperError(other, op);
+  public GSObject OperateRay(Ray other, Indexer op) => UnsupportedOperError(other, op);
 
   #endregion
 
@@ -117,6 +128,7 @@ public abstract class GSObject : IOperate<Add>,
   public GSObject OperateSegment(Segment other, Mod op) => UnsupportedOperError(other, op);
   public GSObject OperateSegment(Segment other, Power op) => UnsupportedOperError(other, op);
   public GSObject OperateSegment(Segment other, LessTh op) => UnsupportedOperError(other, op);
+  public GSObject OperateSegment(Segment other, Indexer op) => UnsupportedOperError(other, op);
 
   #endregion
 
@@ -129,6 +141,7 @@ public abstract class GSObject : IOperate<Add>,
   public GSObject OperateCircle(Circle other, Mod op) => UnsupportedOperError(other, op);
   public GSObject OperateCircle(Circle other, Power op) => UnsupportedOperError(other, op);
   public GSObject OperateCircle(Circle other, LessTh op) => UnsupportedOperError(other, op);
+  public GSObject OperateCircle(Circle other, Indexer op) => UnsupportedOperError(other, op);
 
   #endregion
 
@@ -141,6 +154,7 @@ public abstract class GSObject : IOperate<Add>,
   public GSObject OperateArc(Arc other, Mod op) => UnsupportedOperError(other, op);
   public GSObject OperateArc(Arc other, Power op) => UnsupportedOperError(other, op);
   public GSObject OperateArc(Arc other, LessTh op) => UnsupportedOperError(other, op);
+  public GSObject OperateArc(Arc other, Indexer op) => UnsupportedOperError(other, op);
 
   #endregion
 
@@ -153,14 +167,6 @@ public abstract class GSObject : IOperate<Add>,
   public abstract GSObject OperateScalar(Scalar other, Mod op);
   public GSObject OperateScalar(Scalar other, Power op)
   {
-    (bool isInteger, int val) GetInteger(double d)
-    {
-      if (Functions.EqualApprox(d, double.Floor(d))) return (true, (int)double.Floor(d));
-      if (Functions.EqualApprox(d, double.Ceiling(d))) return (true, (int)double.Ceiling(d));
-
-      return (false, default);
-    }
-
     if (this is Scalar thisScalar)
     {
       if (Functions.EqualApprox(other.value, 0)) return new Scalar(1);
@@ -171,7 +177,7 @@ public abstract class GSObject : IOperate<Add>,
       }
       if (Functions.LessThanApprox(thisScalar.value, 0))
       {
-        var (isInteger, val) = GetInteger(other.value);
+        var (isInteger, val) = Functions.GetInteger(other.value);
         if (!isInteger) throw new RuntimeError(null, "Tried to elevate a negative number to a non-integer exponent", null);
         return new Scalar(Math.Pow(thisScalar.value, val));
       }
@@ -183,6 +189,7 @@ public abstract class GSObject : IOperate<Add>,
   }
 
   public abstract GSObject OperateScalar(Scalar other, LessTh op);
+  public abstract GSObject OperateScalar(Scalar other, Indexer op);
 
   #endregion
 
@@ -195,6 +202,8 @@ public abstract class GSObject : IOperate<Add>,
   public abstract GSObject OperateMeasure(Measure other, Mod op);
   public GSObject OperateMeasure(Measure other, Power op) => UnsupportedOperError(other, op);
   public abstract GSObject OperateMeasure(Measure other, LessTh op);
+  public GSObject OperateMeasure(Measure other, Indexer op) => UnsupportedOperError(other, op);
+
 
   #endregion
 
@@ -207,6 +216,7 @@ public abstract class GSObject : IOperate<Add>,
   public GSObject OperateString(String other, Mod op) => UnsupportedOperError(other, op);
   public GSObject OperateString(String other, Power op) => UnsupportedOperError(other, op);
   public GSObject OperateString(String other, LessTh op) => UnsupportedOperError(other, op);
+  public GSObject OperateString(String other, Indexer op) => UnsupportedOperError(other, op);
 
   #endregion
 
@@ -219,6 +229,7 @@ public abstract class GSObject : IOperate<Add>,
   public GSObject OperateUndefined(Undefined other, Mod op) => UnsupportedOperError(other, op);
   public GSObject OperateUndefined(Undefined other, Power op) => UnsupportedOperError(other, op);
   public GSObject OperateUndefined(Undefined other, LessTh op) => UnsupportedOperError(other, op);
+  public GSObject OperateUndefined(Undefined other, Indexer op) => UnsupportedOperError(other, op);
 
   #endregion
 
@@ -231,6 +242,7 @@ public abstract class GSObject : IOperate<Add>,
   public GSObject OperateFiniteStaticSequence(FiniteStaticSequence other, Mod op) => UnsupportedOperError(other, op);
   public GSObject OperateFiniteStaticSequence(FiniteStaticSequence other, Power op) => UnsupportedOperError(other, op);
   public GSObject OperateFiniteStaticSequence(FiniteStaticSequence other, LessTh op) => UnsupportedOperError(other, op);
+  public GSObject OperateFiniteStaticSequence(FiniteStaticSequence other, Indexer op) => UnsupportedOperError(other, op);
 
 
   #endregion
@@ -244,6 +256,7 @@ public abstract class GSObject : IOperate<Add>,
   public GSObject OperateInfiniteStaticSequence(InfiniteStaticSequence other, Mod op) => UnsupportedOperError(other, op);
   public GSObject OperateInfiniteStaticSequence(InfiniteStaticSequence other, Power op) => UnsupportedOperError(other, op);
   public GSObject OperateInfiniteStaticSequence(InfiniteStaticSequence other, LessTh op) => UnsupportedOperError(other, op);
+  public GSObject OperateInfiniteStaticSequence(InfiniteStaticSequence other, Indexer op) => UnsupportedOperError(other, op);
 
   #endregion
 
@@ -257,6 +270,7 @@ public abstract class GSObject : IOperate<Add>,
   public GSObject OperateGeneratorSequence(GeneratorSequence other, Mod op) => UnsupportedOperError(other, op);
   public GSObject OperateGeneratorSequence(GeneratorSequence other, Power op) => UnsupportedOperError(other, op);
   public GSObject OperateGeneratorSequence(GeneratorSequence other, LessTh op) => UnsupportedOperError(other, op);
+  public GSObject OperateGeneratorSequence(GeneratorSequence other, Indexer op) => UnsupportedOperError(other, op);
 
   #endregion
 }

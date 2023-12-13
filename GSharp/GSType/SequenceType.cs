@@ -81,11 +81,13 @@ public class SequenceType : GSType
     public override (GSType, string) OperableUndefined(Div op) => UnsupportedOperator(UNDEFINED, op);
     public override (GSType, string) OperableUndefined(Mod op) => UnsupportedOperator(UNDEFINED, op);
     public override (GSType, string) OperableUndefined(LessTh op) => UnsupportedOperator(UNDEFINED, op);
+    public override (GSType, string) OperableUndefined(Indexer op) => (this.MostRestrictedType, null);
 
 
     public override (GSType, string) OperableScalar(Mult op) => UnsupportedOperator(TypeName.Scalar.ToString(), op);
     public override (GSType, string) OperableScalar(Div op) => UnsupportedOperator(TypeName.Scalar.ToString(), op);
     public override (GSType, string) OperableScalar(LessTh op) => UnsupportedOperator(TypeName.Scalar.ToString(), op);
+    public override (GSType, string) OperableScalar(Indexer op) => (this.MostRestrictedType, null);
 
 
 }

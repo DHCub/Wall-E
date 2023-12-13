@@ -101,6 +101,14 @@ public class SimpleType : GSType
             _ => UnsupportedOperator(TypeName.Scalar.ToString(), op)
         };
 
+    public override (GSType, string) OperableScalar(Indexer op)
+        => type switch{
+            TypeName.Point => (TypeName.Scalar, null),
+            TypeName.String => (TypeName.String, null),
+            _ => UnsupportedOperator(TypeName.Scalar.ToString(), op)
+        };
+
+
     public override (GSType, string) OperablePoint(Mult op)
         => type switch{
             TypeName.Scalar or TypeName.Measure => (TypeName.Point, null),
@@ -143,6 +151,12 @@ public class SimpleType : GSType
     public override (GSType, string) OperableUndefined(Mod op)
         => type == TypeName.Scalar? (TypeName.Scalar, null) : UnsupportedOperator(UNDEFINED, op);
 
+    public override (GSType, string) OperableUndefined(Indexer op)
+        => type switch{
+            TypeName.Point => (TypeName.Scalar, null),
+            TypeName.String => (TypeName.String, null),
+            _ => UnsupportedOperator(UNDEFINED, op)
+        };
     
 
 }

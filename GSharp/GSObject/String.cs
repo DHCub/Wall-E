@@ -1,3 +1,6 @@
+using System;
+using Godot;
+using GSharp.Exceptions;
 using GSharp.Objects.Collections;
 using GSharp.Objects.Figures;
 using GSharp.Types;
@@ -42,6 +45,12 @@ public class String : GSObject
         => UnsupportedOperError(other, op);
     public override GSObject OperateScalar(Scalar other, LessTh op)
         => UnsupportedOperError(other, op);
+    public override GSObject OperateScalar(Scalar other, Indexer op)
+    {
+        var (isInteger, i) = Functions.GetInteger(other);
+        if (!isInteger || i < 0) throw new RuntimeError(null, IndexingValueMustBeNonNegativeInteger(other), null);
+        return (this.value.Length > i) ? new String(this.value[i].ToString()) : new Undefined();
+    }
 
 
 

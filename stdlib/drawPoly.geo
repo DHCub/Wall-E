@@ -1,16 +1,12 @@
-import "stdlib/getLast.geo";
-
-_drawPoly(poly) = let
-	a, b, r1 = poly;
-	draw segment(a, b);
-	in
-		if !r1 then 1 else let
-		_, r = poly;
-		_drawPoly(r);
-		in 1;
-
 drawPoly(poly) = let 
-	_drawPoly(poly);
-	a, _ = poly;
-	draw segment(a, getLast(poly));
+	i = 1;
+	prev = poly[0];
+	while(i < count(poly))
+		let
+		draw segment(prev, poly[i]);
+		prev := poly[i];
+		i++;
+		in 0;
+	
+	draw segment(poly[0], prev);
 	in 1;

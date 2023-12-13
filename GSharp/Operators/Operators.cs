@@ -16,4 +16,6 @@ public abstract class Power : Operator {}
 
 public abstract class LessTh : Operator {}
 
+public abstract class Indexer : Operator {}
+
 

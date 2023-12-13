@@ -56,6 +56,8 @@ public class Scalar : GSObject
   public override GSObject OperateScalar(Scalar other, LessTh op)
       => new Scalar(Functions.LessThanApprox(this.value, other.value) ? 1 : 0);
 
+  public override GSObject OperateScalar(Scalar other, Indexer op) => UnsupportedOperError(other, op);
+
   public override GSObject OperateFiniteStaticSequence(FiniteStaticSequence other, Add op)
       => UnsupportedOperError(other, op);
 

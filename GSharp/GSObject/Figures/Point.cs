@@ -120,6 +120,14 @@ public class Point : Figure
   public override GSObject OperateScalar(Scalar other, Div op)
       => this / other.value;
 
+  public override GSObject OperateScalar(Scalar other, Indexer op)
+  {
+    var (isInteger, i) = Functions.GetInteger(other);
+
+    if (!isInteger || i < 0) throw new RuntimeError(null, IndexingValueMustBeNonNegativeInteger(other), null);
+    if (i > 1) throw new RuntimeError(null, $"Points are two-dimensional, the {i+1}th coordinate of a point can therefore not be accessed", null);
+    return (i == 0) ? new Scalar(this.XCoord) : new Scalar(this.YCoord);
+  }
 
 
   public override GSObject OperateMeasure(Measure other, Div op)

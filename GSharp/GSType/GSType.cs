@@ -22,7 +22,8 @@ public abstract class GSType : IOperable<Add>,
                                IOperable<Div>,
                                IOperable<Mod>,
                                IOperable<Power>,
-                               IOperable<LessTh>
+                               IOperable<LessTh>,
+                               IOperable<Indexer>
 {
 
     protected const string SEQUENCE = "Sequence";
@@ -107,6 +108,15 @@ public abstract class GSType : IOperable<Add>,
         return $"Cannot Compare {T1} and {T2}";
     }
 
+    private static string CannotIndex(string T1, string T2)
+    {
+        string CANNOT_INDEX = "Cannot Index ";
+        if (T1 == UNDEFINED) return T2 + " is not a valid indexer type";
+        if (T2 == UNDEFINED) return CANNOT_INDEX + T1;
+
+        return CANNOT_INDEX + T1 + " with indexer type " + T2;
+    }
+
 
     public (GSType, string) UnsupportedOperator(string otherT, Add op) => (new UndefinedType(), CannotOperate("Add", this.ToString(), otherT));
 
@@ -116,7 +126,8 @@ public abstract class GSType : IOperable<Add>,
     public (GSType, string?) UnsupportedOperator(string otherT, Power op) => (new UndefinedType(), CannotElevate(this.ToString(), otherT));
     public (GSType, string?) UnsupportedOperator(string otherT, Mod op) => (new UndefinedType(), CannotFindModuloOf(this.ToString(), otherT));
     public (GSType, string?) UnsupportedOperator(string otherT, LessTh op) => (new UndefinedType(), NoOrderRelation(this.ToString(), otherT));
-    
+    public (GSType, string?) UnsupportedOperator(string otherT, Indexer op) => (new UndefinedType(), CannotIndex(this.ToString(), otherT));
+   
     #endregion
 
     #region OperablePoint
@@ -128,6 +139,7 @@ public abstract class GSType : IOperable<Add>,
     public (GSType, string?) OperablePoint(Mod op) => UnsupportedOperator(TypeName.Point.ToString(), op);
     public (GSType, string?) OperablePoint(Power op) => UnsupportedOperator(TypeName.Point.ToString(), op);
     public (GSType, string?) OperablePoint(LessTh op) => UnsupportedOperator(TypeName.Point.ToString(), op);
+    public (GSType, string?) OperablePoint(Indexer op) => UnsupportedOperator(TypeName.Point.ToString(), op);
 
     #endregion
 
@@ -140,6 +152,7 @@ public abstract class GSType : IOperable<Add>,
     public (GSType, string?) OperableLine(Mod op) => UnsupportedOperator(TypeName.Line.ToString(), op);
     public (GSType, string?) OperableLine(Power op) => UnsupportedOperator(TypeName.Line.ToString(), op);
     public (GSType, string?) OperableLine(LessTh op) => UnsupportedOperator(TypeName.Line.ToString(), op);
+    public (GSType, string?) OperableLine(Indexer op) => UnsupportedOperator(TypeName.Line.ToString(), op);
 
     #endregion
 
@@ -152,6 +165,7 @@ public abstract class GSType : IOperable<Add>,
     public (GSType, string?) OperableSegment(Mod op) => UnsupportedOperator(TypeName.Segment.ToString(), op);
     public (GSType, string?) OperableSegment(Power op) => UnsupportedOperator(TypeName.Segment.ToString(), op);
     public (GSType, string?) OperableSegment(LessTh op) => UnsupportedOperator(TypeName.Segment.ToString(), op);
+    public (GSType, string?) OperableSegment(Indexer op) => UnsupportedOperator(TypeName.Segment.ToString(), op);
 
 
     #endregion
@@ -165,6 +179,7 @@ public abstract class GSType : IOperable<Add>,
     public (GSType, string?) OperableRay(Mod op) => UnsupportedOperator(TypeName.Ray.ToString(), op);
     public (GSType, string?) OperableRay(Power op) => UnsupportedOperator(TypeName.Ray.ToString(), op);
     public (GSType, string?) OperableRay(LessTh op) => UnsupportedOperator(TypeName.Ray.ToString(), op);
+    public (GSType, string?) OperableRay(Indexer op) => UnsupportedOperator(TypeName.Ray.ToString(), op);
     
 
     #endregion
@@ -178,6 +193,7 @@ public abstract class GSType : IOperable<Add>,
     public (GSType, string?) OperableCircle(Mod op) => UnsupportedOperator(TypeName.Circle.ToString(), op);
     public (GSType, string?) OperableCircle(Power op) => UnsupportedOperator(TypeName.Circle.ToString(), op);
     public (GSType, string?) OperableCircle(LessTh op) => UnsupportedOperator(TypeName.Circle.ToString(), op);
+    public (GSType, string?) OperableCircle(Indexer op) => UnsupportedOperator(TypeName.Circle.ToString(), op);
 
     #endregion
 
@@ -190,6 +206,7 @@ public abstract class GSType : IOperable<Add>,
     public (GSType, string?) OperableArc(Mod op) => UnsupportedOperator(TypeName.Arc.ToString(), op);
     public (GSType, string?) OperableArc(Power op) => UnsupportedOperator(TypeName.Arc.ToString(), op);
     public (GSType, string?) OperableArc(LessTh op) => UnsupportedOperator(TypeName.Arc.ToString(), op);
+    public (GSType, string?) OperableArc(Indexer op) => UnsupportedOperator(TypeName.Arc.ToString(), op);
 
 
     #endregion
@@ -203,6 +220,7 @@ public abstract class GSType : IOperable<Add>,
     public (GSType, string?) OperableScalar(Mod op) => this.SameTypeAs(TypeName.Scalar) ? (TypeName.Scalar, null) : UnsupportedOperator(TypeName.Scalar.ToString(), op);
     public (GSType, string?) OperableScalar(Power op) => this.SameTypeAs(TypeName.Scalar) ? (TypeName.Scalar, null) : UnsupportedOperator(TypeName.Scalar.ToString(), op);
     public abstract (GSType, string?) OperableScalar(LessTh op);
+    public abstract (GSType, string?) OperableScalar(Indexer op);
 
 
     #endregion
@@ -216,6 +234,8 @@ public abstract class GSType : IOperable<Add>,
     public (GSType, string?) OperableMeasure(Mod op) => UnsupportedOperator(TypeName.Measure.ToString(), op);
     public (GSType, string?) OperableMeasure(Power op) => UnsupportedOperator(TypeName.Measure.ToString(), op);
     public abstract (GSType, string?) OperableMeasure(LessTh op);
+    public (GSType, string?) OperableMeasure(Indexer op) => UnsupportedOperator(TypeName.Measure.ToString(), op);
+
 
 
     #endregion
@@ -229,6 +249,7 @@ public abstract class GSType : IOperable<Add>,
     public (GSType, string?) OperableString(Mod op) => UnsupportedOperator(TypeName.String.ToString(), op);
     public (GSType, string?) OperableString(Power op) => UnsupportedOperator(TypeName.String.ToString(), op);
     public (GSType, string?) OperableString(LessTh op) => UnsupportedOperator(TypeName.String.ToString(), op);
+    public (GSType, string?) OperableString(Indexer op) => UnsupportedOperator(TypeName.String.ToString(), op);
 
     #endregion
 
@@ -241,6 +262,7 @@ public abstract class GSType : IOperable<Add>,
     public (GSType, string?) OperableSequence(SequenceType other, Mod op) => UnsupportedOperator(SEQUENCE, op);
     public (GSType, string?) OperableSequence(SequenceType other, Power op) => UnsupportedOperator(SEQUENCE, op);
     public (GSType, string?) OperableSequence(SequenceType other, LessTh op) => UnsupportedOperator(SEQUENCE, op);
+    public (GSType, string?) OperableSequence(SequenceType other, Indexer op) => UnsupportedOperator(SEQUENCE, op);
 
     #endregion
 
@@ -253,6 +275,7 @@ public abstract class GSType : IOperable<Add>,
     public abstract (GSType, string?) OperableUndefined(Mod op);
     public (GSType, string?) OperableUndefined(Power op) => this.SameTypeAs(TypeName.Scalar) ? (TypeName.Scalar, null) : UnsupportedOperator(TypeName.Scalar.ToString(), op);
     public abstract (GSType, string?) OperableUndefined(LessTh op);
+    public abstract (GSType, string?) OperableUndefined(Indexer op);
 
     #endregion
 
@@ -265,6 +288,7 @@ public abstract class GSType : IOperable<Add>,
     public (GSType, string?) OperableDrawable(Mod op) => UnsupportedOperator(DRAWABLE, op);
     public (GSType, string?) OperableDrawable(Power op) => UnsupportedOperator(DRAWABLE, op);
     public (GSType, string?) OperableDrawable(LessTh op) => UnsupportedOperator(DRAWABLE, op);
+    public (GSType, string?) OperableDrawable(Indexer op) => UnsupportedOperator(DRAWABLE, op);
 
     #endregion
 
@@ -277,6 +301,7 @@ public abstract class GSType : IOperable<Add>,
     public (GSType, string?) OperableFigure(Mod op) => UnsupportedOperator(DRAWABLE, op);
     public (GSType, string?) OperableFigure(Power op) => UnsupportedOperator(DRAWABLE, op);
     public (GSType, string?) OperableFigure(LessTh op) => UnsupportedOperator(DRAWABLE, op);
+    public (GSType, string?) OperableFigure(Indexer op) => UnsupportedOperator(DRAWABLE, op);
 
     #endregion
 

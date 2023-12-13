@@ -32,22 +32,8 @@ theme_override_font_sizes/font_size = 20
 text = "// try pressing draw!
 
 import \"stdlib/mediatrix.geo\";
-import \"stdlib/getLast.geo\";
+import \"stdlib/drawPoly.geo\";
 
-_drawPoly(poly) = let
-	a, b, r1 = poly;
-	draw segment(a, b);
-	in
-		if !r1 then 1 else let
-		_, r = poly;
-		_drawPoly(r);
-		in 1;
-
-drawPoly(poly) = let 
-	_drawPoly(poly);
-	a, _ = poly;
-	draw segment(a, getLast(poly));
-	in 1;
 
 normalize(p1) = let
 	m = measure(point(0, 0), p1);

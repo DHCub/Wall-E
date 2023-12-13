@@ -6,9 +6,9 @@ using GSharp.Types;
 
 public interface IOperable<OP> where OP: Operator
 {
-    public static (GSType retType, string? errorMessage) Operable<T>(IOperable<T> A, IOperable<T> B) where T:Operator
+    public static (GSType retType, string? errorMessage) Operable(IOperable<OP> A, IOperable<OP> B)
     {
-        T op = null;
+        OP op = null;
         if (B is SimpleType simpleType)
         {
             return simpleType.type switch{

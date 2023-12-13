@@ -13,4 +13,5 @@ public abstract class GeometricLocation : Figure
 
   public override GSObject OperateScalar(Scalar other, Mult op) => UnsupportedOperError(other, op);
   public override GSObject OperateScalar(Scalar other, Div op) => UnsupportedOperError(other, op);
+  public override GSObject OperateScalar(Scalar other, Indexer op) => UnsupportedOperError(other, op);
 }
