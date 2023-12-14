@@ -162,3 +162,7 @@ import “NombreDeFichero.geo”
 
 Este tipo de instrucción puede aparecer en cualquier lugar del programa, en caso de que hayan errores en dicha biblioteca, se notificará al usuario con un rastro de las importaciones para que pueda ver dónde fue. Si una biblioteca importada tiene definiciones repetidas, se produce un error de compilación. Si se importan dos veces un mismo fichero, este deberá ser incluido una única vez (la primera).
 
+### Adicionales
+
+Adicionalmente, en este proyecto podrá usar `while` y `for` para iterar. El operador `[]` para indexar secuencias o cadenas de caracteres. El operador `:=` para modificar valores
+de las variables, y los operadores `++`, `--`, `+=`, `-=` para operar y asignar más fácilmente.
