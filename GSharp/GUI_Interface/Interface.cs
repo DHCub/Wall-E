@@ -39,11 +39,25 @@ public class GUIInterface
     _ => throw new NotImplementedException("UNSUPPORTED COLOR IN GUI INTERFACE")
   };
 
+  public static double WindowStartX => Figure.WindowStartX;
+  public static double WindowStartY => Figure.WindowStartY;
+  public static double WindowEndY => Figure.WindowEndY;
+  public static double WindowEndX => Figure.WindowEndX;
+
   Action<Colors, Figure> drawFigure;
   Action<Colors, Figure, string> drawLabeledFigure;
   Action<string> standardOutputHandler;
   Action<string> errorHandler;
   Func<string, string> importHandler;
+
+  /// <summary>
+  /// Interface intended to allow the GSharp logic to communicate with the GUI, through the given parameter handlers
+  /// </summary>
+  /// <param name="standardOutputHandler"></param>
+  /// <param name="errorHandler"></param>
+  /// <param name="importHandler"></param>
+  /// <param name="drawFigure"></param>
+  /// <param name="drawLabeledFigure"></param>
 
   public GUIInterface(Action<string> standardOutputHandler, Action<string> errorHandler, Func<string, string> importHandler, Action<Colors, Figure> drawFigure, Action<Colors, Figure, string> drawLabeledFigure)
   {
@@ -54,31 +68,10 @@ public class GUIInterface
     this.importHandler = importHandler;
   }
 
-  // public void Interpret(string source)
-  // {
-  //   bool hadError = false;
-  //   void ScanErrorHandler(ScanError error)
-  //   {
-  //     errorHandler($"! SCAN ERROR : at {error.line}: " + error.Message);
-  //     hadError = true;
-  //   }
-  //   void ParseErrorHandler(ParseError error)
-  //   {
-  //     errorHandler(error.ToString());
-  //     hadError = true;
-  //   }
-  //   void runtimeErrorHandler(RuntimeError error)
-  //   {
-  //     errorHandler(error.ToString());
-  //     hadError = true;
-  //   }
-  //   List<Stmt> importHandler(string dir) => throw new NotImplementedException();
-
-  //   var interpreter = new Interpreter.Interpreter(runtimeErrorHandler, standardOutputHandler, importHandler, drawFigure, drawLabeledFigure);
-
-  //   interpreter.Eval(source, ScanErrorHandler, ParseErrorHandler, )
-
-  // }
+  public static void UpdateFigureGenerationWindow(double startX, double endX, double startY, double endY, double zoomFactor)
+  {
+    Figure.UpdateWindow(startX, endX, startY, endY, zoomFactor);
+  }
 
   public void Interpret(string source)
   {

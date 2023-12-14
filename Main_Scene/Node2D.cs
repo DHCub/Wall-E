@@ -1,6 +1,7 @@
 using Godot;
 
 using GSharp;
+using GSharp.GUIInterface;
 using GSharp.Objects.Figures;
 
 using System;
@@ -67,19 +68,19 @@ public partial class Node2D : Godot.Node2D
             double B = L.NormalVector.YCoord;
             double C = L.AlgebraicTrace;
 
-            double Window_X_Size = Figure.WindowEndX - Figure.WindowStartX;
-            double Window_Y_Size = Figure.WindowEndY - Figure.WindowStartY;
+            double Window_X_Size = GUIInterface.WindowEndX - GUIInterface.WindowStartX;
+            double Window_Y_Size = GUIInterface.WindowEndY - GUIInterface.WindowStartY;
 
             if (Functions.EqualApprox(Math.Abs(B), 0))
             {
                 if (P1_inf)
                 {
-                    y1 = Figure.WindowStartY - Window_Y_Size/2;
+                    y1 = GUIInterface.WindowStartY - Window_Y_Size/2;
                     x1 = -C/A - B/A*y1;
                 }
                 if (P2_inf)
                 {
-                    y2 = Figure.WindowEndY + Window_Y_Size/2;
+                    y2 = GUIInterface.WindowEndY + Window_Y_Size/2;
                     x2 = -C/A - B/A*y2;
                 }
             }
@@ -87,13 +88,13 @@ public partial class Node2D : Godot.Node2D
             {
                 if (P1_inf)
                 {
-                    x1 = Figure.WindowStartX - Window_X_Size/2;
+                    x1 = GUIInterface.WindowStartX - Window_X_Size/2;
                     if (!Functions.EqualApprox(B, 0)) y1 = -C/B - A/B*x1;
                 }
 
                 if (P2_inf)
                 {
-                    x2 = Figure.WindowEndX + Window_Y_Size/2;
+                    x2 = GUIInterface.WindowEndX + Window_Y_Size/2;
                     if (!Functions.EqualApprox(B, 0)) y2 = -C/B - A/B*x2;
                 }
             }
@@ -113,8 +114,8 @@ public partial class Node2D : Godot.Node2D
             var X = new Line(new(0, 0), new(1, 0));
             var Y = new Line(new(0, 0), new(0, 1));
 
-            draw_segment(X, new(0, 0), new(1, 0), Colors.Black, true, true);
-            draw_segment(Y, new(0, 0), new(0, 1), Colors.Black, true, true);
+            draw_segment(X, new(0, 0), new(1, 0), Godot.Colors.Black, true, true);
+            draw_segment(Y, new(0, 0), new(0, 1), Godot.Colors.Black, true, true);
         }
 
 
@@ -134,7 +135,7 @@ public partial class Node2D : Godot.Node2D
                     shapes[i] = (drawable, color, label, labelLoc);
                 }
                 DrawSetTransform(GetVect2(labelLoc), 0, new(1/axesVectorMultiplier, -1/axesVectorMultiplier));
-                DrawString(ThemeDB.FallbackFont, GetVect2(labelLoc), label, modulate: Colors.Black);
+                DrawString(ThemeDB.FallbackFont, GetVect2(labelLoc), label, modulate: Godot.Colors.Black);
                 DrawSetTransform(Vector2.Zero, 0, Vector2.One);
             }
 
