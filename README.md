@@ -164,5 +164,5 @@ Este tipo de instrucción puede aparecer en cualquier lugar del programa, en cas
 
 ### Adicionales
 
-Adicionalmente, en este proyecto podrá usar `while` y `for` para iterar. El operador `[]` para indexar secuencias o cadenas de caracteres. El operador `:=` para modificar valores
+Adicionalmente, en este proyecto podrá usar `while` y `for` para iterar. El operador `[]` para indexar secuencias, cadenas de caracteres, o acceder a la coordenada x (`[0]`) o y (`[1]`) de un punto. El operador `:=` para modificar valores
 de las variables, y los operadores `++`, `--`, `+=`, `-=` para operar y asignar más fácilmente.
