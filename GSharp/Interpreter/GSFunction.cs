@@ -44,9 +44,9 @@ internal class GSFunction : GSObject, ICallable, IFunction
     }
     catch (Exceptions.Return returnValue)
     {
-      if (declaration.ReturnTypeName is not null && returnValue.Value.SameTypeAs(declaration.ReturnTypeName))
+      if (declaration.ReturnTypeName is not null && !returnValue.Value.SameTypeAs(declaration.ReturnTypeName))
       {
-        throw new RuntimeError(declaration.Token, $"Function returns `{declaration.ReturnTypeName}`, `{returnValue.Value}` passed instead", importStack);
+        throw new RuntimeError(declaration.Token, $"Function returns `{declaration.ReturnTypeName}`, `{returnValue.Value.GetTypeName()}` passed instead", importStack);
       }
 
       return returnValue.Value;
