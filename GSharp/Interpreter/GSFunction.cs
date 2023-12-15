@@ -31,7 +31,7 @@ internal class GSFunction : GSObject, ICallable, IFunction
     {
       if (declaration.Parameters[i].typeName is not null && !arguments[i].SameTypeAs(declaration.Parameters[i].typeName))
       {
-        throw new RuntimeError(declaration.Token, $"Function takes `{declaration.Parameters[i].typeName}` as its #{i + 1} parameter, `{arguments[i].GetType()}` passed instead", importStack);
+        throw new RuntimeError(declaration.Token, $"Function takes `{declaration.Parameters[i].typeName}` as its #{i + 1} parameter, `{arguments[i].GetTypeName()}` passed instead", importStack);
       }
 
       environment.Define(declaration.Parameters[i].Name, arguments[i]);
